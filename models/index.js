@@ -6,9 +6,8 @@ const Sequelize = require('sequelize');
 const process = require('process');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
+const config = require(__dirname + '/../src/database/config.js')[env];
 const db = {};
-const entitiesDir = '../src/user/entities/user.entity.ts';
 
 let sequelize;
 if (config.use_env_variable) {
@@ -18,7 +17,7 @@ if (config.use_env_variable) {
 }
 
 fs
-  .readdirSync(entitiesDir)
+  .readdirSync(__dirname)
   .filter(file => {
     return (
       file.indexOf('.') !== 0 &&
@@ -28,15 +27,11 @@ fs
     );
   })
   .forEach(file => {
-    console.log('now is ', file);
     const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
     db[model.name] = model;
   });
 
-// Let me manually add the entities now
-
 Object.keys(db).forEach(modelName => {
-  console.log('model is ', modelName);
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
