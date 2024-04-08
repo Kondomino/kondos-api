@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { User } from './user/entities/user.entity';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { KondoModule } from './kondo/kondo.module';
+import { Kondo } from './kondo/entities/kondo.entity';
 
 @Module({
   imports: [UserModule, DatabaseModule, ConfigModule.forRoot({ isGlobal: true }),
@@ -17,7 +18,7 @@ import { KondoModule } from './kondo/kondo.module';
       username: 'postgres',
       password: 'cracker0',
       database: 'postgres',
-      models: [User],
+      models: [User, Kondo],
       autoLoadModels: true,
     }),
     KondoModule,
