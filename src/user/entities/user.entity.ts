@@ -16,15 +16,15 @@ export class User extends Model<User> {
     email: string;
 
     @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
-    password: string;
-
-    @Column({
         type: DataType.ENUM,
         values: ['male', 'female'],
-        allowNull: false,
+        allowNull: true,
     })
     gender: string;
+
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: true,
+    })
+    age: string;
 }
