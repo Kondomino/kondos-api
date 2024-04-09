@@ -14,7 +14,7 @@ export class KondoController {
 
   @Get()
   findAll() {
-    return this.kondoService.findAll();
+    return this.kondoService.findActives();
   }
 
   @Get(':id')
@@ -29,6 +29,6 @@ export class KondoController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.kondoService.remove(+id);
+    return this.kondoService.deactivateKondo(+id);
   }
 }
