@@ -1,26 +1,47 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { KONDO_REPOSITORY } from 'src/core/constants';
+import { Kondo } from './entities/Kondo.entity';
+import { UpdateKondoDto } from './dto/update-Kondo.dto';
 import { CreateKondoDto } from './dto/create-kondo.dto';
-import { UpdateKondoDto } from './dto/update-kondo.dto';
 
 @Injectable()
 export class KondoService {
-  create(createKondoDto: CreateKondoDto) {
-    return 'This action adds a new kondo';
-  }
 
-  findAll() {
-    return `This action returns all kondo`;
-  }
+    constructor(@Inject(KONDO_REPOSITORY) private readonly KondoRepository: typeof Kondo) { }
 
-  findOne(id: number) {
-    return `This action returns a #${id} kondo`;
-  }
+    async create(Kondo: CreateKondoDto): Promise<Kondo> {
+        return await this.KondoRepository.create<Kondo>(Kondo);
+    }
 
-  update(id: number, updateKondoDto: UpdateKondoDto) {
-    return `This action updates a #${id} kondo`;
-  }
+    async findOneByEmail(email: string): Promise<Kondo> {
+        return await this.KondoRepository.findOne<Kondo>({ where: { email } });
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} kondo`;
-  }
+    async findOne(id: number): Promise<Kondo> {
+        return await this.KondoRepository.findOne<Kondo>({ where: { id } });
+    }
+    async findActives(): Promise<Kondo[]> {
+        return await this.KondoRepository.findAll<Kondo>({ where: { active: true }});
+    }
+    async findAll(): Promise<Kondo[]> {
+        return await this.KondoRepository.findAll<Kondo>({});
+    }
+
+    async update(id: number, Kondo: UpdateKondoDto): Promise<Kondo> {
+        const KondoFound = await this.findOne(id);
+
+        if (!KondoFound)
+            throw new NotFoundException();
+
+        return await KondoFound.update({ ...Kondo });
+    }
+
+    async deactivateKondo(id: number): Promise<Kondo> {
+        const KondoFound = await this.findOne(id);
+
+        if (!KondoFound)
+            throw new NotFoundException();
+
+        return await KondoFound.update({ active: false});
+    }
 }

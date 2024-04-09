@@ -15,7 +15,7 @@ export class UserController {
 
   @Get()
   findAll() {
-    return this.userService.findAll();
+    return this.userService.findActives();
   }
 
   @Get(':id')

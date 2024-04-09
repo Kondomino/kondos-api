@@ -20,6 +20,9 @@ export class UserService {
     async findOne(id: number): Promise<User> {
         return await this.userRepository.findOne<User>({ where: { id } });
     }
+    async findActives(): Promise<User[]> {
+        return await this.userRepository.findAll<User>({ where: { active: true }});
+    }
     async findAll(): Promise<User[]> {
         return await this.userRepository.findAll<User>({});
     }
@@ -30,8 +33,6 @@ export class UserService {
         if (!userFound)
             throw new NotFoundException();
         
-        //const [numberOfAffectedRows, [updatedUser]] = await this.userRepository.update({ ...user }, { where: { id }, returning: true });
-
         return await userFound.update({ ...user });
     }
 

@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { DatabaseModule } from './core/database/database.module';
 import { ConfigModule } from '@nestjs/config';
@@ -10,7 +8,7 @@ import { KondoModule } from './kondo/kondo.module';
 import { Kondo } from './kondo/entities/kondo.entity';
 
 @Module({
-  imports: [UserModule, DatabaseModule, ConfigModule.forRoot({ isGlobal: true }),
+  imports: [UserModule, KondoModule, DatabaseModule, ConfigModule.forRoot({ isGlobal: true }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: 'localhost',
@@ -21,9 +19,8 @@ import { Kondo } from './kondo/entities/kondo.entity';
       models: [User, Kondo],
       autoLoadModels: true,
     }),
-    KondoModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
