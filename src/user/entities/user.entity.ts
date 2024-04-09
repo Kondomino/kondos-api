@@ -26,5 +26,10 @@ export class User extends Model<User> {
         type: DataType.INTEGER,
         allowNull: true,
     })
-    age: string;
+    age: number;
+
+    @Column({
+        defaultValue: true
+    })
+    active: boolean;
 }
