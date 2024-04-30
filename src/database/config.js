@@ -5,6 +5,6 @@ module.exports = {
      port: 5432,
      username: 'postgres',
      password: 'cracker0',
-     database: 'postgres',
+     database: 'kondos-dev',
   }
 }
