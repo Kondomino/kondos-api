@@ -5,7 +5,6 @@ import { IDataServices } from './idata.services';
 import { PostgresGenericRepository } from '../repositories/pg.generic.repository';
 import { InjectModel } from '@nestjs/sequelize';
 import { Model } from 'sequelize-typescript';
-import { KONDO_REPOSITORY, USER_REPOSITORY } from 'src/core/constants';
 
 @Injectable()
 export class PostgresDataServices
@@ -15,12 +14,14 @@ export class PostgresDataServices
   kondos: PostgresGenericRepository<Kondo>;
 
   constructor(
-    @Inject(USER_REPOSITORY) private readonly userRepository: Model<User>,
-    @Inject(KONDO_REPOSITORY) private readonly kondoRepository: Model<Kondo>
+    @Inject(`User`)
+    private UserRepository: Model<User>,
+    @Inject('Kondo')
+    private KondoRepository: Model<Kondo>,
   ) {}
 
   onApplicationBootstrap() {
-    this.users = new PostgresGenericRepository<User>(this.userRepository);
-    this.kondos = new PostgresGenericRepository<Kondo>(this.kondoRepository);
+    this.users = new PostgresGenericRepository<User>(this.UserRepository);
+    this.kondos = new PostgresGenericRepository<Kondo>(this.KondoRepository);
   }
 }

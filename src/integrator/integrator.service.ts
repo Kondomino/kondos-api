@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { KONDO_REPOSITORY } from 'src/core/constants';
+import { IDataServices } from 'src/database/pg.dataservice/idata.services';
 import { Kondo } from 'src/kondo/entities/Kondo.entity';
 import { SlugifyService } from 'src/utils/slugify/slugify.service';
 const { boolean_columns } = require("./types/boolean_columns");
@@ -16,13 +17,15 @@ export class IntegratorService {
 
   constructor(
     private slugifyService: SlugifyService,
-    @Inject(KONDO_REPOSITORY) private readonly KondoRepository: typeof Kondo
+    //@Inject(KONDO_REPOSITORY) private readonly KondoRepository: typeof Kondo
+    private dataServices: IDataServices,
   ) {}
 
   run() {
 
-    const condos = this.KondoRepository.findAll();
-    return condos;
+    const ae = this.dataServices.kondos.findAll();
+    //const condos = this.KondoRepository.findAll();
+    return ae;
 
     const options = {
       'file': './files/kondos.xlsx',
@@ -176,7 +179,8 @@ export class IntegratorService {
         //
         if (slug !== '') {
   
-          let condo = this.KondoRepository.findOne<Kondo>({ where: { slug } });
+          //let condo = this.KondoRepository.findOne<Kondo>({ where: { slug } });
+          let condo = 'ae';
           console.log('condo fetched is ', condo);
           //let condo = 1;
   
