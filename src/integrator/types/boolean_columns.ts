@@ -1,0 +1,21 @@
+module.exports.boolean_columns = [
+    'lots_available',
+    'finance',
+    'finance_fees',
+    'infra_lobby_24h',
+    'infra_security_team',
+    'infra_wall', 
+    'infra_sports_court',
+    'infra_barbecue_zone',
+    'infra_pool', 
+    'infra_living_space', 
+    'infra_lagoon', 
+    'infra_eletricity',
+    'infra_water',
+    'infra_sidewalks',
+    'infra_internet',
+    'infra_generates_power',
+    'infra_grass_area',
+    'infra_nature_trail',
+    'immediate_delivery'
+    ];
