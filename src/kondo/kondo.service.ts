@@ -1,13 +1,13 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { KONDO_REPOSITORY } from 'src/core/constants';
 import { Kondo } from './entities/Kondo.entity';
 import { UpdateKondoDto } from './dto/update-Kondo.dto';
 import { CreateKondoDto } from './dto/create-kondo.dto';
+import { KONDO_REPOSITORY_PROVIDER } from 'src/core/constants';
 
 @Injectable()
 export class KondoService {
 
-    constructor(@Inject(KONDO_REPOSITORY) private readonly KondoRepository: typeof Kondo) { }
+    constructor(@Inject(KONDO_REPOSITORY_PROVIDER) private readonly KondoRepository: typeof Kondo) { }
 
     async create(Kondo: CreateKondoDto): Promise<Kondo> {
         return await this.KondoRepository.create<Kondo>(Kondo);

@@ -144,6 +144,16 @@ export class Kondo extends Model<Kondo> {
     @Column({
         allowNull: true,
     })
+    infra_pet_area: boolean; // Espaço Pet
+    
+    @Column({
+        allowNull: true,
+    })
+    infra_kids_area: boolean; // Espaço Kids
+
+    @Column({
+        allowNull: true,
+    })
     infra_lagoon: boolean; // Lagoa
 
     @Column({
@@ -176,6 +186,16 @@ export class Kondo extends Model<Kondo> {
     })
     infra_grass_area: boolean; // Area gramada
         
+    @Column({
+        allowNull: true,
+    })
+    infra_woods: boolean; // Bosque
+
+    @Column({
+        allowNull: true,
+    })
+    infra_vegetable_garden: boolean; // Horta
+
     @Column({
         allowNull: true,
     })
