@@ -2,97 +2,100 @@ import { IsBoolean, IsEmail, IsOptional, IsString } from "class-validator";
 
 export class CreateKondoDto {
     @IsString()
-    readonly name: string;
+    name: string;
+
+    @IsString()
+    slug: string;
 
     @IsEmail()
     @IsOptional()
-    readonly email: string;
+    email: string;
 
     @IsBoolean()
     @IsOptional() // Defaults to true
-    readonly active: boolean;
+    active: boolean;
     
     @IsString()
     @IsOptional()
-    readonly type: string;
+    type: string;
     
     @IsString()
     @IsOptional()
-    readonly lot_min_price: string;
+    lot_min_price: string;
     
     @IsString()
     @IsOptional()
-    readonly lot_avg_price: string;
+    lot_avg_price: string;
     
     @IsString()
     @IsOptional()
-    readonly cep: string;
+    cep: string;
     
     @IsString()
     @IsOptional()
-    readonly address: string;
+    address: string;
     
     @IsString()
     @IsOptional()
-    readonly neighborhood: string;
+    neighborhood: string;
     
     @IsString()
     @IsOptional()
-    readonly city: string;
+    city: string;
     
     @IsString()
     @IsOptional()
-    readonly state: string;
+    state: string;
     
     @IsBoolean()
     @IsOptional()
-    readonly infra_lobby_24h: boolean;
+    infra_lobby_24h: boolean;
 
     @IsBoolean()
     @IsOptional()
-    readonly infra_sports_court: boolean;
+    infra_sports_court: boolean;
 
     @IsBoolean()
     @IsOptional()
-    readonly infra_barbecue_zone: boolean;
+    infra_barbecue_zone: boolean;
 
     @IsBoolean()
     @IsOptional()
-    readonly infra_pool: boolean;
+    infra_pool: boolean;
 
     @IsBoolean()
     @IsOptional()
-    readonly infra_living_space: boolean;
+    infra_living_space: boolean;
 
     @IsBoolean()
     @IsOptional()
-    readonly infra_lagoon: boolean;
+    infra_lagoon: boolean;
 
     @IsBoolean()
     @IsOptional()
-    readonly infra_eletricity: boolean;
+    infra_eletricity: boolean;
 
     @IsBoolean()
     @IsOptional()
-    readonly infra_water: boolean;
+    infra_water: boolean;
 
     @IsBoolean()
     @IsOptional()
-    readonly infra_sidewalks: boolean;
+    infra_sidewalks: boolean;
 
     @IsBoolean()
     @IsOptional()
-    readonly infra_broadband: boolean;
+    infra_broadband: boolean;
 
     @IsBoolean()
     @IsOptional()
-    readonly imediate_delivery: boolean;
+    imediate_delivery: boolean;
 
     @IsString()
     @IsOptional()
-    readonly url: string;
+    url: string;
 
     @IsString()
     @IsOptional()
-    readonly phone: string;
+    phone: string;
 }

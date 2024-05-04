@@ -8,6 +8,7 @@ import { KondoModule } from './kondo/kondo.module';
 import { Kondo } from './kondo/entities/kondo.entity';
 import { AppController } from './app.controller';
 import { IntegratorModule } from './integrator/integrator.module';
+import { kondoProviders } from './kondo/repository/kondo.provider';
 
 @Module({
   imports: [DatabaseModule, ConfigModule.forRoot({ isGlobal: true }),
@@ -23,9 +24,10 @@ import { IntegratorModule } from './integrator/integrator.module';
     }),
     UserModule, 
     KondoModule,
-    IntegratorModule
+    IntegratorModule,
+    SequelizeModule.forFeature([Kondo])
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [...kondoProviders],
 })
 export class AppModule {}

@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { KONDO_REPOSITORY } from 'src/core/constants';
-import { IDataServices } from 'src/database/pg.dataservice/idata.services';
+import { CreateKondoDto } from 'src/kondo/dto/create-kondo.dto';
+import { UpdateKondoDto } from 'src/kondo/dto/update-Kondo.dto';
 import { Kondo } from 'src/kondo/entities/Kondo.entity';
+import { KondoRepository } from 'src/kondo/repository/kondo.repository';
 import { SlugifyService } from 'src/utils/slugify/slugify.service';
 const { boolean_columns } = require("./types/boolean_columns");
 import { readFile, utils } from 'xlsx';
@@ -17,15 +18,10 @@ export class IntegratorService {
 
   constructor(
     private slugifyService: SlugifyService,
-    //@Inject(KONDO_REPOSITORY) private readonly KondoRepository: typeof Kondo
-    private dataServices: IDataServices,
+    private readonly KondoRepository: KondoRepository
   ) {}
 
-  run() {
-
-    const ae = this.dataServices.kondos.findAll();
-    //const condos = this.KondoRepository.findAll();
-    return ae;
+  async run() {
 
     const options = {
       'file': './files/kondos.xlsx',
@@ -37,19 +33,20 @@ export class IntegratorService {
 
   async runIntegrator(options) {
 
-    // let's first read the excel file
-    const { sheets, rows, workbook } = await this.readExcel(options.filepath);
+    try {
+      // let's first read the excel file
+      const { sheets, rows, workbook } = await this.readExcel(options.filepath);
 
-    // let's normalize the data
-    this.prepareData(sheets,rows,workbook);
+      // let's normalize the data
+      this.prepareData(sheets,rows,workbook);
 
+      this.showLogs();
 
-    // let's check if the item exists
-    console.log('------ LOGS -----');
-    console.log('updated', this.updated);
-    console.log('created',this.created);
-
-    return 'successfull'
+      return 'successfull'
+    }
+    catch (error) {
+      throw error;
+    }
   }
 
   async readExcel(filePath) {
@@ -144,10 +141,12 @@ export class IntegratorService {
   
       var slug = '';
       var rowForUpdate = '';
-  
+      
       //    const client = await pool.connect();
       const values = records.map(async (rows, rowIndex) => {
   
+        var condoDTO = new CreateKondoDto();
+
         // Now each row here is a Condo
         const sanitizedRecord = rows.map((col, colIndex) => {
   
@@ -162,39 +161,37 @@ export class IntegratorService {
           else if (this.dataTypes[colIndex] == "boolean") {
             col = col == "1"? "1":"0";
           }
-  
           // Check if cell value is empty and assign a default value
-          if (col === "") {
-            col = "''";
-          } else {
-            col = `'${col}'`;
+          else if (this.dataTypes[colIndex] == "text") {
+            
+            // Any treatment for strings?
           }
   
           // preparing cols and values for an update
           rowForUpdate += `${columnsNames[colIndex]} = ${col},`;
+          condoDTO[columnsNames[colIndex]] = col;
+
+          return col;
         });
   
         const rowString = sanitizedRecord.join(", ");
   
-        //
+        // Got a slug?
         if (slug !== '') {
+        
+          const condo = await this.KondoRepository.findOrCreate({
+            where: { slug: condoDTO.slug },
+            defaults: condoDTO
+          });
   
-          //let condo = this.KondoRepository.findOne<Kondo>({ where: { slug } });
-          let condo = 'ae';
-          console.log('condo fetched is ', condo);
-          //let condo = 1;
-  
-          console.log('condo fetched is ', condo);
-          if (condo) {
-            // remove the last comma
-            rowForUpdate = rowForUpdate.slice(0, -1);
+          // Condo was created?
+          if (!condo[1]) {
             // UPDATE
-            //updateCondo(slug, rowForUpdate);
+            this.KondoRepository.update(condoDTO, {slug: condoDTO.slug})
             this.updated++;
           }
           else {
             // CREATE
-            //createCondo(sanitizedRecord, tableCols);
             this.created++;
           }
   
@@ -213,5 +210,13 @@ export class IntegratorService {
     } finally {
       //pool.release();
     }
+  }
+
+  showLogs() {
+
+    // let's check if the item exists
+    console.log('------ LOGS -----');
+    console.log('updated', this.updated);
+    console.log('created',this.created);
   }
 }

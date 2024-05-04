@@ -9,6 +9,8 @@ module.exports.boolean_columns = [
     'infra_barbecue_zone',
     'infra_pool', 
     'infra_living_space', 
+    'infra_pet_area',
+    'infra_kids_area',
     'infra_lagoon', 
     'infra_eletricity',
     'infra_water',
@@ -16,6 +18,8 @@ module.exports.boolean_columns = [
     'infra_internet',
     'infra_generates_power',
     'infra_grass_area',
+    'infra_woods',
+    'infra_vegetable_garden',
     'infra_nature_trail',
     'immediate_delivery'
     ];
