@@ -3,8 +3,9 @@ import { Kondo } from "../entities/Kondo.entity";
 import { KONDO_REPOSITORY_PROVIDER } from "src/core/constants";
 import { CreateKondoDto } from "../dto/create-kondo.dto";
 import { UpdateKondoDto } from "../dto/update-Kondo.dto";
+import { findOrCreateType } from "../types/findorcreate.type";
 
-type findOrCreateType = [Kondo | null, Boolean];
+
 
 @Injectable()
 export class KondoRepository {
