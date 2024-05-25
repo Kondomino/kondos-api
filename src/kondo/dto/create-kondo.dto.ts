@@ -5,6 +5,7 @@ export class CreateKondoDto {
     name: string;
 
     @IsString()
+    @IsOptional()
     slug: string;
 
     @IsEmail()

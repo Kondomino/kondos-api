@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { KondoService } from './kondo.service';
 import { CreateKondoDto } from './dto/create-kondo.dto';
 import { UpdateKondoDto } from './dto/update-kondo.dto';
+import { SearchKondoDto } from './dto/search-kondo.dto';
 
 @Controller('kondo')
 export class KondoController {
@@ -20,6 +21,12 @@ export class KondoController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.kondoService.findOne(+id);
+  }
+
+  @Post('/findBy')
+  findBy(@Body() searchKondoDto: SearchKondoDto) {
+    console.log('findBy');
+    return this.kondoService.findBy(searchKondoDto);
   }
 
   @Patch(':id')
