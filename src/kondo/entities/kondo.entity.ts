@@ -15,6 +15,13 @@ const KondoTypes = Object.freeze({
 module.exports.KondoTypes = KondoTypes;
 @Table
 export class Kondo extends Model<Kondo> {
+    constructor(partial?: Partial<Kondo>) {
+        super();
+        
+        if (partial)
+            Object.assign(this, partial);
+      }
+      
     @Column({
         type: DataType.STRING,
         allowNull: false,
@@ -115,6 +122,7 @@ export class Kondo extends Model<Kondo> {
     @Column({
         allowNull: true,
     })
+    @Expose()
     entry_value_percentage: string; // Valor inicial de entrada minimo?
     
     @Column({

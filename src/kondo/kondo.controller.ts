@@ -6,7 +6,6 @@ import { SearchKondoDto } from './dto/search-kondo.dto';
 
 @Controller('kondo')
 @UseInterceptors(ClassSerializerInterceptor)
-@TransformTo
 export class KondoController {
   constructor(private readonly kondoService: KondoService) {}
 
@@ -16,7 +15,7 @@ export class KondoController {
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.kondoService.findActives();
   }
 
