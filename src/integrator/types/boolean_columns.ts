@@ -1,4 +1,4 @@
-module.exports.boolean_columns = [
+export const boolean_columns = [
     'lots_available',
     'finance',
     'finance_fees',

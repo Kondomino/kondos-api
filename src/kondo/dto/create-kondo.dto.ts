@@ -34,7 +34,7 @@ export class CreateKondoDto {
     
     @IsString()
     @IsOptional()
-    address: string;
+    address_street_and_number: string;
     
     @IsString()
     @IsOptional()

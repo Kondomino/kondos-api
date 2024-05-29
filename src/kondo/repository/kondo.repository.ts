@@ -33,7 +33,7 @@ export class KondoRepository {
      *      If nothing is found, will create.
      * @returns 
      */
-    async findOrCreate(findOrCreate: { where: { id?: Number, slug?: string }, defaults: CreateKondoDto}): Promise<findOrCreateType> {
+    async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: CreateKondoDto}): Promise<findOrCreateType> {
         return await this.KondoRepositoryProvider.findOrCreate<Kondo>(findOrCreate);    
     }
 
@@ -48,11 +48,11 @@ export class KondoRepository {
                     },
      * @returns 
      */
-    async update(updateKondoDto: UpdateKondoDto, where): Promise<{}> {
+    async update(updateKondoDto: UpdateKondoDto, where): Promise<object> {
         return await this.KondoRepositoryProvider.update<Kondo>(updateKondoDto, { where });
     }
 
-    async destroy(): Promise<Number> {
+    async destroy(): Promise<number> {
         return await this.KondoRepositoryProvider.destroy<Kondo>();
     }
 

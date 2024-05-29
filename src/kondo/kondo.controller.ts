@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common';
 import { KondoService } from './kondo.service';
 import { CreateKondoDto } from './dto/create-kondo.dto';
 import { UpdateKondoDto } from './dto/update-kondo.dto';
 import { SearchKondoDto } from './dto/search-kondo.dto';
 
 @Controller('kondo')
+@UseInterceptors(ClassSerializerInterceptor)
+@TransformTo
 export class KondoController {
   constructor(private readonly kondoService: KondoService) {}
 

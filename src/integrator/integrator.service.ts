@@ -1,18 +1,16 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateKondoDto } from 'src/kondo/dto/create-kondo.dto';
-import { UpdateKondoDto } from 'src/kondo/dto/update-Kondo.dto';
-import { Kondo } from 'src/kondo/entities/Kondo.entity';
 import { KondoRepository } from 'src/kondo/repository/kondo.repository';
 import { SlugifyService } from 'src/utils/slugify/slugify.service';
-const { boolean_columns } = require("./types/boolean_columns");
 import { readFile, utils } from 'xlsx';
+import { boolean_columns } from './types/boolean_columns';
 
 //encode_cell
 //sheet_to_json
 
 @Injectable()
 export class IntegratorService {
-  dataTypes: any[] = [];
+  dataTypes: unknown[] = [];
   updated = 0;
   created = 0;
 
@@ -33,20 +31,15 @@ export class IntegratorService {
 
   async runIntegrator(options) {
 
-    try {
-      // let's first read the excel file
-      const { sheets, rows, workbook } = await this.readExcel(options.filepath);
+    // let's first read the excel file
+    const { sheets, rows, workbook } = await this.readExcel(options.filepath);
 
-      // let's normalize the data
-      this.prepareData(sheets,rows,workbook);
+    // let's normalize the data
+    this.prepareData(sheets,rows,workbook);
 
-      this.showLogs();
+    this.showLogs();
 
-      return 'successfull'
-    }
-    catch (error) {
-      throw error;
-    }
+    return 'successfull'
   }
 
   async readExcel(filePath) {
@@ -54,7 +47,7 @@ export class IntegratorService {
     const workbook = readFile(filePath);
     const sheets = workbook.SheetNames;
   
-    let rows = [];
+    const rows = [];
   
     // Retrieving column names form 
     for (const sheet of sheets) {
@@ -63,7 +56,7 @@ export class IntegratorService {
         const worksheet = workbook.Sheets[sheet];
         const range = utils.decode_range(worksheet['!ref']);
   
-        let columns = []; //Emptying list for new sheet
+        const columns = []; //Emptying list for new sheet
         
         
         for (let c = range.s.c; c <= range.e.c; c++) {
@@ -101,9 +94,11 @@ export class IntegratorService {
         const tableName = sheets[i];
         
         // Iterating columns
+        /*
         const tableCols = rows[i].map((columnName, index) => {
           return `${columnName}`
         }).join(", ");
+        */
   
         const columnsNames = rows[i];
   
@@ -115,7 +110,7 @@ export class IntegratorService {
           blankrows: false,
           defval: ''
          };
-        var tableData = utils.sheet_to_json(worksheet, options);
+        const tableData = utils.sheet_to_json(worksheet, options);
   
         tableData.shift();
   
@@ -139,13 +134,13 @@ export class IntegratorService {
 
     try {
   
-      var slug = '';
-      var rowForUpdate = '';
+      let slug = '';
+      //let rowForUpdate = '';
       
       //    const client = await pool.connect();
-      const values = records.map(async (rows, rowIndex) => {
+      records.map(async (rows) => {
   
-        var condoDTO = new CreateKondoDto();
+        const condoDTO = new CreateKondoDto();
 
         // Now each row here is a Condo
         const sanitizedRecord = rows.map((col, colIndex) => {
@@ -168,7 +163,7 @@ export class IntegratorService {
           }
   
           // preparing cols and values for an update
-          rowForUpdate += `${columnsNames[colIndex]} = ${col},`;
+          //rowForUpdate += `${columnsNames[colIndex]} = ${col},`;
           condoDTO[columnsNames[colIndex]] = col;
 
           return col;
@@ -196,7 +191,7 @@ export class IntegratorService {
           }
   
           slug = '';
-          rowForUpdate = '';
+          //rowForUpdate = '';
         }
   
         return `(${rowString})`;
