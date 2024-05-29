@@ -4,7 +4,7 @@ import { USER_REPOSITORY_PROVIDER } from "src/core/constants";
 import { CreateUserDto } from "../dto/create-User.dto";
 import { UpdateUserDto } from "../dto/update-User.dto";
 
-type findOrCreateType = [User | null, Boolean];
+type findOrCreateType = [User | null, boolean];
 
 @Injectable()
 export class UserRepository {
@@ -32,7 +32,7 @@ export class UserRepository {
      *      If nothing is found, will create.
      * @returns 
      */
-    async findOrCreate(findOrCreate: { where: { id?: Number, slug?: string }, defaults: CreateUserDto}): Promise<findOrCreateType> {
+    async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: CreateUserDto}): Promise<findOrCreateType> {
         return await this.UserRepositoryProvider.findOrCreate<User>(findOrCreate);    
     }
 
@@ -47,11 +47,11 @@ export class UserRepository {
                     },
      * @returns 
      */
-    async update(updateUserDto: UpdateUserDto, where): Promise<{}> {
+    async update(updateUserDto: UpdateUserDto, where): Promise<object> {
         return await this.UserRepositoryProvider.update<User>(updateUserDto, { where });
     }
 
-    async destroy(): Promise<Number> {
+    async destroy(): Promise<number> {
         return await this.UserRepositoryProvider.destroy<User>();
     }
 

@@ -1,5 +1,7 @@
-import { DataTypes } from 'sequelize';
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { KondoDetailsType } from './kondo.details.abstract.entity';
+import { KondoAddressType } from './kondo.address.abstract.entity';
+import { Expose } from 'class-transformer';
 
 const KondoTypes = Object.freeze({
     Bairro: 'bairro',
@@ -40,6 +42,41 @@ export class Kondo extends Model<Kondo> {
     })
     description: string;
 
+
+    /**
+     * KONDO ADDRESS
+     */
+    @Column({
+        allowNull: true
+    })
+    minutes_from_bh: string;
+
+    @Column({
+        allowNull: true,
+    })
+    cep: string;
+
+    @Column({
+        allowNull: true,
+    })
+    address_street_and_numbers: string;
+
+    @Column({
+        allowNull: true,
+    })
+    neighborhood: string; // Bairro
+
+    @Column({
+        allowNull: true,
+    })
+    city: string;
+    /**
+     * END OF KONDO ADDRESS
+     */
+
+    /**
+     * KONDO DETAILS
+     */
     @Column({
         allowNull: true,
     })
@@ -60,26 +97,6 @@ export class Kondo extends Model<Kondo> {
     })
     lots_min_size: string;
 
-    @Column({
-        allowNull: true,
-    })
-    cep: string;
-
-    @Column({
-        allowNull: true,
-    })
-    address: string;
-
-    @Column({
-        allowNull: true,
-    })
-    neighborhood: string; // Bairro
-
-    @Column({
-        allowNull: true,
-    })
-    city: string;
-    
     @Column({
         defaultValue: false
     })
@@ -205,6 +222,9 @@ export class Kondo extends Model<Kondo> {
         allowNull: true,
     })
     immediate_delivery: boolean; // Entrega imediata do lote
+    /**
+     * END OF KONDO DETAILS
+     */
 
     @Column({
         allowNull: true,
@@ -237,4 +257,58 @@ export class Kondo extends Model<Kondo> {
         allowNull: true,
     })
     updatedAt: Date;
+
+    @Expose()
+    get details(): KondoDetailsType {
+        return this.getDetails();
+    }
+
+    @Expose()
+    get address(): KondoAddressType {
+        return this.getAddress();
+    }
+
+    getDetails(): KondoDetailsType {
+        return {
+            lot_avg_price: this.lot_avg_price,
+            condo_rent: this.condo_rent,
+            lots_available: this.lots_available,
+            lots_min_size: this.lots_min_size,
+            finance: this.finance,
+            finance_tranches: this.finance_tranches,
+            finance_fees: this.finance_fees,
+            entry_value_percentage: this.entry_value_percentage,
+            infra_description: this.infra_description,
+            infra_lobby_24h: this.infra_lobby_24h,
+            infra_security_team: this.infra_security_team,
+            infra_wall: this.infra_wall,
+            infra_sports_court: this.infra_sports_court,
+            infra_barbecue_zone: this.infra_barbecue_zone,
+            infra_pool: this.infra_pool,
+            infra_living_space: this.infra_living_space,
+            infra_pet_area: this.infra_pet_area,
+            infra_kids_area: this.infra_kids_area,
+            infra_lagoon: this.infra_lagoon,
+            infra_eletricity: this.infra_eletricity,
+            infra_water: this.infra_water,
+            infra_sidewalks: this.infra_sidewalks,
+            infra_internet: this.infra_internet,
+            infra_generates_power: this.infra_generates_power,
+            infra_grass_area: this.infra_grass_area,
+            infra_woods: this.infra_woods,
+            infra_vegetable_garden: this.infra_vegetable_garden,
+            infra_nature_trail: this.infra_nature_trail,
+            immediate_delivery: this.immediate_delivery
+        }
+    }
+
+    getAddress(): KondoAddressType {
+        return {
+            minutes_from_bh: this.minutes_from_bh,
+            cep: this.cep,
+            address_street_and_numbers: this.address_street_and_numbers,
+            neighborhood: this.neighborhood,
+            city: this.city,
+        }
+    }
 }
