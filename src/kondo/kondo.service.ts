@@ -6,7 +6,6 @@ import { KONDO_REPOSITORY_PROVIDER } from 'src/core/constants';
 import { SlugifyService } from 'src/utils/slugify/slugify.service';
 import { findOrCreateType } from './types/findorcreate.type';
 import { SearchKondoDto } from './dto/search-kondo.dto';
-import { classToPlain } from 'class-transformer';
 
 @Injectable()
 export class KondoService {
