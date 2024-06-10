@@ -6,7 +6,6 @@ import { KONDO_REPOSITORY_PROVIDER } from 'src/core/constants';
 import { SlugifyService } from 'src/utils/slugify/slugify.service';
 import { findOrCreateType } from './types/findorcreate.type';
 import { SearchKondoDto } from './dto/search-kondo.dto';
-import { classToPlain } from 'class-transformer';
 
 @Injectable()
 export class KondoService {
@@ -47,11 +46,13 @@ export class KondoService {
         else if (email)
             return this.findOneByEmail(email);
     }
-    async findActives(): Promise<Kondo[]> {
-        return await this.KondoRepository.findAll<Kondo>({ where: { active: true }});
+    async findActives(): Promise<object[]> {
+        return [{}]
+        //return await this.KondoRepository.findAll<Kondo>({ where: { active: true }});
     }
-    async findAll(): Promise<Kondo[]> {
-        return await this.KondoRepository.findAll<Kondo>({});
+    async findAll(): Promise<object[]> {
+        return [{}]
+        //return await this.KondoRepository.findAll<Kondo>({});
     }
 
     async update(id: number, Kondo: UpdateKondoDto): Promise<Kondo> {
