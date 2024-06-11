@@ -2,6 +2,7 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
 import { KondoDetailsType } from './kondo.details.abstract.entity';
 import { KondoAddressType } from './kondo.address.abstract.entity';
 import { Expose } from 'class-transformer';
+import { KondoConveniencesType, basic_conveniences, conveniences_conveniences, extra_conveniences, security_conveniences } from './kondo.conveniences.abstract.entity';
 
 const KondoTypes = Object.freeze({
     Bairro: 'bairro',
@@ -15,13 +16,16 @@ const KondoTypes = Object.freeze({
 module.exports.KondoTypes = KondoTypes;
 @Table
 export class Kondo extends Model<Kondo> {
+    
+    /*
     constructor(partial?: Partial<Kondo>) {
         super();
         
         if (partial)
             Object.assign(this, partial);
       }
-      
+    */
+     
     @Column({
         type: DataType.STRING,
         allowNull: false,
@@ -125,6 +129,9 @@ export class Kondo extends Model<Kondo> {
     @Expose()
     entry_value_percentage: string; // Valor inicial de entrada minimo?
     
+    /**
+     * CONVENIENCES
+     */
     @Column({
         allowNull: true,
         type: DataType.TEXT
@@ -225,14 +232,24 @@ export class Kondo extends Model<Kondo> {
         allowNull: true,
     })
     infra_nature_trail: boolean; // Trilha
+    /**
+     * END OF CONVENIENECS
+     */
+
+    /**
+     * NEW CONVENIENCES TO MAP
+     */
+    // market_nearby
+    // gym
+    // home_office
+    // lounge_bar
+    // party_saloon
 
     @Column({
         allowNull: true,
     })
     immediate_delivery: boolean; // Entrega imediata do lote
-    /**
-     * END OF KONDO DETAILS
-     */
+    
 
     @Column({
         allowNull: true,
@@ -256,19 +273,25 @@ export class Kondo extends Model<Kondo> {
     })
     video: string;
 
-    @Column({
-        allowNull: true,
-    })
-    createdAt: Date;
+    // @Column({
+    //     allowNull: true,
+    // })
+    // createdAt: Date;
     
-    @Column({
-        allowNull: true,
-    })
-    updatedAt: Date;
+    // @Column({
+    //     allowNull: true,
+    // })
+    // updatedAt: Date;
+
+    
+    @Expose()
+    get details() {
+        return this.getDetails();
+    }
 
     @Expose()
-    get details(): KondoDetailsType {
-        return this.getDetails();
+    get conveniences(): unknown[] {
+        return this.getConveniences();
     }
 
     @Expose()
@@ -276,7 +299,7 @@ export class Kondo extends Model<Kondo> {
         return this.getAddress();
     }
 
-    getDetails(): KondoDetailsType {
+    getDetails() {
         return {
             lot_avg_price: this.lot_avg_price,
             condo_rent: this.condo_rent,
@@ -286,27 +309,8 @@ export class Kondo extends Model<Kondo> {
             finance_tranches: this.finance_tranches,
             finance_fees: this.finance_fees,
             entry_value_percentage: this.entry_value_percentage,
+            immediate_delivery: this.immediate_delivery,
             infra_description: this.infra_description,
-            infra_lobby_24h: this.infra_lobby_24h,
-            infra_security_team: this.infra_security_team,
-            infra_wall: this.infra_wall,
-            infra_sports_court: this.infra_sports_court,
-            infra_barbecue_zone: this.infra_barbecue_zone,
-            infra_pool: this.infra_pool,
-            infra_living_space: this.infra_living_space,
-            infra_pet_area: this.infra_pet_area,
-            infra_kids_area: this.infra_kids_area,
-            infra_lagoon: this.infra_lagoon,
-            infra_eletricity: this.infra_eletricity,
-            infra_water: this.infra_water,
-            infra_sidewalks: this.infra_sidewalks,
-            infra_internet: this.infra_internet,
-            infra_generates_power: this.infra_generates_power,
-            infra_grass_area: this.infra_grass_area,
-            infra_woods: this.infra_woods,
-            infra_vegetable_garden: this.infra_vegetable_garden,
-            infra_nature_trail: this.infra_nature_trail,
-            immediate_delivery: this.immediate_delivery
         }
     }
 
@@ -318,5 +322,47 @@ export class Kondo extends Model<Kondo> {
             neighborhood: this.neighborhood,
             city: this.city,
         }
+    }
+    
+    getConveniences(): KondoConveniencesType[] {
+        const conveniences: KondoConveniencesType[] = [{
+                "type": "basic",
+                "conveniences": []
+            },
+            {
+                "type": "security",
+                "conveniences": []
+            },
+            {
+                "type": "convenience",
+                "conveniences": []
+            },
+            {
+                "type": "extra",
+                "conveniences": []
+            }];
+
+            return conveniences.map(item => {
+                if (item.type == 'basic')
+                    item.conveniences = this.getConveniencesOfType(basic_conveniences);
+                if (item.type == 'extra')
+                    item.conveniences = this.getConveniencesOfType(extra_conveniences);
+                if (item.type == 'security')
+                    item.conveniences = this.getConveniencesOfType(security_conveniences);
+                if (item.type == 'convenience')
+                    item.conveniences = this.getConveniencesOfType(conveniences_conveniences);
+                return item;
+            })
+    }
+
+    getConveniencesOfType(conveniences_of_a_type): string[] {
+
+        const conveniences = [];
+        for (let i=0; i<= conveniences_of_a_type.length; i++) {
+            const convenience = conveniences_of_a_type[i];
+            if (this[convenience])
+                conveniences.push(convenience)
+        }
+        return conveniences;
     }
 }
