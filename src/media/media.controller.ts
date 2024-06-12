@@ -1,4 +1,4 @@
-import { Controller, Get, Body } from '@nestjs/common';
+import { Controller, Get, Body, Param } from '@nestjs/common';
 import { MediaService } from './media.service';
 import { SearchMediaDto } from './dto/search-media.dto';
 
@@ -14,8 +14,8 @@ export class MediaController {
   */
 
   @Get()
-  findAll() {
-    return this.mediaService.findAll();
+  findMediasOfKondo(@Param('id') kondoId: string) {
+    return this.mediaService.findMediasOfKondo(kondoId);
   }
 
   @Get(':id')

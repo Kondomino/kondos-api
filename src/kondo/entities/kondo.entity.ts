@@ -13,6 +13,13 @@ const KondoTypes = Object.freeze({
     Industrial: 'industrial'
   });
 
+  const KondoStatus = Object.freeze({
+    DRAFT: 'draft',
+    TEXT_READY: 'text_ready',
+    MEDIA_GATHERING: 'media_gathering',
+    DONE: 'done',
+  });
+
 module.exports.KondoTypes = KondoTypes;
 @Table
 export class Kondo extends Model<Kondo> {
@@ -36,6 +43,17 @@ export class Kondo extends Model<Kondo> {
         defaultValue: true
     })
     active: boolean;
+
+    @Column({
+        values: Object.values(KondoStatus),
+        defaultValue: true
+    })
+    status: string;
+
+    @Column({
+        defaultValue: false
+    })
+    highlight: boolean;
 
     @Column({
         unique: true
@@ -232,24 +250,69 @@ export class Kondo extends Model<Kondo> {
         allowNull: true,
     })
     infra_nature_trail: boolean; // Trilha
+
+    @Column({
+        allowNull: true,
+    })
+    infra_gourmet_area: boolean; // Area Gourmet
+
+    @Column({
+        allowNull: true,
+    })
+    infra_parking_lot: boolean; // Estacionamento
+
+    @Column({
+        allowNull: true,
+    })
+    infra_heliport: boolean; // Heliporto
+
+    @Column({
+        allowNull: true,
+    })
+    infra_gym: boolean; // Academia
+
+    @Column({
+        allowNull: true,
+    })
+    infra_gardens: boolean; // Jardins
+
+    @Column({
+        allowNull: true,
+    })
+    infra_interactive_lobby: boolean; // Portaria interativa?
+
+    @Column({
+        allowNull: true,
+    })
+    infra_home_office: boolean; // Escritório?
+
+    @Column({
+        allowNull: true,
+    })
+    infra_lounge_bar: boolean; // Lounge bar
+
+    @Column({
+        allowNull: true,
+    })
+    infra_party_saloon: boolean; // Salão de festas
+
+    @Column({
+        allowNull: true,
+    })
+    infra_market_nearby: boolean; // Mercado proximo
     /**
      * END OF CONVENIENECS
      */
-
-    /**
-     * NEW CONVENIENCES TO MAP
-     */
-    // market_nearby
-    // gym
-    // home_office
-    // lounge_bar
-    // party_saloon
+    
+    @Column({
+        allowNull: true,
+    })
+    total_area: string; // Area total do empreendimento
 
     @Column({
         allowNull: true,
     })
     immediate_delivery: boolean; // Entrega imediata do lote
-    
 
     @Column({
         allowNull: true,

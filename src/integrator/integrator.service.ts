@@ -197,8 +197,6 @@ export class IntegratorService {
         return `(${rowString})`;
       }).join(", ");
   
-      //const query = `INSERT INTO "${tableName}" (${tableCols}) VALUES ${values};`;
-      //await client.query(query);
     } catch (error) {
       console.error("Error inserting data: ", error);
       throw error;

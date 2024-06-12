@@ -1,4 +1,5 @@
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { Table, Column, Model, DataType, ForeignKey } from "sequelize-typescript";
+import { Kondo } from "src/kondo/entities/kondo.entity";
 
 const MediaTypes = Object.freeze({
     Video: 'video',
@@ -15,12 +16,7 @@ export class Media extends Model<Media> {
         allowNull: false,
     })
     filename: string;
-    
-    // @Column({
-    //     allowNull: false,
-    // })
-    // filename: string;
-
+ 
     @Column({
         values: Object.values(MediaTypes),
         defaultValue: 'image',
@@ -32,7 +28,8 @@ export class Media extends Model<Media> {
     //     allowNull: false,
     // })
     // kondoId: IntegerDataType;
-    // @ForeignKey(() => Kondo)
-    // @Column
-    // kondoId: number;
+    
+    @ForeignKey(() => Kondo)
+    @Column
+    kondoId: number;
 }

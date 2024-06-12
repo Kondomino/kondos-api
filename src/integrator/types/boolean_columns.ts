@@ -20,6 +20,16 @@ export const boolean_columns = [
     'infra_grass_area',
     'infra_woods',
     'infra_vegetable_garden',
+    'infra_gourmet_area',
+    'infra_parking_lot',
+    'infra_market_nearby',
+    'infra_party_saloon',
+    'infra_lounge_bar',
+    'infra_home_office',
     'infra_nature_trail',
+    'infra_gardens',
+    'infra_heliport',
+    'infra_gym',
+    'infra_interactive_lobby',
     'immediate_delivery'
     ];

@@ -35,6 +35,10 @@ export class MediaService {
         return await this.MediaRepository.findOne<Media>({ where: { id } });
     }
     */
+    
+    async findMediasOfKondo(kondoId: string): Promise<Media[]> {
+        return await this.MediaRepository.findAll<Media>({ where: { kondoId }});
+    }
     async findBy(searchMediaDto: SearchMediaDto): Promise<Media> {
         const { filename } = searchMediaDto;
 
