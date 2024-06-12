@@ -5,13 +5,14 @@ import { ConfigModule } from '@nestjs/config';
 import { User } from './user/entities/user.entity';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { KondoModule } from './kondo/kondo.module';
-import { Kondo } from './kondo/entities/kondo.entity';
 import { AppController } from './app.controller';
 import { IntegratorModule } from './integrator/integrator.module';
 import { kondoProviders } from './kondo/repository/kondo.provider';
 import { Dialect } from 'sequelize';
 import { Media } from './media/entities/media.entity';
 import { MediaModule } from './media/media.module';
+import { Kondo } from './kondo/entities/kondo.entity';
+import { SeederModule } from 'nestjs-sequelize-seeder';
 
 @Module({
   imports: [DatabaseModule, ConfigModule.forRoot({ isGlobal: true }),
@@ -28,7 +29,11 @@ import { MediaModule } from './media/media.module';
     UserModule, 
     KondoModule,
     IntegratorModule,
-    MediaModule
+    MediaModule,
+    SeederModule.forRoot({
+      // Activate this if you want to run the seeders if the table is empty in the database
+      runOnlyIfTableIsEmpty: true,
+   }),
     //SequelizeModule.forFeature([User, Kondo])
   ],
   controllers: [AppController],
