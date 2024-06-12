@@ -68,9 +68,9 @@ export class Kondo extends Model<Kondo> {
     
     @Column({
         allowNull: true,
+        type: DataType.TEXT
     })
     description: string;
-
 
     /**
      * KONDO ADDRESS
