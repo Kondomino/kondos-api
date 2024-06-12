@@ -163,7 +163,6 @@ export class IntegratorService {
           }
   
           // preparing cols and values for an update
-          //rowForUpdate += `${columnsNames[colIndex]} = ${col},`;
           condoDTO[columnsNames[colIndex]] = col;
 
           return col;
@@ -174,24 +173,29 @@ export class IntegratorService {
         // Got a slug?
         if (slug !== '') {
         
-          const condo = await this.KondoRepository.findOrCreate({
-            where: { slug: condoDTO.slug },
-            defaults: condoDTO
-          });
-  
-          // Condo was created?
-          if (!condo[1]) {
-            // UPDATE
-            this.KondoRepository.update(condoDTO, {slug: condoDTO.slug})
-            this.updated++;
-          }
-          else {
-            // CREATE
-            this.created++;
-          }
-  
-          slug = '';
-          //rowForUpdate = '';
+          try {
+            const condo = await this.KondoRepository.findOrCreate({
+              where: { slug: condoDTO.slug },
+              defaults: condoDTO
+            });
+
+            // Condo was created?
+            if (!condo[1]) {
+              // UPDATE
+              this.KondoRepository.update(condoDTO, {slug: condoDTO.slug})
+              this.updated++;
+            }
+            else {
+              // CREATE
+              this.created++;
+            }
+    
+            slug = '';
+            
+            } catch(error) {
+              console.error("Error inserting data: ", error);
+              throw error;
+            } 
         }
   
         return `(${rowString})`;
