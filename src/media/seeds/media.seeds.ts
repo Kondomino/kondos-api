@@ -3,49 +3,42 @@ export const mediaSeeds = [
    
    //  98	la-ville
    {
-      filename: 'la-ville-1',
+      filename: 'la-ville-1.jpeg',
       kondoId: 98
    },
    {
-      filename: 'la-ville-2',
+      filename: 'la-ville-2.jpeg',
       kondoId: 98
    },
    {
-      filename: 'la-ville-3',
+      filename: 'la-ville-3.jpeg',
       kondoId: 98
    },
    {
-      filename: 'la-ville-4',
+      filename: 'la-ville-4.jpeg',
       kondoId: 98
    },
    {
-      filename: 'la-ville-5',
+      filename: 'la-ville-5.jpeg',
       kondoId: 98
    },
    {
-      filename: 'la-ville-',
+      filename: 'la-ville-1.mp4',
       kondoId: 98,
       type: 'video'
    },
    {
-      filename: 'la-ville-',
+      filename: 'la-ville-2.mp4',
       kondoId: 98,
       type: 'video'
    },
    {
-      filename: 'la-ville-',
+      filename: 'la-ville-3.mp4',
       kondoId: 98,
       type: 'video'
    },
    //  99	fazendas-terras-de-minas
-    {
-       filename: 'mirrage-nautic-2',
-       kondoId: 60
-    },
-    {
-      filename: 'Editor',
-      kondoId: 61
-    },
+    
  ];
 
 //  1	vitoria-nautico-residencevitoria-da-uniao
