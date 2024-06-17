@@ -1,8 +1,8 @@
 import { Sequelize } from 'sequelize-typescript';
 import { SEQUELIZE, DEVELOPMENT, TEST, PRODUCTION } from '../constants';
 import { databaseConfig } from './database.config';
-import { User } from 'src/user/entities/user.entity';
-import { Kondo } from 'src/kondo/entities/Kondo.entity';
+import { User } from '../../user/entities/user.entity';
+import { Kondo } from '../../kondo/entities/Kondo.entity';
 
 export const databaseProviders = [{
     provide: SEQUELIZE,
