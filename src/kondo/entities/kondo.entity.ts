@@ -1,5 +1,4 @@
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
-import { KondoDetailsType } from './kondo.details.abstract.entity';
 import { KondoAddressType } from './kondo.address.abstract.entity';
 import { Expose } from 'class-transformer';
 import { KondoConveniencesType, basic_conveniences, conveniences_conveniences, extra_conveniences, security_conveniences } from './kondo.conveniences.abstract.entity';
