@@ -87,7 +87,7 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "engines": {
-      "node": "20"
+      "node": "18"
     },
     "main": "dist/index.js"
   }

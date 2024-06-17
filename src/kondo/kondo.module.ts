@@ -5,7 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Kondo } from './entities/Kondo.entity';
 import { kondoProviders } from './repository/kondo.provider';
 import { KondoRepository } from './repository/kondo.repository';
-import { SlugifyModule } from 'src/utils/slugify/slugify.module';
+import { SlugifyModule } from '../utils/slugify/slugify.module';
 
 @Module({
   controllers: [KondoController],

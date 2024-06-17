@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { IntegratorService } from './integrator.service';
 import { IntegratorController } from './integrator.controller';
-import { SlugifyModule } from 'src/utils/slugify/slugify.module';
-import { kondoProviders } from 'src/kondo/repository/kondo.provider';
-import { KondoRepository } from 'src/kondo/repository/kondo.repository';
+import { kondoProviders } from '../kondo/repository/kondo.provider';
+import { KondoRepository } from '../kondo/repository/kondo.repository';
+import { SlugifyModule } from '../utils/slugify/slugify.module';
 
 @Module({
   controllers: [IntegratorController],

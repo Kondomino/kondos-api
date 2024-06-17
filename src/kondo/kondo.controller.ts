@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ClassSerializerInterceptor, UseInterceptors } from '@nestjs/common';
-import { KondoService } from './kondo.service';
 import { CreateKondoDto } from './dto/create-kondo.dto';
-import { UpdateKondoDto } from './dto/update-kondo.dto';
 import { SearchKondoDto } from './dto/search-kondo.dto';
+import { UpdateKondoDto } from './dto/update-Kondo.dto';
+import { KondoService } from './kondo.service';
 
 @Controller('kondo')
 @UseInterceptors(ClassSerializerInterceptor)

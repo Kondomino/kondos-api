@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateKondoDto } from 'src/kondo/dto/create-kondo.dto';
-import { KondoRepository } from 'src/kondo/repository/kondo.repository';
-import { SlugifyService } from 'src/utils/slugify/slugify.service';
+import { KondoRepository } from '../kondo/repository/kondo.repository';
 import { readFile, utils } from 'xlsx';
 import { boolean_columns } from './types/boolean_columns';
+import { CreateKondoDto } from '../kondo/dto/create-kondo.dto';
+import { SlugifyService } from '../utils/slugify/slugify.service';
 
 //encode_cell
 //sheet_to_json
