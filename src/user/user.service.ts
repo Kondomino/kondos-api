@@ -1,6 +1,6 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
-import { USER_REPOSITORY_PROVIDER } from 'src/core/constants';
+import { USER_REPOSITORY_PROVIDER } from '../core/constants';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 
