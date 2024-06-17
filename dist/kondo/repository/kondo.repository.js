@@ -11,6 +11,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KondoRepository = void 0;
 const common_1 = require("@nestjs/common");
@@ -19,26 +28,59 @@ let KondoRepository = class KondoRepository {
     constructor(KondoRepositoryProvider) {
         this.KondoRepositoryProvider = KondoRepositoryProvider;
     }
-    async find() {
-        return await this.KondoRepositoryProvider.findAll();
+    find() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.KondoRepositoryProvider.findAll();
+        });
     }
-    async findOne() {
-        return await this.KondoRepositoryProvider.findOne();
+    findOne() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.KondoRepositoryProvider.findOne();
+        });
     }
-    async findAll() {
-        return await this.KondoRepositoryProvider.findAll();
+    findAll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.KondoRepositoryProvider.findAll();
+        });
     }
-    async findOrCreate(findOrCreate) {
-        return await this.KondoRepositoryProvider.findOrCreate(findOrCreate);
+    /**
+     * Find or Create
+     *
+     * @param findOrCreate
+     *      Will try to find by id or slug.
+     *      If nothing is found, will create.
+     * @returns
+     */
+    findOrCreate(findOrCreate) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.KondoRepositoryProvider.findOrCreate(findOrCreate);
+        });
     }
-    async update(updateKondoDto, where) {
-        return await this.KondoRepositoryProvider.update(updateKondoDto, { where });
+    /**
+     * Update
+     *
+     * @param updateKondoDto
+     * @param where {
+                        where: {
+                        lastName: null,
+                        },
+                    },
+     * @returns
+     */
+    update(updateKondoDto, where) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.KondoRepositoryProvider.update(updateKondoDto, { where });
+        });
     }
-    async destroy() {
-        return await this.KondoRepositoryProvider.destroy();
+    destroy() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.KondoRepositoryProvider.destroy();
+        });
     }
-    async create(createKondoDto) {
-        return await this.KondoRepositoryProvider.create(createKondoDto);
+    create(createKondoDto) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.KondoRepositoryProvider.create(createKondoDto);
+        });
     }
 };
 KondoRepository = __decorate([
@@ -47,4 +89,3 @@ KondoRepository = __decorate([
     __metadata("design:paramtypes", [Object])
 ], KondoRepository);
 exports.KondoRepository = KondoRepository;
-//# sourceMappingURL=kondo.repository.js.map

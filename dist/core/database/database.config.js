@@ -28,4 +28,3 @@ exports.databaseConfig = {
         dialect: process.env.DB_DIALECT,
     },
 };
-//# sourceMappingURL=database.config.js.map

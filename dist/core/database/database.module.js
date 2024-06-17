@@ -18,4 +18,3 @@ DatabaseModule = __decorate([
     })
 ], DatabaseModule);
 exports.DatabaseModule = DatabaseModule;
-//# sourceMappingURL=database.module.js.map

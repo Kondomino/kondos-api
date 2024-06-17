@@ -27,7 +27,8 @@ __decorate([
 ], UpdateKondoDto.prototype, "email", void 0);
 __decorate([
     (0, class_validator_1.IsBoolean)(),
-    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsOptional)() // Defaults to true
+    ,
     __metadata("design:type", Boolean)
 ], UpdateKondoDto.prototype, "active", void 0);
 __decorate([
@@ -136,4 +137,3 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateKondoDto.prototype, "phone", void 0);
 exports.UpdateKondoDto = UpdateKondoDto;
-//# sourceMappingURL=update-Kondo.dto.js.map

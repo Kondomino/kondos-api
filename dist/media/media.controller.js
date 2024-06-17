@@ -20,6 +20,12 @@ let MediaController = class MediaController {
     constructor(mediaService) {
         this.mediaService = mediaService;
     }
+    /*
+    @Post()
+    create(@Body() createMediaDto: CreateMediaDto) {
+      return this.mediaService.create(createMediaDto);
+    }
+    */
     findMediasOfKondo(kondoId) {
         return this.mediaService.findMediasOfKondo(kondoId);
     }
@@ -46,4 +52,3 @@ MediaController = __decorate([
     __metadata("design:paramtypes", [media_service_1.MediaService])
 ], MediaController);
 exports.MediaController = MediaController;
-//# sourceMappingURL=media.controller.js.map

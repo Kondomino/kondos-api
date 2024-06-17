@@ -11,6 +11,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MediaService = void 0;
 const common_1 = require("@nestjs/common");
@@ -19,15 +28,46 @@ let MediaService = class MediaService {
     constructor(MediaRepository) {
         this.MediaRepository = MediaRepository;
     }
-    async findMediasOfKondo(kondoId) {
-        return await this.MediaRepository.findAll({ where: { kondoId } });
+    /*
+    async create(Media: CreateMediaDto): Promise<findOrCreateType> {
+
+        try {
+            //Media.slug = this.slugify.run(Media.name);
+
+            return await this.MediaRepository.findOrCreate({
+                where: { slug: Media.slug },
+                defaults: Media
+            });
+        }
+        catch (error) {
+            console.log('MediaService error: ', error);
+        }
     }
-    async findBy(searchMediaDto) {
-        const { filename } = searchMediaDto;
-        return await this.MediaRepository.findOne({ where: { filename } });
+*/
+    /*
+        async findOneByEmail(email: string): Promise<Media> {
+            return await this.MediaRepository.findOne<Media>({ where: { email } });
+        }
+        
+        async findOne(id: number): Promise<Media> {
+            return await this.MediaRepository.findOne<Media>({ where: { id } });
+        }
+        */
+    findMediasOfKondo(kondoId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.MediaRepository.findAll({ where: { kondoId } });
+        });
     }
-    async findAll() {
-        return await this.MediaRepository.findAll({});
+    findBy(searchMediaDto) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { filename } = searchMediaDto;
+            return yield this.MediaRepository.findOne({ where: { filename } });
+        });
+    }
+    findAll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.MediaRepository.findAll({});
+        });
     }
 };
 MediaService = __decorate([
@@ -36,4 +76,3 @@ MediaService = __decorate([
     __metadata("design:paramtypes", [Object])
 ], MediaService);
 exports.MediaService = MediaService;
-//# sourceMappingURL=media.service.js.map

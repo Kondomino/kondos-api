@@ -29,4 +29,3 @@ __decorate([
     __metadata("design:type", String)
 ], SearchKondoDto.prototype, "email", void 0);
 exports.SearchKondoDto = SearchKondoDto;
-//# sourceMappingURL=search-kondo.dto.js.map

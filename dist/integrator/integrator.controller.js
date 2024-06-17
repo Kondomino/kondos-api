@@ -31,4 +31,3 @@ IntegratorController = __decorate([
     __metadata("design:paramtypes", [integrator_service_1.IntegratorService])
 ], IntegratorController);
 exports.IntegratorController = IntegratorController;
-//# sourceMappingURL=integrator.controller.js.map

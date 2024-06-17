@@ -11,6 +11,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserRepository = void 0;
 const common_1 = require("@nestjs/common");
@@ -19,26 +28,59 @@ let UserRepository = class UserRepository {
     constructor(UserRepositoryProvider) {
         this.UserRepositoryProvider = UserRepositoryProvider;
     }
-    async find() {
-        return await this.UserRepositoryProvider.findAll();
+    find() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.UserRepositoryProvider.findAll();
+        });
     }
-    async findOne() {
-        return await this.UserRepositoryProvider.findOne();
+    findOne() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.UserRepositoryProvider.findOne();
+        });
     }
-    async findAll() {
-        return await this.UserRepositoryProvider.findAll();
+    findAll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.UserRepositoryProvider.findAll();
+        });
     }
-    async findOrCreate(findOrCreate) {
-        return await this.UserRepositoryProvider.findOrCreate(findOrCreate);
+    /**
+     * Find or Create
+     *
+     * @param findOrCreate
+     *      Will try to find by id or slug.
+     *      If nothing is found, will create.
+     * @returns
+     */
+    findOrCreate(findOrCreate) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.UserRepositoryProvider.findOrCreate(findOrCreate);
+        });
     }
-    async update(updateUserDto, where) {
-        return await this.UserRepositoryProvider.update(updateUserDto, { where });
+    /**
+     * Update
+     *
+     * @param updateUserDto
+     * @param where {
+                        where: {
+                        lastName: null,
+                        },
+                    },
+     * @returns
+     */
+    update(updateUserDto, where) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.UserRepositoryProvider.update(updateUserDto, { where });
+        });
     }
-    async destroy() {
-        return await this.UserRepositoryProvider.destroy();
+    destroy() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.UserRepositoryProvider.destroy();
+        });
     }
-    async create(createUserDto) {
-        return await this.UserRepositoryProvider.create(createUserDto);
+    create(createUserDto) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.UserRepositoryProvider.create(createUserDto);
+        });
     }
 };
 UserRepository = __decorate([
@@ -47,4 +89,3 @@ UserRepository = __decorate([
     __metadata("design:paramtypes", [Object])
 ], UserRepository);
 exports.UserRepository = UserRepository;
-//# sourceMappingURL=user.repository.js.map

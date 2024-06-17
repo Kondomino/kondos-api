@@ -23,4 +23,3 @@ IntegratorModule = __decorate([
     })
 ], IntegratorModule);
 exports.IntegratorModule = IntegratorModule;
-//# sourceMappingURL=integrator.module.js.map

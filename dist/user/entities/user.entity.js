@@ -53,4 +53,3 @@ User = __decorate([
     sequelize_typescript_1.Table
 ], User);
 exports.User = User;
-//# sourceMappingURL=user.entity.js.map
