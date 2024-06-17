@@ -1,0 +1,31 @@
+export interface KondoDetailsType {
+    lot_avg_price: string;
+    condo_rent: string;
+    lots_available: boolean;
+    lots_min_size: string;
+    finance: boolean;
+    finance_tranches: string;
+    finance_fees: boolean;
+    entry_value_percentage: string;
+    infra_description: string;
+    infra_lobby_24h: boolean;
+    infra_security_team: boolean;
+    infra_wall: boolean;
+    infra_sports_court: boolean;
+    infra_barbecue_zone: boolean;
+    infra_pool: boolean;
+    infra_living_space: boolean;
+    infra_pet_area: boolean;
+    infra_kids_area: boolean;
+    infra_lagoon: boolean;
+    infra_eletricity: boolean;
+    infra_water: boolean;
+    infra_sidewalks: boolean;
+    infra_internet: boolean;
+    infra_generates_power: boolean;
+    infra_grass_area: boolean;
+    infra_woods: boolean;
+    infra_vegetable_garden: boolean;
+    infra_nature_trail: boolean;
+    immediate_delivery: boolean;
+}

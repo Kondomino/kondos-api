@@ -1,0 +1,40 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.boolean_columns = void 0;
+exports.boolean_columns = [
+    'highlight',
+    'lots_available',
+    'finance',
+    'finance_fees',
+    'infra_lobby_24h',
+    'infra_security_team',
+    'infra_wall',
+    'infra_sports_court',
+    'infra_barbecue_zone',
+    'infra_pool',
+    'infra_living_space',
+    'infra_pet_area',
+    'infra_kids_area',
+    'infra_lagoon',
+    'infra_eletricity',
+    'infra_water',
+    'infra_sidewalks',
+    'infra_internet',
+    'infra_generates_power',
+    'infra_grass_area',
+    'infra_woods',
+    'infra_vegetable_garden',
+    'infra_nature_trail',
+    'infra_interactive_lobby',
+    'infra_gardens',
+    'infra_gourmet_area',
+    'infra_parking_lot',
+    'infra_heliport',
+    'infra_gym',
+    'infra_home_office',
+    'infra_lounge_bar',
+    'infra_party_saloon',
+    'infra_market_nearby',
+    'immediate_delivery'
+];
+//# sourceMappingURL=boolean_columns.js.map
