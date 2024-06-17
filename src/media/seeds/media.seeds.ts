@@ -566,7 +566,6 @@ export const mediaSeeds = [
 // 88	eco-village
 // 89	terra-vista
 // 90	canto-da-siriemaresort-residence
-
 // 92	fazendinhas-eldorado
 // 93	caminho-das-cachoeiras
 // 94	serras-altas-residencial
