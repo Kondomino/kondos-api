@@ -14,10 +14,10 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KondoController = void 0;
 const common_1 = require("@nestjs/common");
-const kondo_service_1 = require("./kondo.service");
 const create_kondo_dto_1 = require("./dto/create-kondo.dto");
-const update_kondo_dto_1 = require("./dto/update-kondo.dto");
 const search_kondo_dto_1 = require("./dto/search-kondo.dto");
+const update_Kondo_dto_1 = require("./dto/update-Kondo.dto");
+const kondo_service_1 = require("./kondo.service");
 let KondoController = class KondoController {
     constructor(kondoService) {
         this.kondoService = kondoService;
@@ -74,7 +74,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_kondo_dto_1.UpdateKondoDto]),
+    __metadata("design:paramtypes", [String, update_Kondo_dto_1.UpdateKondoDto]),
     __metadata("design:returntype", void 0)
 ], KondoController.prototype, "update", null);
 __decorate([

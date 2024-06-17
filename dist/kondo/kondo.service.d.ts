@@ -1,9 +1,9 @@
 import { Kondo } from './entities/Kondo.entity';
 import { UpdateKondoDto } from './dto/update-Kondo.dto';
 import { CreateKondoDto } from './dto/create-kondo.dto';
-import { SlugifyService } from 'src/utils/slugify/slugify.service';
 import { findOrCreateType } from './types/findorcreate.type';
 import { SearchKondoDto } from './dto/search-kondo.dto';
+import { SlugifyService } from '../utils/slugify/slugify.service';
 export declare class KondoService {
     private readonly KondoRepository;
     private slugify;
