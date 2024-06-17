@@ -42,4 +42,3 @@ Media = __decorate([
     sequelize_typescript_1.Table
 ], Media);
 exports.Media = Media;
-//# sourceMappingURL=media.entity.js.map

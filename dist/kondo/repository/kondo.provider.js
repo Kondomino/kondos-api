@@ -7,4 +7,3 @@ exports.kondoProviders = [{
         provide: constants_1.KONDO_REPOSITORY_PROVIDER,
         useValue: kondo_entity_1.Kondo,
     }];
-//# sourceMappingURL=kondo.provider.js.map

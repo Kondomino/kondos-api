@@ -18,4 +18,3 @@ SlugifyModule = __decorate([
     })
 ], SlugifyModule);
 exports.SlugifyModule = SlugifyModule;
-//# sourceMappingURL=slugify.module.js.map

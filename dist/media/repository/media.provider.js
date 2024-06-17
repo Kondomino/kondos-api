@@ -7,4 +7,3 @@ exports.mediaProviders = [{
         provide: constants_1.MEDIA_REPOSITORY_PROVIDER,
         useValue: media_entity_1.Media,
     }];
-//# sourceMappingURL=media.provider.js.map

@@ -20,4 +20,3 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "name", void 0);
 exports.UpdateUserDto = UpdateUserDto;
-//# sourceMappingURL=update-user.dto.js.map

@@ -29,6 +29,14 @@ const KondoStatus = Object.freeze({
 });
 module.exports.KondoTypes = KondoTypes;
 let Kondo = class Kondo extends sequelize_typescript_1.Model {
+    // @Column({
+    //     allowNull: true,
+    // })
+    // createdAt: Date;
+    // @Column({
+    //     allowNull: true,
+    // })
+    // updatedAt: Date;
     get details() {
         return this.getDetails();
     }
@@ -463,4 +471,3 @@ Kondo = __decorate([
     sequelize_typescript_1.Table
 ], Kondo);
 exports.Kondo = Kondo;
-//# sourceMappingURL=Kondo.entity.js.map

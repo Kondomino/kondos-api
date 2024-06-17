@@ -37,4 +37,3 @@ exports.boolean_columns = [
     'infra_market_nearby',
     'immediate_delivery'
 ];
-//# sourceMappingURL=boolean_columns.js.map

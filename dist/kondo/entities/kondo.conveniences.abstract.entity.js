@@ -44,4 +44,3 @@ exports.extra_conveniences = [
     'infra_gym',
     'infra_interactive_lobby'
 ];
-//# sourceMappingURL=kondo.conveniences.abstract.entity.js.map

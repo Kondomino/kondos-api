@@ -7,4 +7,3 @@ exports.userProviders = [{
         provide: constants_1.USER_REPOSITORY_PROVIDER,
         useValue: user_entity_1.User,
     }];
-//# sourceMappingURL=user.provider.js.map

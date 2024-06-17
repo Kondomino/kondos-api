@@ -368,6 +368,112 @@ export const mediaSeeds = [
       kondoId: 110,
       type: 'video'
    }, 
+   // 109	alto-dos-pinheiros
+   {
+      filename: 'alto-dos-pinheiros-1.jpeg',
+      kondoId: 109
+   },
+   {
+      filename: 'alto-dos-pinheiros-2.jpeg',
+      kondoId: 109
+   },
+   {
+      filename: 'alto-dos-pinheiros-3.jpeg',
+      kondoId: 109
+   },
+   {
+      filename: 'alto-dos-pinheiros-4.jpeg',
+      kondoId: 109
+   },
+   {
+      filename: 'alto-dos-pinheiros-5.jpeg',
+      kondoId: 109
+   },
+   {
+      filename: 'alto-dos-pinheiros-6.jpeg',
+      kondoId: 109
+   },
+   {
+      filename: 'alto-dos-pinheiros-7.jpeg',
+      kondoId: 109
+   },
+   {
+      filename: 'alto-dos-pinheiros-8.jpeg',
+      kondoId: 109
+   },
+   {
+      filename: 'alto-dos-pinheiros-9.jpeg',
+      kondoId: 109
+   },
+   {
+      filename: 'alto-dos-pinheiros-10.jpeg',
+      kondoId: 109
+   },
+   {
+      filename: 'alto-dos-pinheiros-11.jpeg',
+      kondoId: 109
+   },
+   // 91	serra-morena
+   {
+      filename: 'serra-morena-1.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-2.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-3.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-4.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-5.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-6.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-7.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-8.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-9.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-10.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-11.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-12.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-13.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-14.jpeg',
+      kondoId: 91
+   },
+   {
+      filename: 'serra-morena-15.jpeg',
+      kondoId: 91
+   },
 ];
 
 //  1	vitoria-nautico-residencevitoria-da-uniao
@@ -460,15 +566,13 @@ export const mediaSeeds = [
 // 88	eco-village
 // 89	terra-vista
 // 90	canto-da-siriemaresort-residence
-// 91	serra-morena
+
 // 92	fazendinhas-eldorado
 // 93	caminho-das-cachoeiras
 // 94	serras-altas-residencial
 // 95	paradiso-ecologico
 // 96	estancia-do-lago
 // 97	balneario-vista-da-lagoa
-// 98	la-ville
-// 99	fazendas-terras-de-minas
 // 100	vila-castela-brisas
 // 101	vila-castela-jardins
 // 102	vila-castela-alameda
@@ -478,4 +582,3 @@ export const mediaSeeds = [
 // 106	vila-castela-arvoredo
 // 107	vila-castela-ipe
 // 108	vila-castela-reserva
-// 109	alto-dos-pinheiros

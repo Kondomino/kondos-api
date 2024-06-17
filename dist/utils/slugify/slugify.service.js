@@ -11,17 +11,16 @@ const common_1 = require("@nestjs/common");
 let SlugifyService = class SlugifyService {
     run(str) {
         return String(str)
-            .normalize('NFKD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .trim()
-            .toLowerCase()
-            .replace(/[^a-z0-9 -]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-');
+            .normalize('NFKD') // split accented characters into their base characters and diacritical marks
+            .replace(/[\u0300-\u036f]/g, '') // remove all the accents, which happen to be all in the \u03xx UNICODE block.
+            .trim() // trim leading or trailing whitespace
+            .toLowerCase() // convert to lowercase
+            .replace(/[^a-z0-9 -]/g, '') // remove non-alphanumeric characters
+            .replace(/\s+/g, '-') // replace spaces with hyphens
+            .replace(/-+/g, '-'); // remove consecutive hyphens
     }
 };
 SlugifyService = __decorate([
     (0, common_1.Injectable)()
 ], SlugifyService);
 exports.SlugifyService = SlugifyService;
-//# sourceMappingURL=slugify.service.js.map

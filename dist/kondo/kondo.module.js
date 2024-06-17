@@ -25,4 +25,3 @@ KondoModule = __decorate([
     })
 ], KondoModule);
 exports.KondoModule = KondoModule;
-//# sourceMappingURL=kondo.module.js.map

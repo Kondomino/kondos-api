@@ -11,6 +11,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MediaRepository = void 0;
 const common_1 = require("@nestjs/common");
@@ -19,26 +28,59 @@ let MediaRepository = class MediaRepository {
     constructor(MediaRepositoryProvider) {
         this.MediaRepositoryProvider = MediaRepositoryProvider;
     }
-    async find() {
-        return await this.MediaRepositoryProvider.findAll();
+    find() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.MediaRepositoryProvider.findAll();
+        });
     }
-    async findOne() {
-        return await this.MediaRepositoryProvider.findOne();
+    findOne() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.MediaRepositoryProvider.findOne();
+        });
     }
-    async findAll() {
-        return await this.MediaRepositoryProvider.findAll();
+    findAll() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.MediaRepositoryProvider.findAll();
+        });
     }
-    async findOrCreate(findOrCreate) {
-        return await this.MediaRepositoryProvider.findOrCreate(findOrCreate);
+    /**
+     * Find or Create
+     *
+     * @param findOrCreate
+     *      Will try to find by id or slug.
+     *      If nothing is found, will create.
+     * @returns
+     */
+    findOrCreate(findOrCreate) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.MediaRepositoryProvider.findOrCreate(findOrCreate);
+        });
     }
-    async update(updateMediaDto, where) {
-        return await this.MediaRepositoryProvider.update(updateMediaDto, { where });
+    /**
+     * Update
+     *
+     * @param updateMediaDto
+     * @param where {
+                        where: {
+                        lastName: null,
+                        },
+                    },
+     * @returns
+     */
+    update(updateMediaDto, where) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.MediaRepositoryProvider.update(updateMediaDto, { where });
+        });
     }
-    async destroy() {
-        return await this.MediaRepositoryProvider.destroy();
+    destroy() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.MediaRepositoryProvider.destroy();
+        });
     }
-    async create(createMediaDto) {
-        return await this.MediaRepositoryProvider.create(createMediaDto);
+    create(createMediaDto) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.MediaRepositoryProvider.create(createMediaDto);
+        });
     }
 };
 MediaRepository = __decorate([
@@ -47,4 +89,3 @@ MediaRepository = __decorate([
     __metadata("design:paramtypes", [Object])
 ], MediaRepository);
 exports.MediaRepository = MediaRepository;
-//# sourceMappingURL=media.repository.js.map

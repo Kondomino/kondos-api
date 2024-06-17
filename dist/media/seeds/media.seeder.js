@@ -11,6 +11,7 @@ const nestjs_sequelize_seeder_1 = require("nestjs-sequelize-seeder");
 const media_seeds_1 = require("./media.seeds");
 exports.__mediaSeeder = [];
 let SeedMedia = class SeedMedia {
+    //data: [];
     run() {
         return media_seeds_1.mediaSeeds;
     }
@@ -22,4 +23,3 @@ SeedMedia = __decorate([
     })
 ], SeedMedia);
 exports.SeedMedia = SeedMedia;
-//# sourceMappingURL=media.seeder.js.map
