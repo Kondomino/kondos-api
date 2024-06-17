@@ -16,8 +16,7 @@ const kondo_module_1 = require("./kondo/kondo.module");
 const app_controller_1 = require("./app.controller");
 const integrator_module_1 = require("./integrator/integrator.module");
 const kondo_provider_1 = require("./kondo/repository/kondo.provider");
-const nestjs_sequelize_seeder_1 = require("nestjs-sequelize-seeder");
-const Kondo_entity_1 = require("./kondo/entities/Kondo.entity");
+const kondo_entity_1 = require("./kondo/entities/kondo.entity");
 const media_entity_1 = require("./media/entities/media.entity");
 const media_module_1 = require("./media/media.module");
 const user_entity_1 = require("./user/entities/user.entity");
@@ -28,22 +27,24 @@ AppModule = __decorate([
         imports: [database_module_1.DatabaseModule, config_1.ConfigModule.forRoot({ isGlobal: true }),
             sequelize_1.SequelizeModule.forRoot({
                 dialect: 'postgres',
-                host: 'localhost',
+                //dialectOptions: { ssl: { require: false, rejectUnauthorized: false } },
+                host: process.env.DB_HOST,
                 port: 5432,
-                username: 'postgres',
-                password: 'cracker0',
-                database: 'kondo-dev',
-                models: [user_entity_1.User, Kondo_entity_1.Kondo, media_entity_1.Media],
+                username: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_NAME,
+                models: [user_entity_1.User, kondo_entity_1.Kondo, media_entity_1.Media],
                 autoLoadModels: true,
             }),
             user_module_1.UserModule,
             kondo_module_1.KondoModule,
             integrator_module_1.IntegratorModule,
             media_module_1.MediaModule,
-            nestjs_sequelize_seeder_1.SeederModule.forRoot({
-                // Activate this if you want to run the seeders if the table is empty in the database
-                runOnlyIfTableIsEmpty: true,
-            }),
+            /*
+            SeederModule.forRoot({
+              // Activate this if you want to run the seeders if the table is empty in the database
+              runOnlyIfTableIsEmpty: true,
+           }),*/
             //SequelizeModule.forFeature([User, Kondo])
         ],
         controllers: [app_controller_1.AppController],
