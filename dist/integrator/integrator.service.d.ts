@@ -1,5 +1,5 @@
-import { KondoRepository } from 'src/kondo/repository/kondo.repository';
-import { SlugifyService } from 'src/utils/slugify/slugify.service';
+import { KondoRepository } from '../kondo/repository/kondo.repository';
+import { SlugifyService } from '../utils/slugify/slugify.service';
 export declare class IntegratorService {
     private slugifyService;
     private readonly KondoRepository;

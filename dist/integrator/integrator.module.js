@@ -10,9 +10,9 @@ exports.IntegratorModule = void 0;
 const common_1 = require("@nestjs/common");
 const integrator_service_1 = require("./integrator.service");
 const integrator_controller_1 = require("./integrator.controller");
-const slugify_module_1 = require("../utils/slugify/slugify.module");
 const kondo_provider_1 = require("../kondo/repository/kondo.provider");
 const kondo_repository_1 = require("../kondo/repository/kondo.repository");
+const slugify_module_1 = require("../utils/slugify/slugify.module");
 let IntegratorModule = class IntegratorModule {
 };
 IntegratorModule = __decorate([
