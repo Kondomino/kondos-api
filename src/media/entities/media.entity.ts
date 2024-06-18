@@ -1,5 +1,5 @@
 import { Table, Column, Model, DataType, ForeignKey } from "sequelize-typescript";
-import { Kondo } from "../../kondo/entities/Kondo.entity";
+import { Kondo } from "../../kondo/entities/kondo.entity";
 
 const MediaTypes = Object.freeze({
     Video: 'video',
