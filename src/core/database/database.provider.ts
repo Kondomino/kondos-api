@@ -3,6 +3,7 @@ import { SEQUELIZE, DEVELOPMENT, TEST, PRODUCTION } from '../constants';
 import { databaseConfig } from './database.config';
 import { User } from '../../user/entities/user.entity';
 import { Kondo } from '../../kondo/entities/kondo.entity';
+import { Media } from '../../media/entities/media.entity';
 
 export const databaseProviders = [{
     provide: SEQUELIZE,
@@ -22,7 +23,7 @@ export const databaseProviders = [{
                 config = databaseConfig.development;
         }
         const sequelize = new Sequelize(config);
-        sequelize.addModels([User, Kondo]);
+        sequelize.addModels([User, Kondo, Media]);
         await sequelize.sync();
         return sequelize;
     },

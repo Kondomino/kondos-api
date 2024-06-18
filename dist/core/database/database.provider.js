@@ -15,6 +15,7 @@ const constants_1 = require("../constants");
 const database_config_1 = require("./database.config");
 const user_entity_1 = require("../../user/entities/user.entity");
 const kondo_entity_1 = require("../../kondo/entities/kondo.entity");
+const media_entity_1 = require("../../media/entities/media.entity");
 exports.databaseProviders = [{
         provide: constants_1.SEQUELIZE,
         useFactory: () => __awaiter(void 0, void 0, void 0, function* () {
@@ -33,7 +34,7 @@ exports.databaseProviders = [{
                     config = database_config_1.databaseConfig.development;
             }
             const sequelize = new sequelize_typescript_1.Sequelize(config);
-            sequelize.addModels([user_entity_1.User, kondo_entity_1.Kondo]);
+            sequelize.addModels([user_entity_1.User, kondo_entity_1.Kondo, media_entity_1.Media]);
             yield sequelize.sync();
             return sequelize;
         }),
