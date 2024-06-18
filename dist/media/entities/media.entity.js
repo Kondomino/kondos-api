@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Media = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
-const Kondo_entity_1 = require("../../kondo/entities/Kondo.entity");
+const kondo_entity_1 = require("../../kondo/entities/kondo.entity");
 const MediaTypes = Object.freeze({
     Video: 'video',
     Image: 'image',
@@ -34,7 +34,7 @@ __decorate([
     __metadata("design:type", String)
 ], Media.prototype, "type", void 0);
 __decorate([
-    (0, sequelize_typescript_1.ForeignKey)(() => Kondo_entity_1.Kondo),
+    (0, sequelize_typescript_1.ForeignKey)(() => kondo_entity_1.Kondo),
     sequelize_typescript_1.Column,
     __metadata("design:type", Number)
 ], Media.prototype, "kondoId", void 0);
