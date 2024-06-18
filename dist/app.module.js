@@ -27,7 +27,7 @@ AppModule = __decorate([
         imports: [database_module_1.DatabaseModule, config_1.ConfigModule.forRoot({ isGlobal: true }),
             sequelize_1.SequelizeModule.forRoot({
                 dialect: 'postgres',
-                //dialectOptions: { ssl: { require: false, rejectUnauthorized: false } },
+                dialectOptions: { ssl: { require: true, rejectUnauthorized: false } },
                 host: process.env.DB_HOST,
                 port: 5432,
                 username: process.env.DB_USER,

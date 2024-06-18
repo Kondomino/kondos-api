@@ -18,7 +18,7 @@ import { User } from './user/entities/user.entity';
   imports: [DatabaseModule, ConfigModule.forRoot({ isGlobal: true }),
     SequelizeModule.forRoot({
       dialect: 'postgres' as Dialect,
-      //dialectOptions: { ssl: { require: false, rejectUnauthorized: false } },
+      dialectOptions: { ssl: { require: true, rejectUnauthorized: false } },
       host: process.env.DB_HOST,
       port: 5432,
       username: process.env.DB_USER,
