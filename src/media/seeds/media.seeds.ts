@@ -474,6 +474,7 @@ export const mediaSeeds = [
       filename: 'serra-morena-15.jpeg',
       kondoId: 91
    },
+
 ];
 
 //  1	vitoria-nautico-residencevitoria-da-uniao
