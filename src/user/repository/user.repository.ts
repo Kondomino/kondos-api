@@ -1,8 +1,8 @@
 import { Injectable, Inject } from "@nestjs/common";
-import { User } from "../entities/User.entity";
+import { User } from "../entities/user.entity";
 import { USER_REPOSITORY_PROVIDER } from "src/core/constants";
-import { CreateUserDto } from "../dto/create-User.dto";
-import { UpdateUserDto } from "../dto/update-User.dto";
+import { CreateUserDto } from "../dto/create-user.dto";
+import { UpdateUserDto } from "../dto/update-user.dto";
 
 type findOrCreateType = [User | null, boolean];
 
