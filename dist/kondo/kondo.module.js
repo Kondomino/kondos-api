@@ -11,7 +11,7 @@ const common_1 = require("@nestjs/common");
 const kondo_service_1 = require("./kondo.service");
 const kondo_controller_1 = require("./kondo.controller");
 const sequelize_1 = require("@nestjs/sequelize");
-const Kondo_entity_1 = require("./entities/Kondo.entity");
+const kondo_entity_1 = require("./entities/kondo.entity");
 const kondo_provider_1 = require("./repository/kondo.provider");
 const kondo_repository_1 = require("./repository/kondo.repository");
 const slugify_module_1 = require("../utils/slugify/slugify.module");
@@ -21,7 +21,7 @@ KondoModule = __decorate([
     (0, common_1.Module)({
         controllers: [kondo_controller_1.KondoController],
         providers: [kondo_service_1.KondoService, ...kondo_provider_1.kondoProviders, kondo_repository_1.KondoRepository],
-        imports: [sequelize_1.SequelizeModule.forFeature([Kondo_entity_1.Kondo]), slugify_module_1.SlugifyModule]
+        imports: [sequelize_1.SequelizeModule.forFeature([kondo_entity_1.Kondo]), slugify_module_1.SlugifyModule]
     })
 ], KondoModule);
 exports.KondoModule = KondoModule;
