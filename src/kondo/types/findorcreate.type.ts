@@ -1,4 +1,4 @@
-import { Kondo } from "../entities/Kondo.entity";
+import { Kondo } from "../entities/kondo.entity";
 
 /**
  * @param Kondo
