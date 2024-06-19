@@ -1,8 +1,8 @@
 import { Injectable, Inject } from "@nestjs/common";
-import { Kondo } from "../entities/Kondo.entity";
+import { Kondo } from "../entities/kondo.entity";
 import { KONDO_REPOSITORY_PROVIDER } from "src/core/constants";
 import { CreateKondoDto } from "../dto/create-kondo.dto";
-import { UpdateKondoDto } from "../dto/update-Kondo.dto";
+import { UpdateKondoDto } from "../dto/update-kondo.dto";
 import { findOrCreateType } from "../types/findorcreate.type";
 
 
