@@ -8,17 +8,20 @@ import { AppController } from './app.controller';
 import { IntegratorModule } from './integrator/integrator.module';
 import { kondoProviders } from './kondo/repository/kondo.provider';
 import { Dialect } from 'sequelize';
-import { SeederModule } from 'nestjs-sequelize-seeder';
 import { Kondo } from './kondo/entities/kondo.entity';
 import { Media } from './media/entities/media.entity';
 import { MediaModule } from './media/media.module';
 import { User } from './user/entities/user.entity';
 
+console.log('env is ', process.env.NODE_ENV);
+const requireSSL_for_prod_only = process.env.NODE_ENV === 'PRODUCTION'?  { ssl: { require: true, rejectUnauthorized: false }}: {};
+
+console.log('variable is ', requireSSL_for_prod_only);
 @Module({
-  imports: [DatabaseModule, ConfigModule.forRoot({ isGlobal: true }),
+  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, 
     SequelizeModule.forRoot({
       dialect: 'postgres' as Dialect,
-      dialectOptions: { ssl: { require: true, rejectUnauthorized: false } },
+      dialectOptions: requireSSL_for_prod_only,
       host: process.env.DB_HOST,
       port: 5432,
       username: process.env.DB_USER,
@@ -41,4 +44,6 @@ import { User } from './user/entities/user.entity';
   controllers: [AppController],
   providers: [...kondoProviders],
 })
+
+
 export class AppModule {}

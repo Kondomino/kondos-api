@@ -20,14 +20,17 @@ const kondo_entity_1 = require("./kondo/entities/kondo.entity");
 const media_entity_1 = require("./media/entities/media.entity");
 const media_module_1 = require("./media/media.module");
 const user_entity_1 = require("./user/entities/user.entity");
+console.log('env is ', process.env.NODE_ENV);
+const requireSSL_for_prod_only = process.env.NODE_ENV === 'PRODUCTION' ? { ssl: { require: true, rejectUnauthorized: false } } : {};
+console.log('variable is ', requireSSL_for_prod_only);
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [database_module_1.DatabaseModule, config_1.ConfigModule.forRoot({ isGlobal: true }),
+        imports: [config_1.ConfigModule.forRoot({ isGlobal: true }), database_module_1.DatabaseModule,
             sequelize_1.SequelizeModule.forRoot({
                 dialect: 'postgres',
-                dialectOptions: { ssl: { require: true, rejectUnauthorized: false } },
+                dialectOptions: requireSSL_for_prod_only,
                 host: process.env.DB_HOST,
                 port: 5432,
                 username: process.env.DB_USER,
