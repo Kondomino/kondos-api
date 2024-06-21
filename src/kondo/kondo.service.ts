@@ -2,18 +2,20 @@ import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { Kondo } from './entities/kondo.entity';
 import { UpdateKondoDto } from './dto/update-kondo.dto';
 import { CreateKondoDto } from './dto/create-kondo.dto';
-import { KONDO_REPOSITORY_PROVIDER } from '../core/constants';
+//import { KONDO_REPOSITORY_PROVIDER } from '../core/constants';
 import { findOrCreateType } from './types/findorcreate.type';
 import { SearchKondoDto } from './dto/search-kondo.dto';
 import { SlugifyService } from '../utils/slugify/slugify.service';
+import { KondoRepository } from './repository/kondo.repository';
+//import { KONDO_REPOSITORY_PROVIDER } from '../core/constants';
 
 @Injectable()
 export class KondoService {
 
     constructor(
-        @Inject(KONDO_REPOSITORY_PROVIDER) private readonly KondoRepository: typeof Kondo,
-        private slugify: SlugifyService
-    ) { }
+        private slugify: SlugifyService,
+        private readonly KondoRepository: KondoRepository
+    ) {}
 
     async create(Kondo: CreateKondoDto): Promise<findOrCreateType> {
 
@@ -30,27 +32,29 @@ export class KondoService {
         }
     }
 
-    async findOneByEmail(email: string): Promise<Kondo> {
-        return await this.KondoRepository.findOne<Kondo>({ where: { email } });
-    }
     async findOne(id: number): Promise<Kondo> {
-        return await this.KondoRepository.findOne<Kondo>({ where: { id } });
+        return await this.KondoRepository.findOne({ where: { id } });
     }
     async findBy(searchKondoDto: SearchKondoDto): Promise<Kondo> {
         const { name, slug, email } = searchKondoDto;
 
         if (name)
-            return await this.KondoRepository.findOne<Kondo>({ where: { name } });
+            return await this.KondoRepository.findOne({ where: { name } });
         else if (slug)
-            return await this.KondoRepository.findOne<Kondo>({ where: { slug } });
+            return await this.KondoRepository.findOne({ where: { slug } });
         else if (email)
-            return this.findOneByEmail(email);
+            return await this.KondoRepository.findOne({ where: { email } });
     }
-    async findActives(): Promise<Kondo[]> {
-        return await this.KondoRepository.findAll<Kondo>({ where: { active: true }});
+    async findActives(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
+
+        searchKondoDto.active = true;
+        return await this.KondoRepository.findAll(searchKondoDto);
     }
-    async findAll(): Promise<Kondo[]> {
-        return await this.KondoRepository.findAll<Kondo>({});
+    async findAll(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
+
+        console.log('find all service');
+        return await this.KondoRepository.findAll(searchKondoDto);
+        //return await this.KondoRepository.findAll<Kondo>({});
     }
 
     async update(id: number, Kondo: UpdateKondoDto): Promise<Kondo> {

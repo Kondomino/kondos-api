@@ -9,33 +9,38 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchKondoDto = void 0;
+exports.PageOptionsDto = void 0;
+const class_transformer_1 = require("class-transformer");
 const class_validator_1 = require("class-validator");
-const page_options_dto_1 = require("../../core/pagination/page.options.dto");
-class SearchKondoDto extends page_options_dto_1.PageOptionsDto {
+const order_type_1 = require("./order.type");
+class PageOptionsDto {
     constructor() {
-        super(...arguments);
-        this.active = true;
+        this.order = order_type_1.Order.ASC;
+        this.page = 1;
+        this.take = 12;
+    }
+    get skip() {
+        return (this.page - 1) * this.take;
     }
 }
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsEnum)(order_type_1.Order),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
-], SearchKondoDto.prototype, "name", void 0);
+], PageOptionsDto.prototype, "order", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], SearchKondoDto.prototype, "slug", void 0);
+    __metadata("design:type", Number)
+], PageOptionsDto.prototype, "page", void 0);
 __decorate([
-    (0, class_validator_1.IsEmail)(),
+    (0, class_transformer_1.Type)(() => Number),
+    (0, class_validator_1.IsInt)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(50),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], SearchKondoDto.prototype, "email", void 0);
-__decorate([
-    (0, class_validator_1.IsBoolean)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Boolean)
-], SearchKondoDto.prototype, "active", void 0);
-exports.SearchKondoDto = SearchKondoDto;
+    __metadata("design:type", Number)
+], PageOptionsDto.prototype, "take", void 0);
+exports.PageOptionsDto = PageOptionsDto;

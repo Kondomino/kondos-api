@@ -34,9 +34,9 @@ let KondoController = class KondoController {
     create(createKondoDto) {
         return this.kondoService.create(createKondoDto);
     }
-    findAll() {
+    findAll(searchKondoDto) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.kondoService.findActives();
+            return this.kondoService.findAll(searchKondoDto);
         });
     }
     findOne(id) {
@@ -62,8 +62,9 @@ __decorate([
 ], KondoController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [search_kondo_dto_1.SearchKondoDto]),
     __metadata("design:returntype", Promise)
 ], KondoController.prototype, "findAll", null);
 __decorate([
