@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, Inject } from "@nestjs/common";
 import { Kondo } from "../entities/kondo.entity";
 import { KONDO_REPOSITORY_PROVIDER } from "src/core/constants";
 import { CreateKondoDto } from "../dto/create-kondo.dto";
 import { UpdateKondoDto } from "../dto/update-kondo.dto";
 import { findOrCreateType } from "../types/findorcreate.type";
-
-
+import { FindOptions, Order } from "sequelize";
+import { SearchKondoDto } from "../dto/search-kondo.dto";
+import { PaginationQuery } from "../../core/pagination/pagination.query.type";
+import { KondoWhereOptions } from "./kondo.where.options";
 
 @Injectable()
 export class KondoRepository {
@@ -13,16 +16,40 @@ export class KondoRepository {
     constructor(@Inject(KONDO_REPOSITORY_PROVIDER) private readonly KondoRepositoryProvider: typeof Kondo) { 
     }
 
-    async find(): Promise<Kondo[]> {
-        return await this.KondoRepositoryProvider.findAll<Kondo>();
+    async findOne(where: FindOptions): Promise<Kondo> {
+        return await this.KondoRepositoryProvider.findOne<Kondo>(where);
     }
 
-    async findOne(): Promise<Kondo> {
-        return await this.KondoRepositoryProvider.findOne<Kondo>();
-    }
+    async findAll(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
+        console.log('page options arrived as', searchKondoDto);
+        // eslint-disable-next-line prefer-const
+        let { take, order, page, name, slug, active } = searchKondoDto;
 
-    async findAll(): Promise<Kondo[]> {
-        return await this.KondoRepositoryProvider.findAll<Kondo>();
+        // eslint-disable-next-line prefer-const
+        let query: PaginationQuery = {
+            limit: take,
+            where: { active }
+        };
+
+        if (name) {
+            query.where = { name };
+        }
+
+        if (slug) {
+            query.where = { slug };
+        }
+
+        if (order) {
+            query.order = [['id', searchKondoDto.order]];
+        }
+
+        page = page? page -1 : 0;
+        query.offset = page * searchKondoDto.take;
+        //const something: number = page * searchKondoDto.take;
+
+        console.log('page is ', page);
+        console.log('query.offset is ', query.offset);
+        return await this.KondoRepositoryProvider.findAll<Kondo>(query);
     }
 
     /**
@@ -60,4 +87,15 @@ export class KondoRepository {
         return await this.KondoRepositoryProvider.create<Kondo>(createKondoDto);
     }
 
+    // prepareWhere(fields): KondoWhereOptions {
+
+    //     const where = fields.filter(item => {
+    //         return item
+    //     })
+    //     const where = {
+
+    //     }
+
+    //     return where;
+    // }
 }

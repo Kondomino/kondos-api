@@ -18,7 +18,7 @@ function bootstrap() {
     return __awaiter(this, void 0, void 0, function* () {
         //initializeApp();
         const app = yield core_1.NestFactory.create(app_module_1.AppModule, { cors: true });
-        app.useGlobalPipes(new common_1.ValidationPipe());
+        app.useGlobalPipes(new common_1.ValidationPipe({ transform: true }));
         yield app.listen(3003);
     });
 }

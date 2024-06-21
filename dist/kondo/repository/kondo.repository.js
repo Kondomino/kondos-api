@@ -22,25 +22,43 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KondoRepository = void 0;
+/* eslint-disable @typescript-eslint/no-unused-vars */
 const common_1 = require("@nestjs/common");
 const constants_1 = require("../../core/constants");
 let KondoRepository = class KondoRepository {
     constructor(KondoRepositoryProvider) {
         this.KondoRepositoryProvider = KondoRepositoryProvider;
     }
-    find() {
+    findOne(where) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.KondoRepositoryProvider.findAll();
+            return yield this.KondoRepositoryProvider.findOne(where);
         });
     }
-    findOne() {
+    findAll(searchKondoDto) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.KondoRepositoryProvider.findOne();
-        });
-    }
-    findAll() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.KondoRepositoryProvider.findAll();
+            console.log('page options arrived as', searchKondoDto);
+            // eslint-disable-next-line prefer-const
+            let { take, order, page, name, slug, active } = searchKondoDto;
+            // eslint-disable-next-line prefer-const
+            let query = {
+                limit: take,
+                where: { active }
+            };
+            if (name) {
+                query.where = { name };
+            }
+            if (slug) {
+                query.where = { slug };
+            }
+            if (order) {
+                query.order = [['id', searchKondoDto.order]];
+            }
+            page = page ? page - 1 : 0;
+            query.offset = page * searchKondoDto.take;
+            //const something: number = page * searchKondoDto.take;
+            console.log('page is ', page);
+            console.log('query.offset is ', query.offset);
+            return yield this.KondoRepositoryProvider.findAll(query);
         });
     }
     /**

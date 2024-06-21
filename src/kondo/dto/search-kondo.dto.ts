@@ -1,6 +1,7 @@
-import { IsEmail, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsEmail, IsOptional, IsString } from "class-validator";
+import { PageOptionsDto } from "../../core/pagination/page.options.dto";
 
-export class SearchKondoDto {
+export class SearchKondoDto extends PageOptionsDto {
     @IsString()
     @IsOptional()
     name: string;
@@ -12,4 +13,8 @@ export class SearchKondoDto {
     @IsEmail()
     @IsOptional()
     email: string;
+
+    @IsBoolean()
+    @IsOptional()
+    active: boolean = true;
 }

@@ -13,12 +13,11 @@ import { Media } from './media/entities/media.entity';
 import { MediaModule } from './media/media.module';
 import { User } from './user/entities/user.entity';
 
-console.log('env is ', process.env.NODE_ENV);
 const requireSSL_for_prod_only = process.env.NODE_ENV === 'PRODUCTION'?  { ssl: { require: true, rejectUnauthorized: false }}: {};
-
-console.log('variable is ', requireSSL_for_prod_only);
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), DatabaseModule, 
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    DatabaseModule, 
     SequelizeModule.forRoot({
       dialect: 'postgres' as Dialect,
       dialectOptions: requireSSL_for_prod_only,
