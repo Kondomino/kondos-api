@@ -5,5 +5,5 @@ export type PaginationQuery = {
     limit?: number,
     order?: Order,
     offset?: number,
-    where?: KondoWhereOptions
+    where?: KondoWhereOptions | any
 }

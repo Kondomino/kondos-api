@@ -15,7 +15,8 @@ export class KondoController {
   }
 
   @Get()
-  async findAll(@Query() searchKondoDto: SearchKondoDto,) {
+  async findAll(@Query() searchKondoDto: SearchKondoDto) {
+    console.log('findAll');
     return this.kondoService.findAll(searchKondoDto);
   }
 

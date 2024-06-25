@@ -51,10 +51,7 @@ export class KondoService {
         return await this.KondoRepository.findAll(searchKondoDto);
     }
     async findAll(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
-
-        console.log('find all service');
         return await this.KondoRepository.findAll(searchKondoDto);
-        //return await this.KondoRepository.findAll<Kondo>({});
     }
 
     async update(id: number, Kondo: UpdateKondoDto): Promise<Kondo> {

@@ -5,10 +5,11 @@ import { KONDO_REPOSITORY_PROVIDER } from "src/core/constants";
 import { CreateKondoDto } from "../dto/create-kondo.dto";
 import { UpdateKondoDto } from "../dto/update-kondo.dto";
 import { findOrCreateType } from "../types/findorcreate.type";
-import { FindOptions, Order } from "sequelize";
+import { FindOptions, Order, Sequelize } from "sequelize";
 import { SearchKondoDto } from "../dto/search-kondo.dto";
 import { PaginationQuery } from "../../core/pagination/pagination.query.type";
 import { KondoWhereOptions } from "./kondo.where.options";
+import { Op } from "sequelize";
 
 @Injectable()
 export class KondoRepository {
@@ -21,9 +22,8 @@ export class KondoRepository {
     }
 
     async findAll(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
-        console.log('page options arrived as', searchKondoDto);
         // eslint-disable-next-line prefer-const
-        let { take, order, page, name, slug, active } = searchKondoDto;
+        let { take, order, page, name, slug, active, phrase } = searchKondoDto;
 
         // eslint-disable-next-line prefer-const
         let query: PaginationQuery = {
@@ -31,6 +31,18 @@ export class KondoRepository {
             where: { active }
         };
 
+        if (phrase) {
+            const queryPhraseArray = phrase.split(' ');
+            query.where = { 
+                [Op.or]:
+                    [
+                        { name: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}`) }}},
+                        { city: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}`) }}},
+                        { neighborhood: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}`) }}}
+                    ] 
+             }
+        }
+        
         if (name) {
             query.where = { name };
         }
@@ -45,10 +57,7 @@ export class KondoRepository {
 
         page = page? page -1 : 0;
         query.offset = page * searchKondoDto.take;
-        //const something: number = page * searchKondoDto.take;
 
-        console.log('page is ', page);
-        console.log('query.offset is ', query.offset);
         return await this.KondoRepositoryProvider.findAll<Kondo>(query);
     }
 

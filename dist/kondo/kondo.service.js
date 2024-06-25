@@ -66,9 +66,7 @@ let KondoService = class KondoService {
     }
     findAll(searchKondoDto) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('find all service');
             return yield this.KondoRepository.findAll(searchKondoDto);
-            //return await this.KondoRepository.findAll<Kondo>({});
         });
     }
     update(id, Kondo) {
