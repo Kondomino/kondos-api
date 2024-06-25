@@ -17,4 +17,8 @@ export class SearchKondoDto extends PageOptionsDto {
     @IsBoolean()
     @IsOptional()
     active: boolean = true;
+
+    @IsString()
+    @IsOptional()
+    phrase: string;
 }
