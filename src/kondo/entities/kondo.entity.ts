@@ -1,7 +1,8 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
 import { KondoAddressType } from './kondo.address.abstract.entity';
 import { Expose } from 'class-transformer';
 import { KondoConveniencesType, basic_conveniences, conveniences_conveniences, extra_conveniences, security_conveniences } from './kondo.conveniences.abstract.entity';
+import { Media } from '../../media/entities/media.entity';
 
 export const KondoTypes = Object.freeze({
     Bairro: 'bairro',
@@ -58,6 +59,11 @@ export class Kondo extends Model<Kondo> {
         unique: true
     })
     slug: string;
+
+    @Column({
+        unique: false
+    })
+    featured_image: string;
 
     @Column({
         values: Object.values(KondoTypes),
@@ -345,7 +351,9 @@ export class Kondo extends Model<Kondo> {
     // })
     // updatedAt: Date;
 
-    
+    @HasMany(() => Media)
+    medias: Media[];
+
     @Expose()
     get details() {
         return this.getDetails();
@@ -428,3 +436,5 @@ export class Kondo extends Model<Kondo> {
         return conveniences;
     }
 }
+
+//Kondo.hasMany(Media);

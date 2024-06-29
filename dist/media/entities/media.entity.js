@@ -38,7 +38,12 @@ __decorate([
     sequelize_typescript_1.Column,
     __metadata("design:type", Number)
 ], Media.prototype, "kondoId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => kondo_entity_1.Kondo),
+    __metadata("design:type", kondo_entity_1.Kondo)
+], Media.prototype, "kondo", void 0);
 Media = __decorate([
     sequelize_typescript_1.Table
 ], Media);
 exports.Media = Media;
+//Media.belongsTo(Kondo);
