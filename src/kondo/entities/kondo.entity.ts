@@ -3,7 +3,7 @@ import { KondoAddressType } from './kondo.address.abstract.entity';
 import { Expose } from 'class-transformer';
 import { KondoConveniencesType, basic_conveniences, conveniences_conveniences, extra_conveniences, security_conveniences } from './kondo.conveniences.abstract.entity';
 
-const KondoTypes = Object.freeze({
+export const KondoTypes = Object.freeze({
     Bairro: 'bairro',
     Casas: 'casas',
     Chacaras: 'chacatas',
@@ -12,7 +12,7 @@ const KondoTypes = Object.freeze({
     Industrial: 'industrial'
   });
 
-  const KondoStatus = Object.freeze({
+export const KondoStatus = Object.freeze({
     DRAFT: 'draft',
     TEXT_READY: 'text_ready',
     MEDIA_GATHERING: 'media_gathering',

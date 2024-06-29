@@ -33,11 +33,11 @@ const requireSSL_for_prod_only = process.env.NODE_ENV === 'PRODUCTION'?  { ssl: 
     KondoModule,
     IntegratorModule,
     MediaModule,
-    /*
-    SeederModule.forRoot({
-      // Activate this if you want to run the seeders if the table is empty in the database
-      runOnlyIfTableIsEmpty: true,
-   }),*/
+  //   SeederModule.forRoot({
+  //     // Activate this if you want to run the seeders if the table is empty in the database
+  //     runOnlyIfTableIsEmpty: true,
+  //     logging: true,
+  //  }),
     //SequelizeModule.forFeature([User, Kondo])
   ],
   controllers: [AppController],

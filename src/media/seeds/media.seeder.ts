@@ -12,6 +12,7 @@ export const __mediaSeeder = [];
    //data: [];
 
    run() {
+    console.log('running seeds');
 
       return mediaSeeds;
     }

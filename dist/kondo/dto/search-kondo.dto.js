@@ -12,10 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SearchKondoDto = void 0;
 const class_validator_1 = require("class-validator");
 const page_options_dto_1 = require("../../core/pagination/page.options.dto");
+const kondo_entity_1 = require("../entities/kondo.entity");
 class SearchKondoDto extends page_options_dto_1.PageOptionsDto {
     constructor() {
         super(...arguments);
         this.active = true;
+        this.status = kondo_entity_1.KondoStatus.DONE;
     }
 }
 __decorate([
@@ -38,6 +40,11 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Boolean)
 ], SearchKondoDto.prototype, "active", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], SearchKondoDto.prototype, "status", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),

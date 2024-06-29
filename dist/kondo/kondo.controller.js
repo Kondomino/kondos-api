@@ -44,7 +44,6 @@ let KondoController = class KondoController {
         return this.kondoService.findOne(+id);
     }
     findBy(searchKondoDto) {
-        console.log('findBy');
         return this.kondoService.findBy(searchKondoDto);
     }
     update(id, updateKondoDto) {

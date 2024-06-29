@@ -43,11 +43,11 @@ AppModule = __decorate([
             kondo_module_1.KondoModule,
             integrator_module_1.IntegratorModule,
             media_module_1.MediaModule,
-            /*
-            SeederModule.forRoot({
-              // Activate this if you want to run the seeders if the table is empty in the database
-              runOnlyIfTableIsEmpty: true,
-           }),*/
+            //   SeederModule.forRoot({
+            //     // Activate this if you want to run the seeders if the table is empty in the database
+            //     runOnlyIfTableIsEmpty: true,
+            //     logging: true,
+            //  }),
             //SequelizeModule.forFeature([User, Kondo])
         ],
         controllers: [app_controller_1.AppController],

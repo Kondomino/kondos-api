@@ -14,8 +14,6 @@ const media_provider_1 = require("./repository/media.provider");
 const media_entity_1 = require("./entities/media.entity");
 const sequelize_1 = require("@nestjs/sequelize");
 const media_repository_1 = require("./repository/media.repository");
-//import { SeedMedia } from './seeds/media.seeder';
-//import { SeederModule } from 'nestjs-sequelize-seeder';
 let MediaModule = class MediaModule {
 };
 MediaModule = __decorate([
