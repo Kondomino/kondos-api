@@ -27,7 +27,6 @@ export class KondoController {
 
   @Post('/findBy')
   findBy(@Body() searchKondoDto: SearchKondoDto) {
-    console.log('findBy');
     return this.kondoService.findBy(searchKondoDto);
   }
 

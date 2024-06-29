@@ -474,10 +474,54 @@ export const mediaSeeds = [
       filename: 'serra-morena-15.jpeg',
       kondoId: 91
    },
-
+   // 122	lumina
+   {
+      filename: 'lumina-1.jpeg',
+      kondoId: 122
+   },
+   {
+      filename: 'lumina-2.jpeg',
+      kondoId: 122
+   },
+   {
+      filename: 'lumina-3.jpeg',
+      kondoId: 122
+   },
+   {
+      filename: 'lumina-4.jpeg',
+      kondoId: 122
+   },
+   {
+      filename: 'lumina-5.jpeg',
+      kondoId: 122
+   },
+   {
+      filename: 'lumina-6.jpeg',
+      kondoId: 122
+   },
+   {
+      filename: 'lumina-7.jpeg',
+      kondoId: 122
+   },
+   {
+      filename: 'lumina-8.jpeg',
+      kondoId: 122
+   },
+   {
+      filename: 'lumina-9.jpeg',
+      kondoId: 122
+   },
+   {
+      filename: 'lumina-10.jpeg',
+      kondoId: 122
+   },
+   {
+      filename: 'lumina-11.jpeg',
+      kondoId: 122
+   },
 ];
 
-//  1	vitoria-nautico-residencevitoria-da-uniao
+// 1	vitoria-nautico-residencevitoria-da-uniao
 // 2	victoria-golf-residencevitoria-da-uniao
 // 3	village-do-gramado
 // 4	vale-dos-sonhos
@@ -567,12 +611,15 @@ export const mediaSeeds = [
 // 88	eco-village
 // 89	terra-vista
 // 90	canto-da-siriemaresort-residence
+// 91	serra-morena
 // 92	fazendinhas-eldorado
 // 93	caminho-das-cachoeiras
 // 94	serras-altas-residencial
 // 95	paradiso-ecologico
 // 96	estancia-do-lago
 // 97	balneario-vista-da-lagoa
+// 98	la-ville
+// 99	fazendas-terras-de-minas
 // 100	vila-castela-brisas
 // 101	vila-castela-jardins
 // 102	vila-castela-alameda
@@ -582,3 +629,18 @@ export const mediaSeeds = [
 // 106	vila-castela-arvoredo
 // 107	vila-castela-ipe
 // 108	vila-castela-reserva
+// 109	alto-dos-pinheiros
+// 110	aguas-do-funil
+// 111	mae-terra
+// 112	versailles
+// 113	gandara
+// 114	balneario-shangryla
+// 115	estancia-da-lapa
+// 116	alta-vista
+// 117	green-village
+// 118	benza
+// 119	ponte-nova
+// 120	sensia-pampulha
+// 121	retiro-das-aguas
+// 122	lumina
+// 123	jardim-linhares

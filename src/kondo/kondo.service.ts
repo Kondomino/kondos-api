@@ -46,7 +46,6 @@ export class KondoService {
             return await this.KondoRepository.findOne({ where: { email } });
     }
     async findActives(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
-
         searchKondoDto.active = true;
         return await this.KondoRepository.findAll(searchKondoDto);
     }

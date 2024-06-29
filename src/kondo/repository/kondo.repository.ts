@@ -23,32 +23,32 @@ export class KondoRepository {
 
     async findAll(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
         // eslint-disable-next-line prefer-const
-        let { take, order, page, name, slug, active, phrase } = searchKondoDto;
+        let { take, order, page, name, slug, active, status, phrase } = searchKondoDto;
 
         // eslint-disable-next-line prefer-const
         let query: PaginationQuery = {
             limit: take,
-            where: { active }
+            where: { active, status }
         };
 
         if (phrase) {
             const queryPhraseArray = phrase.split(' ');
-            query.where = { 
+            query.where = Object.assign(query.where, { 
                 [Op.or]:
                     [
                         { name: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}`) }}},
                         { city: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}`) }}},
                         { neighborhood: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}`) }}}
                     ] 
-             }
+             });
         }
         
         if (name) {
-            query.where = { name };
+            query.where = Object.assign(query.where, { name });
         }
 
         if (slug) {
-            query.where = { slug };
+            query.where = Object.assign(query.where, { slug });
         }
 
         if (order) {

@@ -39,8 +39,8 @@ let IntegratorService = class IntegratorService {
         return __awaiter(this, void 0, void 0, function* () {
             const options = {
                 'file': './files/kondos.xlsx',
-                //'filepath': 'C:/Projetos/kondos-api/src/integrator/files/kondos.xlsx'
-                'filepath': './files/kondos.xlsx'
+                'filepath': 'C:/Projetos/kondos-api/src/integrator/files/kondos.xlsx'
+                //'filepath': './files/kondos.xlsx'
             };
             return this.runIntegrator(options);
         });

@@ -13,6 +13,7 @@ exports.__mediaSeeder = [];
 let SeedMedia = class SeedMedia {
     //data: [];
     run() {
+        console.log('running seeds');
         return media_seeds_1.mediaSeeds;
     }
 };
