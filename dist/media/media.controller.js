@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MediaController = void 0;
 const common_1 = require("@nestjs/common");
 const media_service_1 = require("./media.service");
-const search_media_dto_1 = require("./dto/search-media.dto");
 let MediaController = class MediaController {
     constructor(mediaService) {
         this.mediaService = mediaService;
@@ -29,24 +28,14 @@ let MediaController = class MediaController {
     findMediasOfKondo(kondoId) {
         return this.mediaService.findMediasOfKondo(kondoId);
     }
-    findOne(searchMediaDto) {
-        return this.mediaService.findBy(searchMediaDto);
-    }
 };
 __decorate([
-    (0, common_1.Get)(),
+    (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], MediaController.prototype, "findMediasOfKondo", null);
-__decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [search_media_dto_1.SearchMediaDto]),
-    __metadata("design:returntype", void 0)
-], MediaController.prototype, "findOne", null);
 MediaController = __decorate([
     (0, common_1.Controller)('media'),
     __metadata("design:paramtypes", [media_service_1.MediaService])

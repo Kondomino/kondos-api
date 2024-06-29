@@ -1,6 +1,5 @@
-import { Controller, Get, Body, Param } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { MediaService } from './media.service';
-import { SearchMediaDto } from './dto/search-media.dto';
 
 @Controller('media')
 export class MediaController {
@@ -13,15 +12,15 @@ export class MediaController {
   }
   */
 
-  @Get()
+  @Get(':id')
   findMediasOfKondo(@Param('id') kondoId: string) {
     return this.mediaService.findMediasOfKondo(kondoId);
   }
 
-  @Get(':id')
-  findOne(@Body() searchMediaDto: SearchMediaDto) {
-    return this.mediaService.findBy(searchMediaDto);
-  }
+  // @Get(':id')
+  // findOne(@Body() searchMediaDto: SearchMediaDto) {
+  //   return this.mediaService.findBy(searchMediaDto);
+  // }
 
   /*
   @Patch(':id')

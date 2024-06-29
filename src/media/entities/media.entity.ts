@@ -1,4 +1,4 @@
-import { Table, Column, Model, DataType, ForeignKey } from "sequelize-typescript";
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Kondo } from "../../kondo/entities/kondo.entity";
 
 const MediaTypes = Object.freeze({
@@ -32,4 +32,9 @@ export class Media extends Model<Media> {
     @ForeignKey(() => Kondo)
     @Column
     kondoId: number;
+
+    @BelongsTo(() => Kondo)
+    kondo: Kondo;
 }
+
+//Media.belongsTo(Kondo);

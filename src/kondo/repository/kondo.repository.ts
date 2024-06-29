@@ -10,6 +10,7 @@ import { SearchKondoDto } from "../dto/search-kondo.dto";
 import { PaginationQuery } from "../../core/pagination/pagination.query.type";
 import { KondoWhereOptions } from "./kondo.where.options";
 import { Op } from "sequelize";
+import { Media } from "../../media/entities/media.entity";
 
 @Injectable()
 export class KondoRepository {
