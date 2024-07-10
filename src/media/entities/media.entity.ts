@@ -10,7 +10,7 @@ const MediaTypes = Object.freeze({
 module.exports.MediaTypes = MediaTypes;
 
 @Table
-export class Media extends Model<Media> {
+export class Media extends Model {
       
     @Column({
         type: DataType.STRING,

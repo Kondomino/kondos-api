@@ -11,7 +11,7 @@ export const UnitStatus = Object.freeze({
 
 
 @Table
-export class Unit extends Model<Unit> {
+export class Unit extends Model {
 
     @Column({
         allowNull: false,

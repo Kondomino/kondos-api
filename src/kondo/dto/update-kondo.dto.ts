@@ -33,7 +33,7 @@ export class UpdateKondoDto extends PartialType(CreateKondoDto) {
     
     @IsString()
     @IsOptional()
-    readonly address_street_and_number: string;
+    readonly address_street_and_numbers: string;
     
     @IsString()
     @IsOptional()

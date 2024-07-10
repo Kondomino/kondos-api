@@ -32,7 +32,7 @@ export class UnitRepository {
      *      If nothing is found, will create.
      * @returns 
      */
-    async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: CreateUnitDto}): Promise<findOrCreateType> {
+    async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: Partial<Unit>}): Promise<findOrCreateType> {
         return await this.UnitRepositoryProvider.findOrCreate<Unit>(findOrCreate);    
     }
 
@@ -55,7 +55,7 @@ export class UnitRepository {
         return await this.UnitRepositoryProvider.destroy<Unit>();
     }
 
-    async create(createUnitDto: CreateUnitDto): Promise<Unit> {
+    async create(createUnitDto: Partial<Unit>): Promise<Unit> {
         return await this.UnitRepositoryProvider.create<Unit>(createUnitDto);
     }
 

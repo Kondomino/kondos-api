@@ -23,16 +23,15 @@ export const KondoStatus = Object.freeze({
 
 module.exports.KondoTypes = KondoTypes;
 @Table
-export class Kondo extends Model<Kondo> {
+export class Kondo extends Model {
     
-    /*
     constructor(partial?: Partial<Kondo>) {
-        super();
+      super();
         
-        if (partial)
-            Object.assign(this, partial);
-      }
-    */
+      if (partial)
+        Object.assign(this, partial);
+    }
+    
      
     @Column({
         type: DataType.STRING,
