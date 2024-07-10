@@ -14,6 +14,7 @@ const sequelize_typescript_1 = require("sequelize-typescript");
 const class_transformer_1 = require("class-transformer");
 const kondo_conveniences_abstract_entity_1 = require("./kondo.conveniences.abstract.entity");
 const media_entity_1 = require("../../media/entities/media.entity");
+const like_entity_1 = require("../../like/entities/like.entity");
 exports.KondoTypes = Object.freeze({
     Bairro: 'bairro',
     Casas: 'casas',
@@ -117,7 +118,7 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         values: Object.values(exports.KondoStatus),
-        defaultValue: true
+        defaultValue: exports.KondoStatus.DRAFT
     }),
     __metadata("design:type", String)
 ], Kondo.prototype, "status", void 0);
@@ -456,6 +457,10 @@ __decorate([
     __metadata("design:type", Array)
 ], Kondo.prototype, "medias", void 0);
 __decorate([
+    (0, sequelize_typescript_1.HasMany)(() => like_entity_1.Like),
+    __metadata("design:type", Array)
+], Kondo.prototype, "likes", void 0);
+__decorate([
     (0, class_transformer_1.Expose)(),
     __metadata("design:type", Object),
     __metadata("design:paramtypes", [])
@@ -474,4 +479,4 @@ Kondo = __decorate([
     sequelize_typescript_1.Table
 ], Kondo);
 exports.Kondo = Kondo;
-//Kondo.hasMany(Media);
+//Kondo.hasMany(Like);

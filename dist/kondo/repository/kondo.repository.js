@@ -11,62 +11,59 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KondoRepository = void 0;
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const common_1 = require("@nestjs/common");
 const constants_1 = require("../../core/constants");
 const sequelize_1 = require("sequelize");
+const like_entity_1 = require("../../like/entities/like.entity");
 let KondoRepository = class KondoRepository {
     constructor(KondoRepositoryProvider) {
         this.KondoRepositoryProvider = KondoRepositoryProvider;
     }
-    findOne(where) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.KondoRepositoryProvider.findOne(where);
-        });
+    async findOne(where) {
+        return await this.KondoRepositoryProvider.findOne(where);
     }
-    findAll(searchKondoDto) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // eslint-disable-next-line prefer-const
-            let { take, order, page, name, slug, active, status, phrase } = searchKondoDto;
-            // eslint-disable-next-line prefer-const
-            let query = {
-                limit: take,
-                where: { active, status }
-            };
-            if (phrase) {
-                const queryPhraseArray = phrase.split(' ');
-                query.where = Object.assign(query.where, {
-                    [sequelize_1.Op.or]: [
-                        { name: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}`) } } },
-                        { city: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}`) } } },
-                        { neighborhood: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}`) } } }
-                    ]
-                });
-            }
-            if (name) {
-                query.where = Object.assign(query.where, { name });
-            }
-            if (slug) {
-                query.where = Object.assign(query.where, { slug });
-            }
-            if (order) {
-                query.order = [['id', searchKondoDto.order]];
-            }
-            page = page ? page - 1 : 0;
-            query.offset = page * searchKondoDto.take;
-            return yield this.KondoRepositoryProvider.findAll(query);
-        });
+    async findAll(searchKondoDto) {
+        // eslint-disable-next-line prefer-const
+        let { take, order, page, name, slug, active, status, phrase } = searchKondoDto;
+        // eslint-disable-next-line prefer-const
+        let query = {
+            //attributes: ['Kondo.*', 'Like.id'],
+            //attributes: ['Kondo.*', sequelize.fn('COUNT', sequelize.col('likes.kondoId'))],
+            limit: take,
+            where: { active, status },
+            include: { model: like_entity_1.Like, as: 'likes' },
+            // include: [
+            //     { 
+            //       model: Like,
+            //       as: 'likes', attributes: []
+            //     }
+            // ]
+        };
+        if (phrase) {
+            const queryPhraseArray = phrase.split(' ');
+            query.where = Object.assign(query.where, {
+                [sequelize_1.Op.or]: [
+                    { name: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}`) } } },
+                    { city: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}`) } } },
+                    { neighborhood: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}`) } } }
+                ]
+            });
+        }
+        if (name) {
+            query.where = Object.assign(query.where, { name });
+        }
+        if (slug) {
+            query.where = Object.assign(query.where, { slug });
+        }
+        if (order) {
+            query.order = [['id', searchKondoDto.order]];
+        }
+        page = page ? page - 1 : 0;
+        query.offset = page * searchKondoDto.take;
+        return await this.KondoRepositoryProvider.findAll(query);
     }
     /**
      * Find or Create
@@ -76,10 +73,8 @@ let KondoRepository = class KondoRepository {
      *      If nothing is found, will create.
      * @returns
      */
-    findOrCreate(findOrCreate) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.KondoRepositoryProvider.findOrCreate(findOrCreate);
-        });
+    async findOrCreate(findOrCreate) {
+        return await this.KondoRepositoryProvider.findOrCreate(findOrCreate);
     }
     /**
      * Update
@@ -92,20 +87,14 @@ let KondoRepository = class KondoRepository {
                     },
      * @returns
      */
-    update(updateKondoDto, where) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.KondoRepositoryProvider.update(updateKondoDto, { where });
-        });
+    async update(updateKondoDto, where) {
+        return await this.KondoRepositoryProvider.update(updateKondoDto, { where });
     }
-    destroy() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.KondoRepositoryProvider.destroy();
-        });
+    async destroy() {
+        return await this.KondoRepositoryProvider.destroy();
     }
-    create(createKondoDto) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.KondoRepositoryProvider.create(createKondoDto);
-        });
+    async create(createKondoDto) {
+        return await this.KondoRepositoryProvider.create(createKondoDto);
     }
 };
 KondoRepository = __decorate([

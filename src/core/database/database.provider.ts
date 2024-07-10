@@ -4,6 +4,8 @@ import { databaseConfig } from './database.config';
 import { User } from '../../user/entities/user.entity';
 import { Kondo } from '../../kondo/entities/kondo.entity';
 import { Media } from '../../media/entities/media.entity';
+import { Unit } from '../../unit/entities/unit.entity';
+import { Like } from '../../like/entities/like.entity';
 
 export const databaseProviders = [{
     provide: SEQUELIZE,
@@ -23,7 +25,7 @@ export const databaseProviders = [{
                 config = databaseConfig.development;
         }
         const sequelize = new Sequelize(config);
-        sequelize.addModels([User, Kondo, Media]);
+        sequelize.addModels([User, Kondo, Media, Unit, Like]);
         await sequelize.sync();
         return sequelize;
     },

@@ -1,13 +1,11 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Kondo } from './entities/kondo.entity';
 import { UpdateKondoDto } from './dto/update-kondo.dto';
 import { CreateKondoDto } from './dto/create-kondo.dto';
-//import { KONDO_REPOSITORY_PROVIDER } from '../core/constants';
 import { findOrCreateType } from './types/findorcreate.type';
 import { SearchKondoDto } from './dto/search-kondo.dto';
 import { SlugifyService } from '../utils/slugify/slugify.service';
 import { KondoRepository } from './repository/kondo.repository';
-//import { KONDO_REPOSITORY_PROVIDER } from '../core/constants';
 
 @Injectable()
 export class KondoService {
