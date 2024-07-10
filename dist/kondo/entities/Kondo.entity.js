@@ -31,6 +31,11 @@ exports.KondoStatus = Object.freeze({
 });
 module.exports.KondoTypes = exports.KondoTypes;
 let Kondo = class Kondo extends sequelize_typescript_1.Model {
+    constructor(partial) {
+        super();
+        if (partial)
+            Object.assign(this, partial);
+    }
     get details() {
         return this.getDetails();
     }
@@ -476,7 +481,8 @@ __decorate([
     __metadata("design:paramtypes", [])
 ], Kondo.prototype, "address", null);
 Kondo = __decorate([
-    sequelize_typescript_1.Table
+    sequelize_typescript_1.Table,
+    __metadata("design:paramtypes", [Object])
 ], Kondo);
 exports.Kondo = Kondo;
 //Kondo.hasMany(Like);

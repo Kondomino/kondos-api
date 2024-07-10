@@ -2,15 +2,12 @@
 import { Injectable, Inject } from "@nestjs/common";
 import { Kondo } from "../entities/kondo.entity";
 import { KONDO_REPOSITORY_PROVIDER } from "src/core/constants";
-import { CreateKondoDto } from "../dto/create-kondo.dto";
 import { UpdateKondoDto } from "../dto/update-kondo.dto";
 import { findOrCreateType } from "../types/findorcreate.type";
-import { FindOptions, Order, Sequelize } from "sequelize";
+import { FindOptions } from "sequelize";
 import { SearchKondoDto } from "../dto/search-kondo.dto";
 import { PaginationQuery } from "../../core/pagination/pagination.query.type";
-import { KondoWhereOptions } from "./kondo.where.options";
 import { Op } from "sequelize";
-import { Media } from "../../media/entities/media.entity";
 import { Like } from "../../like/entities/like.entity";
 import sequelize from "sequelize";
 
@@ -31,16 +28,11 @@ export class KondoRepository {
         // eslint-disable-next-line prefer-const
         let query: PaginationQuery = {
             //attributes: ['Kondo.*', 'Like.id'],
-            //attributes: ['Kondo.*', sequelize.fn('COUNT', sequelize.col('likes.kondoId'))],
+            attributes: ['Kondo.*', [sequelize.fn('COUNT', sequelize.col('likes.kondoId')), 'likes']],
             limit: take,
             where: { active, status },
-            include: { model: Like, as: 'likes' },
-            // include: [
-            //     { 
-            //       model: Like,
-            //       as: 'likes', attributes: []
-            //     }
-            // ]
+            include: { model: Like, as: 'likes', required: false, duplicating: false, attributes: [] },
+            group: 'Kondo.id'
         };
 
         if (phrase) {
@@ -81,7 +73,7 @@ export class KondoRepository {
      *      If nothing is found, will create.
      * @returns 
      */
-    async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: CreateKondoDto}): Promise<findOrCreateType> {
+    async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: Partial<Kondo>}): Promise<findOrCreateType> {
         return await this.KondoRepositoryProvider.findOrCreate<Kondo>(findOrCreate);    
     }
 
@@ -104,7 +96,7 @@ export class KondoRepository {
         return await this.KondoRepositoryProvider.destroy<Kondo>();
     }
 
-    async create(createKondoDto: CreateKondoDto): Promise<Kondo> {
+    async create(createKondoDto: Partial<Kondo>): Promise<Kondo> {
         return await this.KondoRepositoryProvider.create<Kondo>(createKondoDto);
     }
 }

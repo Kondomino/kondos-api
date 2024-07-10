@@ -5,7 +5,7 @@ import { Unit } from "../../unit/entities/unit.entity";
 import { User } from "../../user/entities/user.entity";
 
 @Table
-export class Like extends Model<Like> {
+export class Like extends Model {
 
     // userid
     @ForeignKey(() => User)

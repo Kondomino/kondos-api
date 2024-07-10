@@ -32,7 +32,7 @@ export class LikeRepository {
      *      If nothing is found, will create.
      * @returns 
      */
-    async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: CreateLikeDto}): Promise<findOrCreateType> {
+    async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: Partial<Like>}): Promise<findOrCreateType> {
         return await this.LikeRepositoryProvider.findOrCreate<Like>(findOrCreate);    
     }
 
@@ -55,7 +55,7 @@ export class LikeRepository {
         return await this.LikeRepositoryProvider.destroy<Like>();
     }
 
-    async create(createLikeDto: CreateLikeDto): Promise<Like> {
+    async create(createLikeDto: Partial<Like>): Promise<Like> {
         return await this.LikeRepositoryProvider.create<Like>(createLikeDto);
     }
 
