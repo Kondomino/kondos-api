@@ -11,6 +11,8 @@ import { PaginationQuery } from "../../core/pagination/pagination.query.type";
 import { KondoWhereOptions } from "./kondo.where.options";
 import { Op } from "sequelize";
 import { Media } from "../../media/entities/media.entity";
+import { Like } from "../../like/entities/like.entity";
+import sequelize from "sequelize";
 
 @Injectable()
 export class KondoRepository {
@@ -28,8 +30,17 @@ export class KondoRepository {
 
         // eslint-disable-next-line prefer-const
         let query: PaginationQuery = {
+            //attributes: ['Kondo.*', 'Like.id'],
+            //attributes: ['Kondo.*', sequelize.fn('COUNT', sequelize.col('likes.kondoId'))],
             limit: take,
-            where: { active, status }
+            where: { active, status },
+            include: { model: Like, as: 'likes' },
+            // include: [
+            //     { 
+            //       model: Like,
+            //       as: 'likes', attributes: []
+            //     }
+            // ]
         };
 
         if (phrase) {
@@ -58,7 +69,7 @@ export class KondoRepository {
 
         page = page? page -1 : 0;
         query.offset = page * searchKondoDto.take;
-
+        
         return await this.KondoRepositoryProvider.findAll<Kondo>(query);
     }
 
@@ -96,16 +107,4 @@ export class KondoRepository {
     async create(createKondoDto: CreateKondoDto): Promise<Kondo> {
         return await this.KondoRepositoryProvider.create<Kondo>(createKondoDto);
     }
-
-    // prepareWhere(fields): KondoWhereOptions {
-
-    //     const where = fields.filter(item => {
-    //         return item
-    //     })
-    //     const where = {
-
-    //     }
-
-    //     return where;
-    // }
 }

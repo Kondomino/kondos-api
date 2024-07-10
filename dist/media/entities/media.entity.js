@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Media = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const kondo_entity_1 = require("../../kondo/entities/kondo.entity");
+const unit_entity_1 = require("../../unit/entities/unit.entity");
 const MediaTypes = Object.freeze({
     Video: 'video',
     Image: 'image',
@@ -42,6 +43,15 @@ __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => kondo_entity_1.Kondo),
     __metadata("design:type", kondo_entity_1.Kondo)
 ], Media.prototype, "kondo", void 0);
+__decorate([
+    (0, sequelize_typescript_1.ForeignKey)(() => unit_entity_1.Unit),
+    sequelize_typescript_1.Column,
+    __metadata("design:type", Number)
+], Media.prototype, "unitId", void 0);
+__decorate([
+    (0, sequelize_typescript_1.BelongsTo)(() => unit_entity_1.Unit),
+    __metadata("design:type", unit_entity_1.Unit)
+], Media.prototype, "unit", void 0);
 Media = __decorate([
     sequelize_typescript_1.Table
 ], Media);

@@ -1,5 +1,6 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Kondo } from "../../kondo/entities/kondo.entity";
+import { Unit } from "../../unit/entities/unit.entity";
 
 const MediaTypes = Object.freeze({
     Video: 'video',
@@ -22,12 +23,6 @@ export class Media extends Model<Media> {
         defaultValue: 'image',
     })
     type: string;
-
-    // @Column({
-    //     type: DataType.STRING,
-    //     allowNull: false,
-    // })
-    // kondoId: IntegerDataType;
     
     @ForeignKey(() => Kondo)
     @Column
@@ -35,6 +30,13 @@ export class Media extends Model<Media> {
 
     @BelongsTo(() => Kondo)
     kondo: Kondo;
+
+    @ForeignKey(() => Unit)
+    @Column
+    unitId: number;
+
+    @BelongsTo(() => Unit)
+    unit: Unit;
 }
 
 //Media.belongsTo(Kondo);

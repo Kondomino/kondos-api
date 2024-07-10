@@ -3,6 +3,7 @@ import { KondoAddressType } from './kondo.address.abstract.entity';
 import { Expose } from 'class-transformer';
 import { KondoConveniencesType, basic_conveniences, conveniences_conveniences, extra_conveniences, security_conveniences } from './kondo.conveniences.abstract.entity';
 import { Media } from '../../media/entities/media.entity';
+import { Like } from '../../like/entities/like.entity';
 
 export const KondoTypes = Object.freeze({
     Bairro: 'bairro',
@@ -46,7 +47,7 @@ export class Kondo extends Model<Kondo> {
 
     @Column({
         values: Object.values(KondoStatus),
-        defaultValue: true
+        defaultValue: KondoStatus.DRAFT
     })
     status: string;
 
@@ -354,6 +355,9 @@ export class Kondo extends Model<Kondo> {
     @HasMany(() => Media)
     medias: Media[];
 
+    @HasMany(() => Like)
+    likes: Like[];
+
     @Expose()
     get details() {
         return this.getDetails();
@@ -437,4 +441,4 @@ export class Kondo extends Model<Kondo> {
     }
 }
 
-//Kondo.hasMany(Media);
+//Kondo.hasMany(Like);
