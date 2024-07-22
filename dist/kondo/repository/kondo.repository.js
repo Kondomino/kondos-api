@@ -43,7 +43,6 @@ let KondoRepository = class KondoRepository {
             let { take, order, page, name, slug, active, status, phrase } = searchKondoDto;
             // eslint-disable-next-line prefer-const
             let query = {
-                //attributes: ['Kondo.*', 'Like.id'],
                 attributes: ['Kondo.*', [sequelize_2.default.fn('COUNT', sequelize_2.default.col('likes.kondoId')), 'likes']],
                 limit: take,
                 where: { active, status },

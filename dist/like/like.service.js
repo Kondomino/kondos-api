@@ -5,12 +5,34 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LikeService = void 0;
 const common_1 = require("@nestjs/common");
+const like_repository_1 = require("./repository/like.repository");
 let LikeService = class LikeService {
+    constructor(LikeRepository) {
+        this.LikeRepository = LikeRepository;
+    }
     create(createLikeDto) {
-        return 'This action adds a new like';
+        return __awaiter(this, void 0, void 0, function* () {
+            const { kondoId, unitId, userId } = createLikeDto;
+            if (kondoId)
+                return yield this.LikeRepository.create({ kondoId, userId });
+            if (unitId)
+                return yield this.LikeRepository.create({ unitId, userId });
+        });
     }
     findAll() {
         return `This action returns all like`;
@@ -26,6 +48,7 @@ let LikeService = class LikeService {
     }
 };
 LikeService = __decorate([
-    (0, common_1.Injectable)()
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [like_repository_1.LikeRepository])
 ], LikeService);
 exports.LikeService = LikeService;

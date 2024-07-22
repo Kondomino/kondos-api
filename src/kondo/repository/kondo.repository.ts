@@ -27,7 +27,6 @@ export class KondoRepository {
 
         // eslint-disable-next-line prefer-const
         let query: PaginationQuery = {
-            //attributes: ['Kondo.*', 'Like.id'],
             attributes: ['Kondo.*', [sequelize.fn('COUNT', sequelize.col('likes.kondoId')), 'likes']],
             limit: take,
             where: { active, status },

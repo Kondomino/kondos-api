@@ -38,7 +38,7 @@ let LikeController = class LikeController {
     }
 };
 __decorate([
-    (0, common_1.Post)(),
+    (0, common_1.Post)('/kondo'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_like_dto_1.CreateLikeDto]),
