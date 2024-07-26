@@ -24,6 +24,8 @@ const unit_module_1 = require("./unit/unit.module");
 const unit_entity_1 = require("./unit/entities/unit.entity");
 const like_module_1 = require("./like/like.module");
 const like_entity_1 = require("./like/entities/like.entity");
+const auth_module_1 = require("./auth/auth.module");
+const google_strategy_1 = require("./auth/strategies/google.strategy");
 const requireSSL_for_prod_only = process.env.NODE_ENV === 'PRODUCTION' ? { ssl: { require: true, rejectUnauthorized: false } } : {};
 let AppModule = class AppModule {
 };
@@ -49,6 +51,7 @@ AppModule = __decorate([
             media_module_1.MediaModule,
             unit_module_1.UnitModule,
             like_module_1.LikeModule,
+            auth_module_1.AuthModule
             //   SeederModule.forRoot({
             //     // Activate this if you want to run the seeders if the table is empty in the database
             //     runOnlyIfTableIsEmpty: true,
@@ -57,7 +60,7 @@ AppModule = __decorate([
             //SequelizeModule.forFeature([User, Kondo])
         ],
         controllers: [app_controller_1.AppController],
-        providers: [...kondo_provider_1.kondoProviders],
+        providers: [...kondo_provider_1.kondoProviders, google_strategy_1.GoogleStrategy],
     })
 ], AppModule);
 exports.AppModule = AppModule;

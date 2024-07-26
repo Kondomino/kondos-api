@@ -33,13 +33,18 @@ let UserService = class UserService {
             return yield this.userRepository.create(user);
         });
     }
+    // async findOneByUsername(username: string): Promise<User | undefined> {
+    //     return await this.userRepository.findOne<User>({ where: { username } });
+    // }
     findOneByEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('searching by email ', email);
             return yield this.userRepository.findOne({ where: { email } });
         });
     }
     findOne(id) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('searching for', id);
             return yield this.userRepository.findOne({ where: { id } });
         });
     }
@@ -67,6 +72,14 @@ let UserService = class UserService {
             if (!userFound)
                 throw new common_1.NotFoundException();
             return yield userFound.update({ active: false });
+        });
+    }
+    findOrCreate(userDto) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.userRepository.findOrCreate({
+                where: { email: userDto.email },
+                defaults: userDto
+            });
         });
     }
 };
