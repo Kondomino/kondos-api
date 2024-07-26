@@ -16,6 +16,8 @@ import { UnitModule } from './unit/unit.module';
 import { Unit } from './unit/entities/unit.entity';
 import { LikeModule } from './like/like.module';
 import { Like } from './like/entities/like.entity';
+import { AuthModule } from './auth/auth.module';
+import { GoogleStrategy } from './auth/strategies/google.strategy';
 
 const requireSSL_for_prod_only = process.env.NODE_ENV === 'PRODUCTION'?  { ssl: { require: true, rejectUnauthorized: false }}: {};
 @Module({
@@ -39,6 +41,7 @@ const requireSSL_for_prod_only = process.env.NODE_ENV === 'PRODUCTION'?  { ssl: 
     MediaModule,
     UnitModule,
     LikeModule,
+    AuthModule
   //   SeederModule.forRoot({
   //     // Activate this if you want to run the seeders if the table is empty in the database
   //     runOnlyIfTableIsEmpty: true,
@@ -47,7 +50,7 @@ const requireSSL_for_prod_only = process.env.NODE_ENV === 'PRODUCTION'?  { ssl: 
     //SequelizeModule.forFeature([User, Kondo])
   ],
   controllers: [AppController],
-  providers: [...kondoProviders],
+  providers: [...kondoProviders, GoogleStrategy],
 })
 
 
