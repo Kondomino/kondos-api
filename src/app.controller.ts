@@ -3,7 +3,7 @@ import { Public } from "./auth/decorators/public.decorator";
 import { AuthService } from "./auth/auth.service";
 import { LoginDto } from "./auth/dto/login.dto";
 import { GoogleOAuthGuard } from "./auth/guards/google-oauth.guard";
-import { Response, response } from "express";
+import { Response } from "express";
 
 @Controller()
 export class AppController {
@@ -19,7 +19,26 @@ export class AppController {
   @Public()
   @Post('auth/login')
   async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+    return await this.authService.login(loginDto);
+  }
+
+  @Public()
+  @Redirect('', 302)
+  @Post('auth/logout')
+  async logout(@Body() loginDto: LoginDto, response: Response) {
+    response.clearCookie('ksession');
+    response.clearCookie('koken');
+    
+    return { url: `http://localhost:3000/` }
+  }
+
+  @Public()
+  @Redirect('', 302)
+  redirectBackLogin(access_token: string, response: Response) {
+    response.cookie('ksession', 'on')
+    response.cookie('koken', access_token);
+
+    return { url: `http://localhost:3000/?token=${access_token}` }
   }
 
   @Public()
@@ -27,6 +46,7 @@ export class AppController {
   @UseGuards(GoogleOAuthGuard)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async googleAuth(@Request() req) {
+    console.log('received google auth attempt');
   }
 
   @Public()
@@ -36,12 +56,7 @@ export class AppController {
   async googleAuthRedirect(@Request() req, @Res({ passthrough: true }) response: Response) {
     const { access_token } = await this.authService.googleLogin(req);
 
-    // response
-    //   .status(201)
-    //   .set('Content-Type', 'text/plain')
-    //   //.cookie('test', 'value1')
-    //   //.redirect(`http://localhost:3000/?token=${access_token}`);
-    //   .location(`http://localhost:3000/?token=${access_token}`);
+    //this.redirectBackLogin(access_token, response);
 
     response.cookie('ksession', 'on')
     response.cookie('koken', access_token);

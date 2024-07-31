@@ -13,5 +13,6 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.use(cookieParser());
+  app.setGlobalPrefix('api');
   await app.listen(3003);}
 bootstrap();

@@ -36,22 +36,30 @@ let AppController = class AppController {
     }
     login(loginDto) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.authService.login(loginDto);
+            return yield this.authService.login(loginDto);
         });
+    }
+    logout(loginDto, response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            response.clearCookie('ksession');
+            response.clearCookie('koken');
+            return { url: `http://localhost:3000/` };
+        });
+    }
+    redirectBackLogin(access_token, response) {
+        response.cookie('ksession', 'on');
+        response.cookie('koken', access_token);
+        return { url: `http://localhost:3000/?token=${access_token}` };
     }
     googleAuth(req) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('received google auth attempt');
         });
     }
     googleAuthRedirect(req, response) {
         return __awaiter(this, void 0, void 0, function* () {
             const { access_token } = yield this.authService.googleLogin(req);
-            // response
-            //   .status(201)
-            //   .set('Content-Type', 'text/plain')
-            //   //.cookie('test', 'value1')
-            //   //.redirect(`http://localhost:3000/?token=${access_token}`);
-            //   .location(`http://localhost:3000/?token=${access_token}`);
+            //this.redirectBackLogin(access_token, response);
             response.cookie('ksession', 'on');
             response.cookie('koken', access_token);
             return { url: `http://localhost:3000/?token=${access_token}` };
@@ -73,6 +81,22 @@ __decorate([
     __metadata("design:paramtypes", [login_dto_1.LoginDto]),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "login", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Redirect)('', 302),
+    (0, common_1.Post)('auth/logout'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [login_dto_1.LoginDto, Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "logout", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Redirect)('', 302),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], AppController.prototype, "redirectBackLogin", null);
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Get)('auth'),

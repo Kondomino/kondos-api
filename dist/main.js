@@ -21,6 +21,7 @@ function bootstrap() {
         const app = yield core_1.NestFactory.create(app_module_1.AppModule, { cors: true });
         app.useGlobalPipes(new common_1.ValidationPipe({ transform: true }));
         app.use(cookieParser());
+        app.setGlobalPrefix('api');
         yield app.listen(3003);
     });
 }
