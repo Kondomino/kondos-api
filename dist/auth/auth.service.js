@@ -72,6 +72,25 @@ let AuthService = class AuthService {
             };
         });
     }
+    register(createUserDto) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { name } = createUserDto;
+            const names = name.split(" ");
+            const userDTO = {
+                email: createUserDto.email,
+                password: createUserDto.password,
+                firstName: names[0],
+                lastName: names[1] ? names[1] : '',
+            };
+            // FIND OR CREATE USER
+            const fetch = yield this.usersService.findOrCreate(userDTO);
+            // IF FOUND, UPDATE
+            return {
+                message: 'User information from google',
+                access_token: this.generateJwt({ email: fetch[0].email }),
+            };
+        });
+    }
     googleLogin(req) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!req.user) {
