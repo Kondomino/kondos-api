@@ -4,6 +4,7 @@ import { AuthService } from "./auth/auth.service";
 import { LoginDto } from "./auth/dto/login.dto";
 import { GoogleOAuthGuard } from "./auth/guards/google-oauth.guard";
 import { Response } from "express";
+import { CreateUserDto } from "./user/dto/create-user.dto";
 
 @Controller()
 export class AppController {
@@ -14,6 +15,12 @@ export class AppController {
   @Public()
   hello(): string {
     return 'Hello';
+  }
+
+  @Public()
+  @Post('auth/register')
+  async register(@Body() createUserDto: CreateUserDto) {
+    return await this.authService.register(createUserDto);
   }
 
   @Public()

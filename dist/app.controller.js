@@ -27,12 +27,18 @@ const public_decorator_1 = require("./auth/decorators/public.decorator");
 const auth_service_1 = require("./auth/auth.service");
 const login_dto_1 = require("./auth/dto/login.dto");
 const google_oauth_guard_1 = require("./auth/guards/google-oauth.guard");
+const create_user_dto_1 = require("./user/dto/create-user.dto");
 let AppController = class AppController {
     constructor(authService) {
         this.authService = authService;
     }
     hello() {
         return 'Hello';
+    }
+    register(createUserDto) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.authService.register(createUserDto);
+        });
     }
     login(loginDto) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -73,6 +79,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", String)
 ], AppController.prototype, "hello", null);
+__decorate([
+    (0, public_decorator_1.Public)(),
+    (0, common_1.Post)('auth/register'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_user_dto_1.CreateUserDto]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "register", null);
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('auth/login'),
