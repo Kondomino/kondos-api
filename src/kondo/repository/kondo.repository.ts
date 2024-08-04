@@ -2,14 +2,14 @@
 import { Injectable, Inject } from "@nestjs/common";
 import { Kondo } from "../entities/kondo.entity";
 import { KONDO_REPOSITORY_PROVIDER } from "src/core/constants";
-import { CreateKondoDto } from "../dto/create-kondo.dto";
 import { UpdateKondoDto } from "../dto/update-kondo.dto";
 import { findOrCreateType } from "../types/findorcreate.type";
-import { FindOptions, Order, Sequelize } from "sequelize";
+import { FindOptions } from "sequelize";
 import { SearchKondoDto } from "../dto/search-kondo.dto";
 import { PaginationQuery } from "../../core/pagination/pagination.query.type";
-import { KondoWhereOptions } from "./kondo.where.options";
 import { Op } from "sequelize";
+import { Like } from "../../like/entities/like.entity";
+import sequelize from "sequelize";
 
 @Injectable()
 export class KondoRepository {
@@ -23,32 +23,35 @@ export class KondoRepository {
 
     async findAll(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
         // eslint-disable-next-line prefer-const
-        let { take, order, page, name, slug, active, phrase } = searchKondoDto;
+        let { take, order, page, name, slug, active, status, phrase } = searchKondoDto;
 
         // eslint-disable-next-line prefer-const
         let query: PaginationQuery = {
+            attributes: ['Kondo.*', [sequelize.fn('COUNT', sequelize.col('likes.kondoId')), 'likes']],
             limit: take,
-            where: { active }
+            where: { active, status },
+            include: { model: Like, as: 'likes', required: false, duplicating: false, attributes: [] },
+            group: 'Kondo.id'
         };
 
         if (phrase) {
             const queryPhraseArray = phrase.split(' ');
-            query.where = { 
+            query.where = Object.assign(query.where, { 
                 [Op.or]:
                     [
                         { name: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}`) }}},
                         { city: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}`) }}},
                         { neighborhood: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}`) }}}
                     ] 
-             }
+             });
         }
         
         if (name) {
-            query.where = { name };
+            query.where = Object.assign(query.where, { name });
         }
 
         if (slug) {
-            query.where = { slug };
+            query.where = Object.assign(query.where, { slug });
         }
 
         if (order) {
@@ -57,7 +60,7 @@ export class KondoRepository {
 
         page = page? page -1 : 0;
         query.offset = page * searchKondoDto.take;
-
+        
         return await this.KondoRepositoryProvider.findAll<Kondo>(query);
     }
 
@@ -69,7 +72,7 @@ export class KondoRepository {
      *      If nothing is found, will create.
      * @returns 
      */
-    async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: CreateKondoDto}): Promise<findOrCreateType> {
+    async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: Partial<Kondo>}): Promise<findOrCreateType> {
         return await this.KondoRepositoryProvider.findOrCreate<Kondo>(findOrCreate);    
     }
 
@@ -92,19 +95,7 @@ export class KondoRepository {
         return await this.KondoRepositoryProvider.destroy<Kondo>();
     }
 
-    async create(createKondoDto: CreateKondoDto): Promise<Kondo> {
+    async create(createKondoDto: Partial<Kondo>): Promise<Kondo> {
         return await this.KondoRepositoryProvider.create<Kondo>(createKondoDto);
     }
-
-    // prepareWhere(fields): KondoWhereOptions {
-
-    //     const where = fields.filter(item => {
-    //         return item
-    //     })
-    //     const where = {
-
-    //     }
-
-    //     return where;
-    // }
 }

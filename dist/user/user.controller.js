@@ -11,12 +11,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const user_service_1 = require("./user.service");
 const update_user_dto_1 = require("./dto/update-user.dto");
 const user_dto_1 = require("./dto/user.dto");
+const public_decorator_1 = require("../auth/decorators/public.decorator");
 let UserController = class UserController {
     constructor(userService) {
         this.userService = userService;
@@ -27,8 +37,22 @@ let UserController = class UserController {
     findAll() {
         return this.userService.findActives();
     }
+    getCurrent(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email } = request['user'];
+            const user = yield this.userService.findOneByEmail(email);
+            return {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+                picture: user.picture,
+                updatedAt: user.updatedAt,
+            };
+        });
+    }
     findOne(id) {
-        return this.userService.findOne(+id);
+        return this.userService.findOne(Number(id));
     }
     update(id, updateUserDto) {
         return this.userService.update(+id, updateUserDto);
@@ -38,6 +62,7 @@ let UserController = class UserController {
     }
 };
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -50,6 +75,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('current'),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Request]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getCurrent", null);
 __decorate([
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),

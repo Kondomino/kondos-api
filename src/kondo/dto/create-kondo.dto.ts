@@ -19,14 +19,14 @@ export class CreateKondoDto {
     @IsString()
     @IsOptional()
     type: string;
-    
+
     @IsString()
     @IsOptional()
-    lot_min_price: string;
-    
+    description: string;
+
     @IsString()
     @IsOptional()
-    lot_avg_price: string;
+    minutes_from_bh: string;
     
     @IsString()
     @IsOptional()
@@ -34,11 +34,22 @@ export class CreateKondoDto {
     
     @IsString()
     @IsOptional()
-    address_street_and_number: string;
+    address_street_and_numbers: string;
     
     @IsString()
     @IsOptional()
     neighborhood: string;
+
+    @IsString()
+    @IsOptional()
+    lot_min_price: string;
+    
+    @IsString()
+    @IsOptional()
+    lot_avg_price: string;
+
+    
+    
     
     @IsString()
     @IsOptional()
@@ -47,6 +58,10 @@ export class CreateKondoDto {
     @IsString()
     @IsOptional()
     state: string;
+
+    @IsBoolean()
+    @IsOptional()
+    highlight: boolean;
     
     @IsBoolean()
     @IsOptional()

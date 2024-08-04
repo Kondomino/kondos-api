@@ -1,9 +1,11 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
 import { KondoAddressType } from './kondo.address.abstract.entity';
 import { Expose } from 'class-transformer';
 import { KondoConveniencesType, basic_conveniences, conveniences_conveniences, extra_conveniences, security_conveniences } from './kondo.conveniences.abstract.entity';
+import { Media } from '../../media/entities/media.entity';
+import { Like } from '../../like/entities/like.entity';
 
-const KondoTypes = Object.freeze({
+export const KondoTypes = Object.freeze({
     Bairro: 'bairro',
     Casas: 'casas',
     Chacaras: 'chacatas',
@@ -12,7 +14,7 @@ const KondoTypes = Object.freeze({
     Industrial: 'industrial'
   });
 
-  const KondoStatus = Object.freeze({
+export const KondoStatus = Object.freeze({
     DRAFT: 'draft',
     TEXT_READY: 'text_ready',
     MEDIA_GATHERING: 'media_gathering',
@@ -21,16 +23,15 @@ const KondoTypes = Object.freeze({
 
 module.exports.KondoTypes = KondoTypes;
 @Table
-export class Kondo extends Model<Kondo> {
+export class Kondo extends Model {
     
-    /*
     constructor(partial?: Partial<Kondo>) {
-        super();
+      super();
         
-        if (partial)
-            Object.assign(this, partial);
-      }
-    */
+      if (partial)
+        Object.assign(this, partial);
+    }
+    
      
     @Column({
         type: DataType.STRING,
@@ -45,7 +46,7 @@ export class Kondo extends Model<Kondo> {
 
     @Column({
         values: Object.values(KondoStatus),
-        defaultValue: true
+        defaultValue: KondoStatus.DRAFT
     })
     status: string;
 
@@ -58,6 +59,11 @@ export class Kondo extends Model<Kondo> {
         unique: true
     })
     slug: string;
+
+    @Column({
+        unique: false
+    })
+    featured_image: string;
 
     @Column({
         values: Object.values(KondoTypes),
@@ -345,7 +351,12 @@ export class Kondo extends Model<Kondo> {
     // })
     // updatedAt: Date;
 
-    
+    @HasMany(() => Media)
+    medias: Media[];
+
+    @HasMany(() => Like)
+    likes: Like[];
+
     @Expose()
     get details() {
         return this.getDetails();
@@ -428,3 +439,5 @@ export class Kondo extends Model<Kondo> {
         return conveniences;
     }
 }
+
+//Kondo.hasMany(Like);

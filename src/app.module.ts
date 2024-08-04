@@ -12,6 +12,12 @@ import { Kondo } from './kondo/entities/kondo.entity';
 import { Media } from './media/entities/media.entity';
 import { MediaModule } from './media/media.module';
 import { User } from './user/entities/user.entity';
+import { UnitModule } from './unit/unit.module';
+import { Unit } from './unit/entities/unit.entity';
+import { LikeModule } from './like/like.module';
+import { Like } from './like/entities/like.entity';
+import { AuthModule } from './auth/auth.module';
+import { GoogleStrategy } from './auth/strategies/google.strategy';
 
 const requireSSL_for_prod_only = process.env.NODE_ENV === 'PRODUCTION'?  { ssl: { require: true, rejectUnauthorized: false }}: {};
 @Module({
@@ -26,22 +32,25 @@ const requireSSL_for_prod_only = process.env.NODE_ENV === 'PRODUCTION'?  { ssl: 
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      models: [User, Kondo, Media],
+      models: [User, Kondo, Media, Unit, Like],
       autoLoadModels: true,
     }),
     UserModule, 
     KondoModule,
     IntegratorModule,
     MediaModule,
-    /*
-    SeederModule.forRoot({
-      // Activate this if you want to run the seeders if the table is empty in the database
-      runOnlyIfTableIsEmpty: true,
-   }),*/
+    UnitModule,
+    LikeModule,
+    AuthModule
+  //   SeederModule.forRoot({
+  //     // Activate this if you want to run the seeders if the table is empty in the database
+  //     runOnlyIfTableIsEmpty: true,
+  //     logging: true,
+  //  }),
     //SequelizeModule.forFeature([User, Kondo])
   ],
   controllers: [AppController],
-  providers: [...kondoProviders],
+  providers: [...kondoProviders, GoogleStrategy],
 })
 
 

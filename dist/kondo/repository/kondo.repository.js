@@ -26,6 +26,8 @@ exports.KondoRepository = void 0;
 const common_1 = require("@nestjs/common");
 const constants_1 = require("../../core/constants");
 const sequelize_1 = require("sequelize");
+const like_entity_1 = require("../../like/entities/like.entity");
+const sequelize_2 = require("sequelize");
 let KondoRepository = class KondoRepository {
     constructor(KondoRepositoryProvider) {
         this.KondoRepositoryProvider = KondoRepositoryProvider;
@@ -38,27 +40,30 @@ let KondoRepository = class KondoRepository {
     findAll(searchKondoDto) {
         return __awaiter(this, void 0, void 0, function* () {
             // eslint-disable-next-line prefer-const
-            let { take, order, page, name, slug, active, phrase } = searchKondoDto;
+            let { take, order, page, name, slug, active, status, phrase } = searchKondoDto;
             // eslint-disable-next-line prefer-const
             let query = {
+                attributes: ['Kondo.*', [sequelize_2.default.fn('COUNT', sequelize_2.default.col('likes.kondoId')), 'likes']],
                 limit: take,
-                where: { active }
+                where: { active, status },
+                include: { model: like_entity_1.Like, as: 'likes', required: false, duplicating: false, attributes: [] },
+                group: 'Kondo.id'
             };
             if (phrase) {
                 const queryPhraseArray = phrase.split(' ');
-                query.where = {
+                query.where = Object.assign(query.where, {
                     [sequelize_1.Op.or]: [
                         { name: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}`) } } },
                         { city: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}`) } } },
                         { neighborhood: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}`) } } }
                     ]
-                };
+                });
             }
             if (name) {
-                query.where = { name };
+                query.where = Object.assign(query.where, { name });
             }
             if (slug) {
-                query.where = { slug };
+                query.where = Object.assign(query.where, { slug });
             }
             if (order) {
                 query.order = [['id', searchKondoDto.order]];

@@ -3,6 +3,7 @@ import { CreateKondoDto } from './dto/create-kondo.dto';
 import { SearchKondoDto } from './dto/search-kondo.dto';
 import { UpdateKondoDto } from './dto/update-kondo.dto';
 import { KondoService } from './kondo.service';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('kondo')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -14,20 +15,22 @@ export class KondoController {
     return this.kondoService.create(createKondoDto);
   }
 
+  @Public()
   @Get()
   async findAll(@Query() searchKondoDto: SearchKondoDto) {
     console.log('findAll');
     return this.kondoService.findAll(searchKondoDto);
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.kondoService.findOne(+id);
   }
 
+  @Public()
   @Post('/findBy')
   findBy(@Body() searchKondoDto: SearchKondoDto) {
-    console.log('findBy');
     return this.kondoService.findBy(searchKondoDto);
   }
 

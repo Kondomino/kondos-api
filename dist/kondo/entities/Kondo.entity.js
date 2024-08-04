@@ -9,11 +9,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Kondo = void 0;
+exports.Kondo = exports.KondoStatus = exports.KondoTypes = void 0;
 const sequelize_typescript_1 = require("sequelize-typescript");
 const class_transformer_1 = require("class-transformer");
 const kondo_conveniences_abstract_entity_1 = require("./kondo.conveniences.abstract.entity");
-const KondoTypes = Object.freeze({
+const media_entity_1 = require("../../media/entities/media.entity");
+const like_entity_1 = require("../../like/entities/like.entity");
+exports.KondoTypes = Object.freeze({
     Bairro: 'bairro',
     Casas: 'casas',
     Chacaras: 'chacatas',
@@ -21,22 +23,19 @@ const KondoTypes = Object.freeze({
     Comercial: 'comercial',
     Industrial: 'industrial'
 });
-const KondoStatus = Object.freeze({
+exports.KondoStatus = Object.freeze({
     DRAFT: 'draft',
     TEXT_READY: 'text_ready',
     MEDIA_GATHERING: 'media_gathering',
     DONE: 'done',
 });
-module.exports.KondoTypes = KondoTypes;
+module.exports.KondoTypes = exports.KondoTypes;
 let Kondo = class Kondo extends sequelize_typescript_1.Model {
-    // @Column({
-    //     allowNull: true,
-    // })
-    // createdAt: Date;
-    // @Column({
-    //     allowNull: true,
-    // })
-    // updatedAt: Date;
+    constructor(partial) {
+        super();
+        if (partial)
+            Object.assign(this, partial);
+    }
     get details() {
         return this.getDetails();
     }
@@ -123,8 +122,8 @@ __decorate([
 ], Kondo.prototype, "active", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        values: Object.values(KondoStatus),
-        defaultValue: true
+        values: Object.values(exports.KondoStatus),
+        defaultValue: exports.KondoStatus.DRAFT
     }),
     __metadata("design:type", String)
 ], Kondo.prototype, "status", void 0);
@@ -142,7 +141,13 @@ __decorate([
 ], Kondo.prototype, "slug", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        values: Object.values(KondoTypes),
+        unique: false
+    }),
+    __metadata("design:type", String)
+], Kondo.prototype, "featured_image", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        values: Object.values(exports.KondoTypes),
         defaultValue: 'casas',
     }),
     __metadata("design:type", String)
@@ -453,6 +458,14 @@ __decorate([
     __metadata("design:type", String)
 ], Kondo.prototype, "video", void 0);
 __decorate([
+    (0, sequelize_typescript_1.HasMany)(() => media_entity_1.Media),
+    __metadata("design:type", Array)
+], Kondo.prototype, "medias", void 0);
+__decorate([
+    (0, sequelize_typescript_1.HasMany)(() => like_entity_1.Like),
+    __metadata("design:type", Array)
+], Kondo.prototype, "likes", void 0);
+__decorate([
     (0, class_transformer_1.Expose)(),
     __metadata("design:type", Object),
     __metadata("design:paramtypes", [])
@@ -468,6 +481,8 @@ __decorate([
     __metadata("design:paramtypes", [])
 ], Kondo.prototype, "address", null);
 Kondo = __decorate([
-    sequelize_typescript_1.Table
+    sequelize_typescript_1.Table,
+    __metadata("design:paramtypes", [Object])
 ], Kondo);
 exports.Kondo = Kondo;
+//Kondo.hasMany(Like);
