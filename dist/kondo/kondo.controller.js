@@ -27,6 +27,7 @@ const create_kondo_dto_1 = require("./dto/create-kondo.dto");
 const search_kondo_dto_1 = require("./dto/search-kondo.dto");
 const update_kondo_dto_1 = require("./dto/update-kondo.dto");
 const kondo_service_1 = require("./kondo.service");
+const public_decorator_1 = require("../auth/decorators/public.decorator");
 let KondoController = class KondoController {
     constructor(kondoService) {
         this.kondoService = kondoService;
@@ -44,7 +45,6 @@ let KondoController = class KondoController {
         return this.kondoService.findOne(+id);
     }
     findBy(searchKondoDto) {
-        console.log('findBy');
         return this.kondoService.findBy(searchKondoDto);
     }
     update(id, updateKondoDto) {
@@ -62,6 +62,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], KondoController.prototype, "create", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)()),
     __metadata("design:type", Function),
@@ -69,6 +70,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], KondoController.prototype, "findAll", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Get)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -76,6 +78,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], KondoController.prototype, "findOne", null);
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/findBy'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),

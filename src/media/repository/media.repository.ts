@@ -32,7 +32,7 @@ export class MediaRepository {
      *      If nothing is found, will create.
      * @returns 
      */
-    async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: CreateMediaDto}): Promise<findOrCreateType> {
+    async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: Partial<Media>}): Promise<findOrCreateType> {
         return await this.MediaRepositoryProvider.findOrCreate<Media>(findOrCreate);    
     }
 
@@ -55,7 +55,7 @@ export class MediaRepository {
         return await this.MediaRepositoryProvider.destroy<Media>();
     }
 
-    async create(createMediaDto: CreateMediaDto): Promise<Media> {
+    async create(createMediaDto: Partial<Media>): Promise<Media> {
         return await this.MediaRepositoryProvider.create<Media>(createMediaDto);
     }
 

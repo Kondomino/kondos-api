@@ -1,5 +1,6 @@
 import { IsBoolean, IsEmail, IsOptional, IsString } from "class-validator";
 import { PageOptionsDto } from "../../core/pagination/page.options.dto";
+import { KondoStatus } from "../entities/kondo.entity";
 
 export class SearchKondoDto extends PageOptionsDto {
     @IsString()
@@ -17,6 +18,10 @@ export class SearchKondoDto extends PageOptionsDto {
     @IsBoolean()
     @IsOptional()
     active: boolean = true;
+
+    @IsString()
+    @IsOptional()
+    status: string = KondoStatus.DONE;
 
     @IsString()
     @IsOptional()

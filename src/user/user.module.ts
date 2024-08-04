@@ -8,6 +8,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 @Module({
   controllers: [UserController],
   providers: [UserService, ...userProviders],
-  imports: [SequelizeModule.forFeature([User])]
+  imports: [SequelizeModule.forFeature([User])],
+  exports: [UserService]
 })
 export class UserModule {}

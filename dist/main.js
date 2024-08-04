@@ -13,12 +13,15 @@ const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 const common_1 = require("@nestjs/common");
 const dotenv = require("dotenv");
+const cookieParser = require("cookie-parser");
 dotenv.config();
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function* () {
         //initializeApp();
         const app = yield core_1.NestFactory.create(app_module_1.AppModule, { cors: true });
         app.useGlobalPipes(new common_1.ValidationPipe({ transform: true }));
+        app.use(cookieParser());
+        app.setGlobalPrefix('api');
         yield app.listen(3003);
     });
 }

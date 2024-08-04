@@ -22,7 +22,6 @@ exports.KondoService = void 0;
 const common_1 = require("@nestjs/common");
 const slugify_service_1 = require("../utils/slugify/slugify.service");
 const kondo_repository_1 = require("./repository/kondo.repository");
-//import { KONDO_REPOSITORY_PROVIDER } from '../core/constants';
 let KondoService = class KondoService {
     constructor(slugify, KondoRepository) {
         this.slugify = slugify;
