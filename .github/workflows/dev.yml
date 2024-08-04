@@ -60,7 +60,7 @@ jobs:
         username: ${{ secrets.REMOTE_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: "./"  # This now correctly points to the current directory
-        target: "/usr/share/nginx/kondomino.com.br/api"
+        target: "/usr/share/nginx/qa.kondomino.com.br/api"
 
     - name: Restart PM2 application
       uses: appleboy/ssh-action@master
@@ -69,8 +69,8 @@ jobs:
         username: ${{ secrets.REMOTE_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd /usr/share/nginx/kondomino.com.br/api
-          pm2 reload kondomino-api
+          cd /usr/share/nginx/qa.kondomino.com.br/api
+          pm2 reload qa-kondomino-api
 
     
   notify-on-success:
@@ -95,7 +95,7 @@ jobs:
                 },
                 {
                   "name": "URL",
-                  "value": "[Nenhuma](https://nada.com)",
+                  "value": "[https://qa.kondomino.com/api](https://qa.kondomino.com/api)",
                   "inline": true
                 },
                 {
