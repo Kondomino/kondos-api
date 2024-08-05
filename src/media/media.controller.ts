@@ -1,5 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { MediaService } from './media.service';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('media')
 export class MediaController {
@@ -12,6 +13,7 @@ export class MediaController {
   }
   */
 
+  @Public()
   @Get(':id')
   findMediasOfKondo(@Param('id') kondoId: string) {
     return this.mediaService.findMediasOfKondo(kondoId);
