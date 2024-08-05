@@ -36,7 +36,7 @@ export class AppController {
     response.clearCookie('ksession');
     response.clearCookie('koken');
     
-    return { url: `http://localhost:3000/` }
+    return { url: process.env.WEB_URL }
   }
 
   @Public()
@@ -45,7 +45,7 @@ export class AppController {
     response.cookie('ksession', 'on')
     response.cookie('koken', access_token);
 
-    return { url: `http://localhost:3000/?token=${access_token}` }
+    return { url: `${process.env.WEB_URL}/?token=${access_token}` }
   }
 
   @Public()
@@ -68,6 +68,6 @@ export class AppController {
     response.cookie('ksession', 'on')
     response.cookie('koken', access_token);
 
-    return { url: `http://localhost:3000/?token=${access_token}` }
+    return { url: `${process.env.WEB_URL}/?token=${access_token}` }
   }
 }
