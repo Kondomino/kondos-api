@@ -49,13 +49,13 @@ let AppController = class AppController {
         return __awaiter(this, void 0, void 0, function* () {
             response.clearCookie('ksession');
             response.clearCookie('koken');
-            return { url: `http://localhost:3000/` };
+            return { url: process.env.WEB_URL };
         });
     }
     redirectBackLogin(access_token, response) {
         response.cookie('ksession', 'on');
         response.cookie('koken', access_token);
-        return { url: `http://localhost:3000/?token=${access_token}` };
+        return { url: `${process.env.WEB_URL}/?token=${access_token}` };
     }
     googleAuth(req) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -68,7 +68,7 @@ let AppController = class AppController {
             //this.redirectBackLogin(access_token, response);
             response.cookie('ksession', 'on');
             response.cookie('koken', access_token);
-            return { url: `http://localhost:3000/?token=${access_token}` };
+            return { url: `${process.env.WEB_URL}/?token=${access_token}` };
         });
     }
 };
