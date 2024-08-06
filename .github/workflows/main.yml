@@ -70,7 +70,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /usr/share/nginx/qa.kondomino.com.br/api
-          pm2 reload qa-kondomino-api
+          pm2 reload kondomino-api
 
     
   notify-on-success:
