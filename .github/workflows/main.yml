@@ -95,7 +95,7 @@ jobs:
                 },
                 {
                   "name": "URL",
-                  "value": "[https://qa.kondomino.com/api](https://qa.kondomino.com/api)",
+                  "value": "[https://kondomino.com/api](https://kondomino.com/api)",
                   "inline": true
                 },
                 {
