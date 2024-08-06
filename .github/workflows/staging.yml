@@ -1,0 +1,144 @@
+name: Kondomino API CI/CD on Amazon Linux
+
+on:
+  push:
+    branches: [ staging ]
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      project_name: ${{ env.project_name }}
+      short_commit_sha: ${{ env.short_commit_sha }}
+      commit_message: ${{ env.commit_message }}
+      branch_name: ${{ env.branch_name }}
+      alias_url: ${{ env.alias_url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get Project Name
+        id: get_project_name
+        run: |
+          project_name=$(basename $GITHUB_REPOSITORY)
+          echo "project_name=$project_name" >> $GITHUB_ENV
+
+      - name: Get Short Commit SHA
+        id: get_short_commit_sha
+        run: |
+          short_commit_sha=$(git rev-parse --short HEAD)
+          echo "short_commit_sha=$short_commit_sha" >> $GITHUB_ENV
+
+      - name: Get Commit message
+        id: get_commit_message
+        run: |
+          commit_message=$(git log -1 --pretty=%B)
+          echo "commit_message=$commit_message" >> $GITHUB_ENV
+
+      - name: Get Branch Name
+        id: get_branch_name
+        run: |
+          branch_name=${GITHUB_REF##*/}
+          echo "branch_name=$branch_name" >> $GITHUB_ENV
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build application
+      run: npm run build
+
+    - name: Deploy to AWS EC2
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "./"  # This now correctly points to the current directory
+        target: "/usr/share/nginx/qa.kondomino.com.br/api"
+
+    - name: Restart PM2 application
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /usr/share/nginx/qa.kondomino.com.br/api
+          pm2 reload qa-kondomino-api
+
+    
+  notify-on-success:
+    runs-on: ubuntu-latest
+    needs: [deploy, prepare]
+    steps:
+    
+      - name: Send to Discord
+        run: |
+          RESPONSE=$(curl -H "Content-Type: application/json" -d '{
+            "username": "GitHub Actions",
+            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+            "embeds": [{
+              "title": "🎉 **Deploy Bem-Sucedido** 🎉",
+              "description": "O deploy foi realizado com sucesso! Confira os detalhes abaixo.",
+              "color": 3066993,
+              "fields": [
+                {
+                  "name": "Repositório",
+                  "value": "${{ github.repository }}",
+                  "inline": true
+                },
+                {
+                  "name": "URL",
+                  "value": "[https://qa.kondomino.com/api](https://qa.kondomino.com/api)",
+                  "inline": true
+                },
+                {
+                  "name": "Commit",
+                  "value": "[${{needs.prepare.outputs.short_commit_sha}}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})",
+                  "inline": true
+                }
+              ],
+              "footer": {
+                "text": "Obrigado por contribuir! 🚀"
+              }
+            }]
+          }' ${{ secrets.DISCORD_WEBHOOK }})
+          echo "Webhook response: $RESPONSE"
+
+  notify-on-failure:
+    runs-on: ubuntu-latest
+    needs: [prepare, deploy]
+    if: ${{ failure() }}
+    steps:
+      - name: Notify Failure via Webhook
+        run: |
+          curl -H "Content-Type: application/json" -d '{
+            "username": "GitHub Actions",
+            "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+            "embeds": [{
+              "title": "🚨 **Falha no Workflow** 🚨",
+              "description": "O workflow falhou. Veja os detalhes abaixo.",
+              "color": 15158332,
+              "fields": [
+                {
+                  "name": "Repositório",
+                  "value": "${{ github.repository }}",
+                  "inline": true
+                },
+                {
+                  "name": "Commit",
+                  "value": "[${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})",
+                  "inline": true
+                }
+              ],
+              "footer": {
+                "text": "Verifique o workflow para mais detalhes."
+              }
+            }]
+          }' ${{ secrets.DISCORD_WEBHOOK }}  
