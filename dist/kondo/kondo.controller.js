@@ -37,7 +37,6 @@ let KondoController = class KondoController {
     }
     findAll(searchKondoDto) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('findAll');
             return this.kondoService.findAll(searchKondoDto);
         });
     }
