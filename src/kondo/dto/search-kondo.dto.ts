@@ -25,5 +25,5 @@ export class SearchKondoDto extends PageOptionsDto {
 
     @IsString()
     @IsOptional()
-    phrase: string;
+    search: string;
 }

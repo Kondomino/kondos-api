@@ -40,7 +40,7 @@ let KondoRepository = class KondoRepository {
     findAll(searchKondoDto) {
         return __awaiter(this, void 0, void 0, function* () {
             // eslint-disable-next-line prefer-const
-            let { take, order, page, name, slug, active, status, phrase } = searchKondoDto;
+            let { take, order, page, name, slug, active, status, search } = searchKondoDto;
             // eslint-disable-next-line prefer-const
             let query = {
                 attributes: ['Kondo.*', [sequelize_2.default.fn('COUNT', sequelize_2.default.col('likes.kondoId')), 'likes']],
@@ -49,13 +49,13 @@ let KondoRepository = class KondoRepository {
                 include: { model: like_entity_1.Like, as: 'likes', required: false, duplicating: false, attributes: [] },
                 group: 'Kondo.id'
             };
-            if (phrase) {
-                const queryPhraseArray = phrase.split(' ');
+            if (search) {
+                const queryPhraseArray = search.split(' ');
                 query.where = Object.assign(query.where, {
                     [sequelize_1.Op.or]: [
-                        { name: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}`) } } },
-                        { city: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}`) } } },
-                        { neighborhood: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}`) } } }
+                        { name: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}%`) } } },
+                        { city: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}%`) } } },
+                        { neighborhood: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}%`) } } }
                     ]
                 });
             }
@@ -70,6 +70,7 @@ let KondoRepository = class KondoRepository {
             }
             page = page ? page - 1 : 0;
             query.offset = page * searchKondoDto.take;
+            console.log('query is ', query);
             return yield this.KondoRepositoryProvider.findAll(query);
         });
     }

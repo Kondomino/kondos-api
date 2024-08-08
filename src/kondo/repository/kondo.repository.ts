@@ -23,7 +23,7 @@ export class KondoRepository {
 
     async findAll(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
         // eslint-disable-next-line prefer-const
-        let { take, order, page, name, slug, active, status, phrase } = searchKondoDto;
+        let { take, order, page, name, slug, active, status, search } = searchKondoDto;
 
         // eslint-disable-next-line prefer-const
         let query: PaginationQuery = {
@@ -34,14 +34,14 @@ export class KondoRepository {
             group: 'Kondo.id'
         };
 
-        if (phrase) {
-            const queryPhraseArray = phrase.split(' ');
+        if (search) {
+            const queryPhraseArray = search.split(' ');
             query.where = Object.assign(query.where, { 
                 [Op.or]:
                     [
-                        { name: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}`) }}},
-                        { city: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}`) }}},
-                        { neighborhood: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}`) }}}
+                        { name: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}%`) }}},
+                        { city: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}%`) }}},
+                        { neighborhood: { [Op.iLike]: { [Op.any]: queryPhraseArray.map(item=> `%${item}%`) }}}
                     ] 
              });
         }
