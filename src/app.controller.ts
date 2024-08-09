@@ -45,6 +45,9 @@ export class AppController {
     response.cookie('ksession', 'on')
     response.cookie('koken', access_token);
 
+    console.log(process.env.NODE_ENV);
+    console.log(process.env.WEB_URL);
+
     return { url: `${process.env.WEB_URL}/?token=${access_token}` }
   }
 
@@ -68,6 +71,9 @@ export class AppController {
     response.cookie('ksession', 'on')
     response.cookie('koken', access_token);
 
+    console.log(process.env.NODE_ENV);
+    console.log(process.env.WEB_URL);
+    
     return { url: `${process.env.WEB_URL}/?token=${access_token}` }
   }
 }

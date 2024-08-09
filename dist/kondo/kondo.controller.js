@@ -37,13 +37,18 @@ let KondoController = class KondoController {
     }
     findAll(searchKondoDto) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('api received kondo/findAll request', searchKondoDto);
             return this.kondoService.findAll(searchKondoDto);
         });
     }
-    findOne(id) {
-        return this.kondoService.findOne(+id);
-    }
+    // @Public()
+    // @Get(':id')
+    // findOne(@Param('id') id: string) {
+    //   console.log('api received kondo/findOne request');
+    //   return this.kondoService.findOne(+id);
+    // }
     findBy(searchKondoDto) {
+        console.log('received kondo/findBy request', searchKondoDto);
         return this.kondoService.findBy(searchKondoDto);
     }
     update(id, updateKondoDto) {
@@ -68,14 +73,6 @@ __decorate([
     __metadata("design:paramtypes", [search_kondo_dto_1.SearchKondoDto]),
     __metadata("design:returntype", Promise)
 ], KondoController.prototype, "findAll", null);
-__decorate([
-    (0, public_decorator_1.Public)(),
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], KondoController.prototype, "findOne", null);
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/findBy'),

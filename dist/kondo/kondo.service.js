@@ -49,6 +49,9 @@ let KondoService = class KondoService {
     findBy(searchKondoDto) {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, slug, email } = searchKondoDto;
+            console.log('api kondo.service.findBy name', name);
+            console.log('api kondo.service.findBy slug', slug);
+            console.log('api kondo.service.findBy email', email);
             if (name)
                 return yield this.KondoRepository.findOne({ where: { name } });
             else if (slug)
