@@ -31,6 +31,7 @@ export class KondoController {
   @Public()
   @Post('/findBy')
   findBy(@Body() searchKondoDto: SearchKondoDto) {
+    console.log('received kondo/findBy request', searchKondoDto);
     return this.kondoService.findBy(searchKondoDto);
   }
 
