@@ -22,12 +22,12 @@ export class KondoController {
     return this.kondoService.findAll(searchKondoDto);
   }
 
-  @Public()
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    console.log('api received kondo/findOne request');
-    return this.kondoService.findOne(+id);
-  }
+  // @Public()
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   console.log('api received kondo/findOne request');
+  //   return this.kondoService.findOne(+id);
+  // }
 
   @Public()
   @Post('/findBy')
