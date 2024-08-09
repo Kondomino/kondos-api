@@ -66,8 +66,12 @@ let KondoRepository = class KondoRepository {
             if (slug) {
                 query.where = Object.assign(query.where, { slug });
             }
+            // TODO: create an orderByField = 'field'
             if (order) {
                 query.order = [['id', searchKondoDto.order]];
+            }
+            else {
+                query.order = [['createdAt', 'DESC']];
             }
             page = page ? page - 1 : 0;
             query.offset = page * searchKondoDto.take;

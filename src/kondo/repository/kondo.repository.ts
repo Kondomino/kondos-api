@@ -55,8 +55,12 @@ export class KondoRepository {
             query.where = Object.assign(query.where, { slug });
         }
 
+        // TODO: create an orderByField = 'field'
         if (order) {
             query.order = [['id', searchKondoDto.order]];
+        }
+        else {
+            query.order = [['createdAt', 'DESC']];
         }
 
         page = page? page -1 : 0;
