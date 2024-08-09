@@ -60,7 +60,7 @@ export class KondoRepository {
             query.order = [['id', searchKondoDto.order]];
         }
         else {
-            query.order = [['createdAt', 'DESC']];
+            query.order = [['updateddAt', 'DESC']];
         }
 
         page = page? page -1 : 0;
