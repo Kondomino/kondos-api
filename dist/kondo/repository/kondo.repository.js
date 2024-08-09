@@ -34,6 +34,7 @@ let KondoRepository = class KondoRepository {
     }
     findOne(where) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log('kondo.repository findOne', where);
             return yield this.KondoRepositoryProvider.findOne(where);
         });
     }
