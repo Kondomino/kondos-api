@@ -18,6 +18,7 @@ export class KondoController {
   @Public()
   @Get()
   async findAll(@Query() searchKondoDto: SearchKondoDto) {
+    console.log('received kondo/findAll request', searchKondoDto);
     return this.kondoService.findAll(searchKondoDto);
   }
 
