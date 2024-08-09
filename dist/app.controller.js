@@ -55,6 +55,8 @@ let AppController = class AppController {
     redirectBackLogin(access_token, response) {
         response.cookie('ksession', 'on');
         response.cookie('koken', access_token);
+        console.log(process.env.NODE_ENV);
+        console.log(process.env.WEB_URL);
         return { url: `${process.env.WEB_URL}/?token=${access_token}` };
     }
     googleAuth(req) {
@@ -68,6 +70,8 @@ let AppController = class AppController {
             //this.redirectBackLogin(access_token, response);
             response.cookie('ksession', 'on');
             response.cookie('koken', access_token);
+            console.log(process.env.NODE_ENV);
+            console.log(process.env.WEB_URL);
             return { url: `${process.env.WEB_URL}/?token=${access_token}` };
         });
     }

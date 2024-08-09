@@ -15,7 +15,7 @@ const class_validator_1 = require("class-validator");
 const order_type_1 = require("./order.type");
 class PageOptionsDto {
     constructor() {
-        this.order = order_type_1.Order.ASC;
+        this.order = order_type_1.Order.DSC;
         this.page = 1;
         this.take = 12;
     }
