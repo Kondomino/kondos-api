@@ -35,7 +35,9 @@ export class KondoService {
     }
     async findBy(searchKondoDto: SearchKondoDto): Promise<Kondo> {
         const { name, slug, email } = searchKondoDto;
-
+        console.log('api kondo.service.findBy name', name);
+        console.log('api kondo.service.findBy slug', slug);
+        console.log('api kondo.service.findBy email', email);
         if (name)
             return await this.KondoRepository.findOne({ where: { name } });
         else if (slug)

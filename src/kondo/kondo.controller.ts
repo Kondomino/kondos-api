@@ -18,13 +18,14 @@ export class KondoController {
   @Public()
   @Get()
   async findAll(@Query() searchKondoDto: SearchKondoDto) {
-    console.log('received kondo/findAll request', searchKondoDto);
+    console.log('api received kondo/findAll request', searchKondoDto);
     return this.kondoService.findAll(searchKondoDto);
   }
 
   @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
+    console.log('api received kondo/findOne request');
     return this.kondoService.findOne(+id);
   }
 
