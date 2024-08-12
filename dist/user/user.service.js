@@ -38,13 +38,13 @@ let UserService = class UserService {
     // }
     findOneByEmail(email) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('searching by email ', email);
+            //console.log('searching by email ', email);
             return yield this.userRepository.findOne({ where: { email } });
         });
     }
     findOne(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('searching for', id);
+            //console.log('searching for', id);
             return yield this.userRepository.findOne({ where: { id } });
         });
     }

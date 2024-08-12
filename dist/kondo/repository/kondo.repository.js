@@ -34,7 +34,7 @@ let KondoRepository = class KondoRepository {
     }
     findOne(where) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('kondo.repository findOne', where);
+            //console.log('kondo.repository findOne', where);
             return yield this.KondoRepositoryProvider.findOne(where);
         });
     }
@@ -71,7 +71,7 @@ let KondoRepository = class KondoRepository {
                 query.order = [['id', searchKondoDto.order]];
             }
             else {
-                query.order = [['createdAt', 'DESC']];
+                query.order = [['updateddAt', 'DESC']];
             }
             page = page ? page - 1 : 0;
             query.offset = page * searchKondoDto.take;

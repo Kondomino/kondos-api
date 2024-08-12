@@ -20,6 +20,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KondoService = void 0;
 const common_1 = require("@nestjs/common");
+const kondo_entity_1 = require("./entities/kondo.entity");
 const slugify_service_1 = require("../utils/slugify/slugify.service");
 const kondo_repository_1 = require("./repository/kondo.repository");
 let KondoService = class KondoService {
@@ -49,9 +50,6 @@ let KondoService = class KondoService {
     findBy(searchKondoDto) {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, slug, email } = searchKondoDto;
-            console.log('api kondo.service.findBy name', name);
-            console.log('api kondo.service.findBy slug', slug);
-            console.log('api kondo.service.findBy email', email);
             if (name)
                 return yield this.KondoRepository.findOne({ where: { name } });
             else if (slug)
@@ -69,6 +67,12 @@ let KondoService = class KondoService {
     findAll(searchKondoDto) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.KondoRepository.findAll(searchKondoDto);
+        });
+    }
+    getConveniences() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const kondo = new kondo_entity_1.Kondo();
+            return kondo.getConveniences();
         });
     }
     update(id, Kondo) {

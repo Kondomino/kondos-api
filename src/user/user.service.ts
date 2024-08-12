@@ -17,11 +17,11 @@ export class UserService {
     //     return await this.userRepository.findOne<User>({ where: { username } });
     // }
     async findOneByEmail(email: string): Promise<User> {
-        console.log('searching by email ', email);
+        //console.log('searching by email ', email);
         return await this.userRepository.findOne<User>({ where: { email } });
     }
     async findOne(id: number): Promise<User> {
-        console.log('searching for', id);
+        //console.log('searching for', id);
         return await this.userRepository.findOne<User>({ where: { id } });
     }
     async findActives(): Promise<User[]> {

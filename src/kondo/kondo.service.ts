@@ -6,6 +6,7 @@ import { findOrCreateType } from './types/findorcreate.type';
 import { SearchKondoDto } from './dto/search-kondo.dto';
 import { SlugifyService } from '../utils/slugify/slugify.service';
 import { KondoRepository } from './repository/kondo.repository';
+import { KondoConveniencesType } from './entities/kondo.conveniences.abstract.entity';
 
 @Injectable()
 export class KondoService {
@@ -35,9 +36,6 @@ export class KondoService {
     }
     async findBy(searchKondoDto: SearchKondoDto): Promise<Kondo> {
         const { name, slug, email } = searchKondoDto;
-        console.log('api kondo.service.findBy name', name);
-        console.log('api kondo.service.findBy slug', slug);
-        console.log('api kondo.service.findBy email', email);
         if (name)
             return await this.KondoRepository.findOne({ where: { name } });
         else if (slug)
@@ -52,7 +50,12 @@ export class KondoService {
     async findAll(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
         return await this.KondoRepository.findAll(searchKondoDto);
     }
+    async getConveniences(): Promise<KondoConveniencesType[]> {
+        const kondo = new Kondo();
 
+        return kondo.getConveniences();
+    }
+    
     async update(id: number, Kondo: UpdateKondoDto): Promise<Kondo> {
         const KondoFound = await this.findOne(id);
 

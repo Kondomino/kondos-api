@@ -18,8 +18,15 @@ export class KondoController {
   @Public()
   @Get()
   async findAll(@Query() searchKondoDto: SearchKondoDto) {
-    console.log('api received kondo/findAll request', searchKondoDto);
+    //console.log('api received kondo/findAll request', searchKondoDto);
     return this.kondoService.findAll(searchKondoDto);
+  }
+
+  @Public()
+  @Get('/conveniences')
+  async getConveniences() {
+    //console.log('api received kondo/getConveniences request');
+    return this.kondoService.getConveniences();
   }
 
   // @Public()
@@ -32,7 +39,7 @@ export class KondoController {
   @Public()
   @Post('/findBy')
   findBy(@Body() searchKondoDto: SearchKondoDto) {
-    console.log('received kondo/findBy request', searchKondoDto);
+    //console.log('received kondo/findBy request', searchKondoDto);
     return this.kondoService.findBy(searchKondoDto);
   }
 
