@@ -15,7 +15,7 @@ const config_1 = require("@nestjs/config");
 const passport_1 = require("@nestjs/passport");
 let GoogleOAuthGuard = class GoogleOAuthGuard extends (0, passport_1.AuthGuard)('google') {
     constructor(configService) {
-        console.log('trying google oauth');
+        //console.log('trying google oauth');
         super({
             accessType: 'offline',
         });

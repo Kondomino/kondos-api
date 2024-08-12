@@ -99,10 +99,10 @@ let Kondo = class Kondo extends sequelize_typescript_1.Model {
     }
     getConveniencesOfType(conveniences_of_a_type) {
         const conveniences = [];
-        for (let i = 0; i <= conveniences_of_a_type.length; i++) {
+        for (let i = 0; i < conveniences_of_a_type.length; i++) {
             const convenience = conveniences_of_a_type[i];
-            if (this[convenience])
-                conveniences.push(convenience);
+            //if (this[convenience])
+            conveniences.push(convenience);
         }
         return conveniences;
     }

@@ -18,7 +18,7 @@ export class KondoRepository {
     }
 
     async findOne(where: FindOptions): Promise<Kondo> {
-        console.log('kondo.repository findOne', where);
+        //console.log('kondo.repository findOne', where);
         return await this.KondoRepositoryProvider.findOne<Kondo>(where);
     }
 

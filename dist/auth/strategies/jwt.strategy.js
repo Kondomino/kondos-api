@@ -25,7 +25,7 @@ const common_1 = require("@nestjs/common");
 const constants_1 = require("../constants");
 let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy) {
     constructor() {
-        console.log('[jwt.strategy] constructor');
+        //console.log('[jwt.strategy] constructor');
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
@@ -35,7 +35,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     validate(payload) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('[jwt.strategy] validate');
+            //console.log('[jwt.strategy] validate');
             return { userId: payload.sub, username: payload.username };
         });
     }
