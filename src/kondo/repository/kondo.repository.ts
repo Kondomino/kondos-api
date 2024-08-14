@@ -24,7 +24,7 @@ export class KondoRepository {
 
     async findAll(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
         // eslint-disable-next-line prefer-const
-        let { take, order, page, name, slug, active, status, search } = searchKondoDto;
+        let { take, order, page, name, slug, active, status, search, conveniences } = searchKondoDto;
 
         // eslint-disable-next-line prefer-const
         let query: PaginationQuery = {
@@ -47,6 +47,13 @@ export class KondoRepository {
              });
         }
         
+        if (conveniences) {
+            const conveniencesArray = conveniences.split(',');
+            for (const item of conveniencesArray) {
+                query.where[item] = true;
+            }
+        }
+
         if (name) {
             query.where = Object.assign(query.where, { name });
         }
