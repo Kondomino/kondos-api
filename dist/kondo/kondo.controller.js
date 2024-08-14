@@ -37,13 +37,11 @@ let KondoController = class KondoController {
     }
     findAll(searchKondoDto) {
         return __awaiter(this, void 0, void 0, function* () {
-            //console.log('api received kondo/findAll request', searchKondoDto);
             return this.kondoService.findAll(searchKondoDto);
         });
     }
     getConveniences() {
         return __awaiter(this, void 0, void 0, function* () {
-            //console.log('api received kondo/getConveniences request');
             return this.kondoService.getConveniences();
         });
     }

@@ -41,7 +41,7 @@ let KondoRepository = class KondoRepository {
     findAll(searchKondoDto) {
         return __awaiter(this, void 0, void 0, function* () {
             // eslint-disable-next-line prefer-const
-            let { take, order, page, name, slug, active, status, search } = searchKondoDto;
+            let { take, order, page, name, slug, active, status, search, conveniences } = searchKondoDto;
             // eslint-disable-next-line prefer-const
             let query = {
                 attributes: ['Kondo.*', [sequelize_2.default.fn('COUNT', sequelize_2.default.col('likes.kondoId')), 'likes']],
@@ -59,6 +59,12 @@ let KondoRepository = class KondoRepository {
                         { neighborhood: { [sequelize_1.Op.iLike]: { [sequelize_1.Op.any]: queryPhraseArray.map(item => `%${item}%`) } } }
                     ]
                 });
+            }
+            if (conveniences) {
+                const conveniencesArray = conveniences.split(',');
+                for (const item of conveniencesArray) {
+                    query.where[item] = true;
+                }
             }
             if (name) {
                 query.where = Object.assign(query.where, { name });
