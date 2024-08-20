@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.IntegratorController = void 0;
 const common_1 = require("@nestjs/common");
 const integrator_service_1 = require("./integrator.service");
+const public_decorator_1 = require("../auth/decorators/public.decorator");
 let IntegratorController = class IntegratorController {
     constructor(integratorService) {
         this.integratorService = integratorService;
@@ -21,6 +22,7 @@ let IntegratorController = class IntegratorController {
     }
 };
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/run'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),

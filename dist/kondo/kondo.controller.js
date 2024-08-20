@@ -52,7 +52,7 @@ let KondoController = class KondoController {
     //   return this.kondoService.findOne(+id);
     // }
     findBy(searchKondoDto) {
-        //console.log('received kondo/findBy request', searchKondoDto);
+        console.log('received kondo/findBy request', searchKondoDto);
         return this.kondoService.findBy(searchKondoDto);
     }
     update(id, updateKondoDto) {
