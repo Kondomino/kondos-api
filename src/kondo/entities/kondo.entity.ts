@@ -31,10 +31,9 @@ export class Kondo extends Model {
       if (partial)
         Object.assign(this, partial);
     }
-    
      
     @Column({
-        type: DataType.STRING,
+        //type: DataType.STRING,
         allowNull: false,
     })
     name: string;
@@ -357,6 +356,8 @@ export class Kondo extends Model {
     @HasMany(() => Like)
     likes: Like[];
 
+    allConveniences: boolean = false;
+
     @Expose()
     get details() {
         return this.getDetails();
@@ -397,6 +398,12 @@ export class Kondo extends Model {
         }
     }
     
+    getAllConveniences() {
+        this.allConveniences = true;
+
+        return this.getConveniences();
+    }
+
     getConveniences(): KondoConveniencesType[] {
         const conveniences: KondoConveniencesType[] = [{
                 "type": "basic",
@@ -415,7 +422,7 @@ export class Kondo extends Model {
                 "conveniences": []
             }];
 
-            return conveniences.map(item => {
+        return conveniences.map(item => {
                 if (item.type == 'basic')
                     item.conveniences = this.getConveniencesOfType(basic_conveniences);
                 if (item.type == 'extra')
@@ -433,11 +440,14 @@ export class Kondo extends Model {
         const conveniences = [];
         for (let i=0; i< conveniences_of_a_type.length; i++) {
             const convenience = conveniences_of_a_type[i];
-            //if (this[convenience])
-            conveniences.push(convenience)
+
+            // Will only add to the list, if it's getting All, or if the Kondo has it
+            if (this.allConveniences) {
+                conveniences.push(convenience);
+            }
+            else if (this[convenience])
+                conveniences.push(convenience)
         }
         return conveniences;
     }
 }
-
-//Kondo.hasMany(Like);

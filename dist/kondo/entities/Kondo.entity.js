@@ -33,6 +33,7 @@ module.exports.KondoTypes = exports.KondoTypes;
 let Kondo = class Kondo extends sequelize_typescript_1.Model {
     constructor(partial) {
         super();
+        this.allConveniences = false;
         if (partial)
             Object.assign(this, partial);
     }
@@ -68,6 +69,10 @@ let Kondo = class Kondo extends sequelize_typescript_1.Model {
             city: this.city,
         };
     }
+    getAllConveniences() {
+        this.allConveniences = true;
+        return this.getConveniences();
+    }
     getConveniences() {
         const conveniences = [{
                 "type": "basic",
@@ -101,15 +106,20 @@ let Kondo = class Kondo extends sequelize_typescript_1.Model {
         const conveniences = [];
         for (let i = 0; i < conveniences_of_a_type.length; i++) {
             const convenience = conveniences_of_a_type[i];
-            //if (this[convenience])
-            conveniences.push(convenience);
+            // Will only add to the list, if it's getting All, or if the Kondo has it
+            if (this.allConveniences) {
+                console.log('fetching all conveniences');
+                conveniences.push(convenience);
+            }
+            if (this[convenience])
+                conveniences.push(convenience);
         }
         return conveniences;
     }
 };
 __decorate([
     (0, sequelize_typescript_1.Column)({
-        type: sequelize_typescript_1.DataType.STRING,
+        //type: DataType.STRING,
         allowNull: false,
     }),
     __metadata("design:type", String)

@@ -53,7 +53,7 @@ export class KondoService {
     async getConveniences(): Promise<KondoConveniencesType[]> {
         const kondo = new Kondo();
 
-        return kondo.getConveniences();
+        return kondo.getAllConveniences();
     }
     
     async update(id: number, Kondo: UpdateKondoDto): Promise<Kondo> {

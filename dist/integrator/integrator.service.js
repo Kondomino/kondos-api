@@ -158,10 +158,14 @@ let IntegratorService = class IntegratorService {
                     // Got a slug?
                     if (slug !== '') {
                         try {
+                            console.log('------------------ ');
+                            console.log('lets try with ', condoDTO.slug);
                             const condo = yield this.KondoRepository.findOrCreate({
                                 where: { slug: condoDTO.slug },
                                 defaults: condoDTO
                             });
+                            console.log('found condo 0 ??', condo[0]);
+                            console.log('found condo 1 ??', condo[1]);
                             // Condo was created?
                             if (!condo[1]) {
                                 // UPDATE
@@ -169,6 +173,7 @@ let IntegratorService = class IntegratorService {
                                 this.updated++;
                             }
                             else {
+                                console.log('condo created', condoDTO.slug);
                                 // CREATE
                                 this.created++;
                             }

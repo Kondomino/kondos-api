@@ -72,7 +72,7 @@ let KondoService = class KondoService {
     getConveniences() {
         return __awaiter(this, void 0, void 0, function* () {
             const kondo = new kondo_entity_1.Kondo();
-            return kondo.getConveniences();
+            return kondo.getAllConveniences();
         });
     }
     update(id, Kondo) {
