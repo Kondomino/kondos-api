@@ -2,11 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { LikeService } from './like.service';
 import { CreateLikeDto } from './dto/create-like.dto';
 import { UpdateLikeDto } from './dto/update-like.dto';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('like')
 export class LikeController {
   constructor(private readonly likeService: LikeService) {}
 
+  @Public()
   @Post('/kondo')
   create(@Body() createLikeDto: CreateLikeDto) {
     return this.likeService.create(createLikeDto);

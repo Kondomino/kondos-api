@@ -108,10 +108,9 @@ let Kondo = class Kondo extends sequelize_typescript_1.Model {
             const convenience = conveniences_of_a_type[i];
             // Will only add to the list, if it's getting All, or if the Kondo has it
             if (this.allConveniences) {
-                console.log('fetching all conveniences');
                 conveniences.push(convenience);
             }
-            if (this[convenience])
+            else if (this[convenience])
                 conveniences.push(convenience);
         }
         return conveniences;
@@ -495,4 +494,3 @@ Kondo = __decorate([
     __metadata("design:paramtypes", [Object])
 ], Kondo);
 exports.Kondo = Kondo;
-//Kondo.hasMany(Like);

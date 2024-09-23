@@ -8,5 +8,5 @@ export type PaginationQuery = {
     offset?: number,
     where?: KondoWhereOptions | any,
     include?: object,
-    group?: string
+    group?: string | string[]
 }

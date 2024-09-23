@@ -44,11 +44,15 @@ let KondoRepository = class KondoRepository {
             let { take, order, page, name, slug, active, status, search, conveniences } = searchKondoDto;
             // eslint-disable-next-line prefer-const
             let query = {
-                attributes: ['Kondo.*', [sequelize_2.default.fn('COUNT', sequelize_2.default.col('likes.kondoId')), 'likes']],
+                attributes: [
+                    'Kondo.*',
+                    [sequelize_2.default.fn('COUNT', sequelize_2.default.col('likes.kondoId')), 'likes'],
+                    [sequelize_2.default.literal('CASE WHEN "likes".id IS NOT NULL THEN true ELSE false END'), 'isLiked'],
+                ],
                 limit: take,
                 where: { active, status },
                 include: { model: like_entity_1.Like, as: 'likes', required: false, duplicating: false, attributes: [] },
-                group: 'Kondo.id'
+                group: ['Kondo.id', 'likes.id']
             };
             if (search) {
                 const queryPhraseArray = search.split(' ');

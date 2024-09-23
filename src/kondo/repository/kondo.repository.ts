@@ -28,11 +28,15 @@ export class KondoRepository {
 
         // eslint-disable-next-line prefer-const
         let query: PaginationQuery = {
-            attributes: ['Kondo.*', [sequelize.fn('COUNT', sequelize.col('likes.kondoId')), 'likes']],
+            attributes: [
+                'Kondo.*',
+                [sequelize.fn('COUNT', sequelize.col('likes.kondoId')), 'likes'],
+                [sequelize.literal('CASE WHEN "likes".id IS NOT NULL THEN true ELSE false END'), 'isLiked'],
+            ],
             limit: take,
             where: { active, status },
             include: { model: Like, as: 'likes', required: false, duplicating: false, attributes: [] },
-            group: 'Kondo.id'
+            group: ['Kondo.id', 'likes.id' ]
         };
 
         if (search) {
@@ -72,7 +76,6 @@ export class KondoRepository {
 
         page = page? page -1 : 0;
         query.offset = page * searchKondoDto.take;
-        
         return await this.KondoRepositoryProvider.findAll<Kondo>(query);
     }
 

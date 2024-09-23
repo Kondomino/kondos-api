@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const like_service_1 = require("./like.service");
 const create_like_dto_1 = require("./dto/create-like.dto");
 const update_like_dto_1 = require("./dto/update-like.dto");
+const public_decorator_1 = require("../auth/decorators/public.decorator");
 let LikeController = class LikeController {
     constructor(likeService) {
         this.likeService = likeService;
@@ -38,6 +39,7 @@ let LikeController = class LikeController {
     }
 };
 __decorate([
+    (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/kondo'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
