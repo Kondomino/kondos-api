@@ -13,9 +13,11 @@ exports.UpdateUserDto = void 0;
 const mapped_types_1 = require("@nestjs/mapped-types");
 const class_validator_1 = require("class-validator");
 const user_dto_1 = require("./user.dto");
+const swagger_1 = require("@nestjs/swagger");
 class UpdateUserDto extends (0, mapped_types_1.PartialType)(user_dto_1.UserDto) {
 }
 __decorate([
+    (0, swagger_1.ApiProperty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "name", void 0);
