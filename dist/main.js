@@ -21,17 +21,19 @@ function bootstrap() {
         const port = 3003;
         //initializeApp();
         const app = yield core_1.NestFactory.create(app_module_1.AppModule, { cors: true });
+        app.useGlobalPipes(new common_1.ValidationPipe({ transform: true }));
+        app.use(cookieParser());
+        app.setGlobalPrefix('api');
         const config = new swagger_1.DocumentBuilder()
             .setTitle('Kondomino API')
             .setDescription(`The best API in the world. JSON download: http://localhost:${port}/api-json`)
             .setVersion('1.0')
+            .setBasePath('v1')
+            .setExternalDoc('Postman Collection', '/api-json')
             .addTag('kondos-1.0')
             .build();
         const document = swagger_1.SwaggerModule.createDocument(app, config);
         swagger_1.SwaggerModule.setup('api', app, document);
-        app.useGlobalPipes(new common_1.ValidationPipe({ transform: true }));
-        app.use(cookieParser());
-        app.setGlobalPrefix('api');
         yield app.listen(port);
     });
 }
