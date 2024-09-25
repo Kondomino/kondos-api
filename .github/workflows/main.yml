@@ -2,7 +2,7 @@ name: Kondomino API CI/CD on Amazon Linux
 
 on:
   push:
-    branches: [ main ]
+    branches: main 
 
 jobs:
   prepare:
