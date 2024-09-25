@@ -29,11 +29,15 @@ jobs:
           short_commit_sha=$(git rev-parse --short HEAD)
           echo "short_commit_sha=$short_commit_sha" >> $GITHUB_ENV
 
-      - name: Get Commit message
-        id: get_commit_message
-        run: |
-          commit_message=$(git log -1 --pretty=%B)
-          echo "commit_message=$commit_message" >> $GITHUB_ENV
+          - name: Get Commit or Pull Request Message
+          id: get_commit_or_pr_message
+          run: |
+            if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+              commit_message="${{ github.event.pull_request.title }}"
+            else
+              commit_message=$(git log -1 --pretty=%B)
+            fi
+            echo "commit_message=$commit_message" >> $GITHUB_ENV
 
       - name: Get Branch Name
         id: get_branch_name
