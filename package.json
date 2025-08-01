@@ -19,7 +19,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "build:watch": "tsc --watch"
+    "build:watch": "tsc --watch",
+    "migrate": "sequelize-cli db:migrate",
+    "migrate:undo": "sequelize-cli db:migrate:undo",
+    "migrate:status": "sequelize-cli db:migrate:status",
+    "create:kondo": "npx ts-node src/kondo/scripts/create-mock-kondo.ts",
+    "generate:token": "npx ts-node src/kondo/scripts/token-generator.ts"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
@@ -30,11 +35,13 @@
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/sequelize": "^10.0.1",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/sequelize": "^4.28.20",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
     "nestjs-sequelize-seeder": "^1.1.4",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",

@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateKondoDto } from './create-kondo.dto';
-import { IsBoolean, IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateKondoDto extends PartialType(CreateKondoDto) {
     @IsString()
@@ -23,9 +23,9 @@ export class UpdateKondoDto extends PartialType(CreateKondoDto) {
     @IsOptional()
     readonly lot_min_price: string;
     
-    @IsString()
+    @IsNumber()
     @IsOptional()
-    readonly lot_avg_price: string;
+    readonly lot_avg_price: number;
     
     @IsString()
     @IsOptional()

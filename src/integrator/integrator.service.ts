@@ -3,6 +3,7 @@ import { KondoRepository } from '../kondo/repository/kondo.repository';
 import { readFile, utils } from 'xlsx';
 import { boolean_columns } from './types/boolean_columns';
 import { CreateKondoDto } from '../kondo/dto/create-kondo.dto';
+import { UpdateKondoDto } from '../kondo/dto/update-kondo.dto';
 import { SlugifyService } from '../utils/slugify/slugify.service';
 
 //encode_cell
@@ -183,7 +184,7 @@ export class IntegratorService {
             // Condo was created?
             if (!condo[1]) {
               // UPDATE
-              this.KondoRepository.update(condoDTO, {slug: condoDTO.slug})
+              this.KondoRepository.update(condoDTO as unknown as UpdateKondoDto, {slug: condoDTO.slug})
               this.updated++;
             }
             else {

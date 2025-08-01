@@ -70,7 +70,6 @@ let KondoRepository = class KondoRepository {
             }
             page = page ? page - 1 : 0;
             query.offset = page * searchKondoDto.take;
-            console.log('query is ', query);
             return yield this.KondoRepositoryProvider.findAll(query);
         });
     }

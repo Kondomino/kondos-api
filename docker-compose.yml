@@ -1,17 +1,20 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16
-    container_name: kondo-dev
+    container_name: kondo
     environment:
-      POSTGRES_DB: kondo-dev
+      POSTGRES_DB: kondo
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5433:5433"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data: 
