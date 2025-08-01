@@ -1,11 +1,11 @@
 import { Sequelize } from 'sequelize-typescript';
-import { SEQUELIZE, DEVELOPMENT, TEST, PRODUCTION } from '../constants';
+import { SEQUELIZE, DEVELOPMENT, TEST, PRODUCTION } from '../core/constants';
 import { databaseConfig } from './database.config';
-import { User } from '../../user/entities/user.entity';
-import { Kondo } from '../../kondo/entities/kondo.entity';
-import { Media } from '../../media/entities/media.entity';
-import { Unit } from '../../unit/entities/unit.entity';
-import { Like } from '../../like/entities/like.entity';
+import { User } from '../user/entities/user.entity';
+import { Kondo } from '../kondo/entities/kondo.entity';
+import { Media } from '../media/entities/media.entity';
+import { Unit } from '../unit/entities/unit.entity';
+import { Like } from '../like/entities/like.entity';
 
 export const databaseProviders = [{
     provide: SEQUELIZE,
