@@ -42,9 +42,9 @@ __decorate([
     __metadata("design:type", String)
 ], UpdateKondoDto.prototype, "lot_min_price", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], UpdateKondoDto.prototype, "lot_avg_price", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),

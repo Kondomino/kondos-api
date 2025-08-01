@@ -113,13 +113,15 @@ export class Kondo extends Model {
      */
     @Column({
         allowNull: true,
+        type: DataType.DECIMAL(10, 2)
     })
-    lot_avg_price: string;
+    lot_avg_price: number;
 
     @Column({
         allowNull: true,
+        type: DataType.DECIMAL(10, 2)
     })
-    condo_rent: string;
+    condo_rent: number;
 
     @Column({
         defaultValue: false
