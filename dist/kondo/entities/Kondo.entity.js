@@ -201,14 +201,16 @@ __decorate([
 __decorate([
     (0, sequelize_typescript_1.Column)({
         allowNull: true,
+        type: sequelize_typescript_1.DataType.DECIMAL(10, 2)
     }),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], Kondo.prototype, "lot_avg_price", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
         allowNull: true,
+        type: sequelize_typescript_1.DataType.DECIMAL(10, 2)
     }),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], Kondo.prototype, "condo_rent", void 0);
 __decorate([
     (0, sequelize_typescript_1.Column)({
