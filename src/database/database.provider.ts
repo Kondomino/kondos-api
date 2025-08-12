@@ -6,6 +6,9 @@ import { Kondo } from '../kondo/entities/kondo.entity';
 import { Media } from '../media/entities/media.entity';
 import { Unit } from '../unit/entities/unit.entity';
 import { Like } from '../like/entities/like.entity';
+import { RealEstateAgency } from '../whatsapp/entities/real-estate-agency.entity';
+import { Conversation } from '../whatsapp/entities/conversation.entity';
+import { Message } from '../whatsapp/entities/message.entity';
 
 export const databaseProviders = [{
     provide: SEQUELIZE,
@@ -25,7 +28,7 @@ export const databaseProviders = [{
                 config = databaseConfig.development;
         }
         const sequelize = new Sequelize(config);
-        sequelize.addModels([User, Kondo, Media, Unit, Like]);
+        sequelize.addModels([User, Kondo, Media, Unit, Like, RealEstateAgency, Conversation, Message]);
         await sequelize.sync();
         return sequelize;
     },

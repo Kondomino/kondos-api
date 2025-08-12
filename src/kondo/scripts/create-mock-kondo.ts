@@ -10,7 +10,6 @@ import {
   mockKondoCasas4Data,
   mockKondoCasas5Data
 } from '../../database/mocks';
-import { generateMockToken } from './token-generator';
 
 /**
  * Script to create mock Kondo data in the database via API calls
@@ -24,12 +23,6 @@ async function makeRequest(url: string, method: string = 'GET', data?: any) {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
-    
-    // Only add Authorization header for non-GET requests (POST, PUT, PATCH, DELETE)
-    if (method !== 'GET') {
-      const token = generateMockToken();
-      headers['Authorization'] = `Bearer ${token}`;
-    }
     
     const response = await fetch(url, {
       method,
@@ -123,17 +116,11 @@ console.log(`
 
 3. The script will:
    - Check if server is running
-   - Generate JWT tokens for authentication
    - Create 7 different kondo types in the database
    - Show creation results and IDs
    - Provide test commands
 
-4. Token generation:
-   
-   Generate a mock token:
-   npm run generate:token
-
-5. Manual API testing:
+4. Manual API testing:
    
    List all kondos (no auth required):
    curl -X GET http://localhost:3003/api/kondo | jq
@@ -141,23 +128,19 @@ console.log(`
    Get specific kondo (no auth required):
    curl -X GET http://localhost:3003/api/kondo/1 | jq
 
-   Create kondo (auth required):
+   Create kondo (no auth required):
    curl -X POST http://localhost:3003/api/kondo \\
-     -H "Authorization: Bearer YOUR_TOKEN" \\
      -H "Content-Type: application/json" \\
      -d '{"name":"Test Kondo","email":"test@example.com"}'
 
-6. Frontend integration:
+5. Frontend integration:
    
    import { mockKondoData } from '../../database/mocks';
-   import { generateMockToken } from './token-generator';
    
-   const token = generateMockToken();
    const response = await fetch('/api/kondo', {
      method: 'POST',
      headers: { 
-       'Content-Type': 'application/json',
-       'Authorization': \`Bearer \${token}\`
+       'Content-Type': 'application/json'
      },
      body: JSON.stringify(mockKondoData)
    });

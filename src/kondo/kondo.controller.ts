@@ -10,6 +10,7 @@ import { Public } from '../auth/decorators/public.decorator';
 export class KondoController {
   constructor(private readonly kondoService: KondoService) {}
 
+  @Public()
   @Post()
   create(@Body() createKondoDto: CreateKondoDto) {
     return this.kondoService.create(createKondoDto);

@@ -25,6 +25,10 @@ const like_module_1 = require("./like/like.module");
 const like_entity_1 = require("./like/entities/like.entity");
 const auth_module_1 = require("./auth/auth.module");
 const google_strategy_1 = require("./auth/strategies/google.strategy");
+const whatsapp_module_1 = require("./whatsapp/whatsapp.module");
+const real_estate_agency_entity_1 = require("./whatsapp/entities/real-estate-agency.entity");
+const conversation_entity_1 = require("./whatsapp/entities/conversation.entity");
+const message_entity_1 = require("./whatsapp/entities/message.entity");
 const dotenv = require("dotenv");
 dotenv.config();
 const requireSSL_for_prod_only = process.env.NODE_ENV === 'PRODUCTION' ? { ssl: { require: true, rejectUnauthorized: false } } : {};
@@ -51,7 +55,7 @@ AppModule = __decorate([
                 username: process.env.DB_USER || 'postgres',
                 password: process.env.DB_PASSWORD || 'postgres',
                 database: process.env.DB_NAME || 'kondo',
-                models: [user_entity_1.User, kondo_entity_1.Kondo, media_entity_1.Media, unit_entity_1.Unit, like_entity_1.Like],
+                models: [user_entity_1.User, kondo_entity_1.Kondo, media_entity_1.Media, unit_entity_1.Unit, like_entity_1.Like, real_estate_agency_entity_1.RealEstateAgency, conversation_entity_1.Conversation, message_entity_1.Message],
                 autoLoadModels: true,
                 logging: (msg) => console.log('🐘 DB Query:', msg),
                 logQueryParameters: true,
@@ -63,7 +67,8 @@ AppModule = __decorate([
             media_module_1.MediaModule,
             unit_module_1.UnitModule,
             like_module_1.LikeModule,
-            auth_module_1.AuthModule
+            auth_module_1.AuthModule,
+            whatsapp_module_1.WhatsappModule
             //   SeederModule.forRoot({
             //     // Activate this if you want to run the seeders if the table is empty in the database
             //     runOnlyIfTableIsEmpty: true,

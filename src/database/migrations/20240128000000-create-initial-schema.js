@@ -348,7 +348,7 @@ module.exports = {
         type: Sequelize.ENUM('draft', 'text_ready', 'media_gathering', 'published'),
         defaultValue: 'draft',
       },
-      bedroms: {
+      bedrooms: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
       },
@@ -379,6 +379,50 @@ module.exports = {
       closet: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
+      },
+      unit_type: {
+        type: Sequelize.ENUM('apartment', 'house', 'lot'),
+        allowNull: false,
+      },
+      area: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: true,
+      },
+      lot_size: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      floor: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      building: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      features: {
+        type: Sequelize.JSON,
+        allowNull: true,
+      },
+      images: {
+        type: Sequelize.JSON,
+        allowNull: true,
+      },
+      video_url: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      contact_phone: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      contact_email: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       createdAt: {
         type: Sequelize.DATE,
