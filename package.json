@@ -24,9 +24,12 @@
     "migrate:undo": "sequelize-cli db:migrate:undo",
     "migrate:status": "sequelize-cli db:migrate:status",
     "create:kondo": "npx ts-node src/kondo/scripts/create-mock-kondo.ts",
-    "generate:token": "npx ts-node src/kondo/scripts/token-generator.ts"
+    "create:unit": "npx ts-node src/unit/scripts/create-mock-unit.ts",
+    "seed": "npm run create:kondo && npm run create:unit",
+    "token": "npx ts-node src/kondo/scripts/token-generator.ts"
   },
   "dependencies": {
+    "@langchain/core": "^0.3.69",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^3.2.0",
     "@nestjs/core": "^9.0.0",
@@ -43,6 +46,7 @@
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
+    "langchain": "^0.3.30",
     "nestjs-sequelize-seeder": "^1.1.4",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
