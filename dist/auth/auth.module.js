@@ -18,7 +18,8 @@ const constants_1 = require("./constants");
 const jwt_strategy_1 = require("./strategies/jwt.strategy");
 let AuthModule = class AuthModule {
 };
-AuthModule = __decorate([
+exports.AuthModule = AuthModule;
+exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             user_module_1.UserModule,
@@ -41,4 +42,3 @@ AuthModule = __decorate([
         exports: [auth_service_1.AuthService]
     })
 ], AuthModule);
-exports.AuthModule = AuthModule;

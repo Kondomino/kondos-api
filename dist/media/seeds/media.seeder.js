@@ -17,10 +17,10 @@ let SeedMedia = class SeedMedia {
         return media_seeds_1.mediaSeeds;
     }
 };
-SeedMedia = __decorate([
+exports.SeedMedia = SeedMedia;
+exports.SeedMedia = SeedMedia = __decorate([
     (0, nestjs_sequelize_seeder_1.Seeder)({
         model: 'Media',
         unique: [],
     })
 ], SeedMedia);
-exports.SeedMedia = SeedMedia;

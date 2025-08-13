@@ -37,6 +37,7 @@ let LikeController = class LikeController {
         return this.likeService.remove(+id);
     }
 };
+exports.LikeController = LikeController;
 __decorate([
     (0, common_1.Post)('/kondo'),
     __param(0, (0, common_1.Body)()),
@@ -72,8 +73,7 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], LikeController.prototype, "remove", null);
-LikeController = __decorate([
+exports.LikeController = LikeController = __decorate([
     (0, common_1.Controller)('like'),
     __metadata("design:paramtypes", [like_service_1.LikeService])
 ], LikeController);
-exports.LikeController = LikeController;

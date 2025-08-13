@@ -47,8 +47,8 @@ let LikeService = class LikeService {
         return `This action removes a #${id} like`;
     }
 };
-LikeService = __decorate([
+exports.LikeService = LikeService;
+exports.LikeService = LikeService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [like_repository_1.LikeRepository])
 ], LikeService);
-exports.LikeService = LikeService;

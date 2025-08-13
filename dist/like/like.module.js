@@ -14,10 +14,10 @@ const like_provider_1 = require("./repository/like.provider");
 const like_repository_1 = require("./repository/like.repository");
 let LikeModule = class LikeModule {
 };
-LikeModule = __decorate([
+exports.LikeModule = LikeModule;
+exports.LikeModule = LikeModule = __decorate([
     (0, common_1.Module)({
         controllers: [like_controller_1.LikeController],
         providers: [like_service_1.LikeService, ...like_provider_1.likeProviders, like_repository_1.LikeRepository],
     })
 ], LikeModule);
-exports.LikeModule = LikeModule;

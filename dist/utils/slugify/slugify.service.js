@@ -20,7 +20,7 @@ let SlugifyService = class SlugifyService {
             .replace(/-+/g, '-'); // remove consecutive hyphens
     }
 };
-SlugifyService = __decorate([
+exports.SlugifyService = SlugifyService;
+exports.SlugifyService = SlugifyService = __decorate([
     (0, common_1.Injectable)()
 ], SlugifyService);
-exports.SlugifyService = SlugifyService;

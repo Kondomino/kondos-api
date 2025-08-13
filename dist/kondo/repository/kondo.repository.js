@@ -20,6 +20,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KondoRepository = void 0;
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -27,7 +30,7 @@ const common_1 = require("@nestjs/common");
 const constants_1 = require("../../core/constants");
 const sequelize_1 = require("sequelize");
 const like_entity_1 = require("../../like/entities/like.entity");
-const sequelize_2 = require("sequelize");
+const sequelize_2 = __importDefault(require("sequelize"));
 let KondoRepository = class KondoRepository {
     constructor(KondoRepositoryProvider) {
         this.KondoRepositoryProvider = KondoRepositoryProvider;
@@ -125,9 +128,9 @@ let KondoRepository = class KondoRepository {
         });
     }
 };
-KondoRepository = __decorate([
+exports.KondoRepository = KondoRepository;
+exports.KondoRepository = KondoRepository = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(constants_1.KONDO_REPOSITORY_PROVIDER)),
     __metadata("design:paramtypes", [Object])
 ], KondoRepository);
-exports.KondoRepository = KondoRepository;

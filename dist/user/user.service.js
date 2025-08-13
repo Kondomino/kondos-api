@@ -83,9 +83,9 @@ let UserService = class UserService {
         });
     }
 };
-UserService = __decorate([
+exports.UserService = UserService;
+exports.UserService = UserService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(constants_1.USER_REPOSITORY_PROVIDER)),
     __metadata("design:paramtypes", [Object])
 ], UserService);
-exports.UserService = UserService;

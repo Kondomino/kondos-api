@@ -23,6 +23,7 @@ class PageOptionsDto {
         return (this.page - 1) * this.take;
     }
 }
+exports.PageOptionsDto = PageOptionsDto;
 __decorate([
     (0, class_validator_1.IsEnum)(order_type_1.Order),
     (0, class_validator_1.IsOptional)(),
@@ -43,4 +44,3 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], PageOptionsDto.prototype, "take", void 0);
-exports.PageOptionsDto = PageOptionsDto;

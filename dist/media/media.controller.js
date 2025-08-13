@@ -30,6 +30,7 @@ let MediaController = class MediaController {
         return this.mediaService.findMediasOfKondo(kondoId);
     }
 };
+exports.MediaController = MediaController;
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Get)(':id'),
@@ -38,8 +39,7 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], MediaController.prototype, "findMediasOfKondo", null);
-MediaController = __decorate([
+exports.MediaController = MediaController = __decorate([
     (0, common_1.Controller)('media'),
     __metadata("design:paramtypes", [media_service_1.MediaService])
 ], MediaController);
-exports.MediaController = MediaController;

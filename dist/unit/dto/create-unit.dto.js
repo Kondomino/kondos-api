@@ -14,6 +14,7 @@ const class_validator_1 = require("class-validator");
 const unit_entity_1 = require("../entities/unit.entity");
 class CreateUnitDto {
 }
+exports.CreateUnitDto = CreateUnitDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -284,4 +285,3 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateUnitDto.prototype, "source_url", void 0);
-exports.CreateUnitDto = CreateUnitDto;

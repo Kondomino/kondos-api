@@ -21,6 +21,7 @@ class SearchKondoDto extends page_options_dto_1.PageOptionsDto {
         this.status = kondo_entity_1.KondoStatus.DONE;
     }
 }
+exports.SearchKondoDto = SearchKondoDto;
 __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, class_validator_1.IsString)(),
@@ -63,4 +64,3 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], SearchKondoDto.prototype, "conveniences", void 0);
-exports.SearchKondoDto = SearchKondoDto;

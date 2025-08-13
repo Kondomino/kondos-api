@@ -14,6 +14,7 @@ const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class UserDto {
 }
+exports.UserDto = UserDto;
 __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, class_validator_1.IsEmail)(),
@@ -48,4 +49,3 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UserDto.prototype, "picture", void 0);
-exports.UserDto = UserDto;

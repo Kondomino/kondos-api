@@ -1,17 +1,17 @@
 import { Injectable, Logger, ForbiddenException } from '@nestjs/common';
 import { WebhookDto } from './dto/webhook.dto';
 import { SendMessageDto } from './dto/send-message.dto';
-import { AIAgentMock, AIResponse } from './ai.agent.mock';
 import { ConversationService } from './services/conversation.service';
+import { AgenticService } from '../agentic/agentic.service';
 
 @Injectable()
 export class WhatsappService {
   private readonly logger = new Logger(WhatsappService.name);
   private readonly verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || 'your_verify_token_here';
-  private readonly aiAgent = new AIAgentMock();
 
   constructor(
-    private readonly conversationService: ConversationService
+    private readonly conversationService: ConversationService,
+    private readonly agenticService: AgenticService,
   ) {
     this.logger.log(`WhatsApp Service initialized with verify token: ${this.verifyToken}`);
     this.logger.log(`Environment variable WHATSAPP_VERIFY_TOKEN: ${process.env.WHATSAPP_VERIFY_TOKEN}`);
@@ -166,72 +166,57 @@ export class WhatsappService {
     const from: string = message.from;
     const messageType: string = message.type;
     const textContent: string | undefined = messageType === 'text' ? message.text?.body : undefined;
+    const messageId: string = message.id;
 
-    // Single place to detect whether the sender is a real estate agent
-    const isRealEstateAgent: boolean = await this.conversationService.isRealEstateAgent(from, textContent);
-
-    if (!isRealEstateAgent) {
-      this.logger.log(`Message from ${from}. Not a real estate agent`);
-      return;
+    // Extract media data if present
+    let mediaData = undefined;
+    if (messageType === 'image' || messageType === 'document' || messageType === 'video') {
+      mediaData = {
+        mediaId: message[messageType]?.id,
+        mediaUrl: message[messageType]?.link,
+        filename: message[messageType]?.filename,
+        mimeType: message[messageType]?.mime_type,
+        size: message[messageType]?.size,
+      };
     }
 
-    let sendResult: { type: 'text' | 'image' | 'document'; aiResponse?: AIResponse; whatsappResponse?: any } | undefined;
+    // Process message through Agentic service
+    const agentResponse = await this.agenticService.processIncomingMessage(
+      from,
+      textContent || '[Media message]',
+      messageType,
+      messageId,
+      mediaData
+    );
 
-    if (messageType === 'text') {
-      sendResult = await this.handleTextMessage(message);
-    } else if (messageType === 'image') {
-      sendResult = await this.handleImageMessage(message);
-    } else {
-      this.logger.log(`Unhandled message type: ${messageType}`);
+    // If agent decides to respond, send the message
+    if (agentResponse.shouldRespond && agentResponse.message) {
+      const messageData: SendMessageDto = {
+        to: from,
+        type: agentResponse.messageType || 'text',
+        text: agentResponse.message,
+      };
+
+      const sentMessage = await this.sendMessage(messageData);
+
+      // Post-process the interaction
+      await this.postProcessMessage({
+        originalMessage: message,
+        agentResponse,
+        sentMessage,
+      });
     }
-
-    await this.postProcessMessage({
-      isRealEstateAgent,
-      originalMessage: message,
-      sent: sendResult,
-    });
-  }
-
-  private async handleTextMessage(message: any): Promise<{ type: 'text'; aiResponse: AIResponse; whatsappResponse: any }> {
-    const text = message.text?.body;
-    const from = message.from;
-    
-    this.logger.log(`Received text message from ${from}: ${text}`);
-    
-    const aiResponse = this.aiAgent.getResponse(text);
-    this.logger.log(`AI Response: ${JSON.stringify(aiResponse, null, 2)}`);
-
-    const sentMessage = await this.sendAIResponse(from, aiResponse);
-    const whatsappResponse = sentMessage?.data?.whatsappResponse;
-
-    return { type: 'text', aiResponse, whatsappResponse };
-  }
-
-  private async handleImageMessage(message: any): Promise<{ type: 'image'; aiResponse: AIResponse; whatsappResponse: any }> {
-    const from = message.from;
-    
-    this.logger.log(`Received image message from ${from}: ${message.image?.id}`);
-
-    const aiResponse: AIResponse = {
-      message: "📸 Obrigado pela imagem! Vou analisar e te respondo em breve.",
-      type: 'text'
-    };
-
-    const sentMessage = await this.sendAIResponse(from, aiResponse);
-    const whatsappResponse = sentMessage?.data?.whatsappResponse;
-
-    return { type: 'image', aiResponse, whatsappResponse };
   }
 
   private async postProcessMessage(input: {
-    isRealEstateAgent: boolean;
     originalMessage: any;
-    sent?: { type: 'text' | 'image' | 'document'; aiResponse?: AIResponse; whatsappResponse?: any };
+    agentResponse: any;
+    sentMessage?: any;
   }): Promise<void> {
-    const { isRealEstateAgent, originalMessage, sent } = input;
+    const { originalMessage, agentResponse, sentMessage } = input;
 
-    if (!isRealEstateAgent) {
-      return; // Non-agents: no persistence
+    if (!agentResponse.conversationId) {
+      return; // No persistence needed
     }
 
     const from = originalMessage.from;
@@ -239,53 +224,17 @@ export class WhatsappService {
     const messageType = originalMessage.type;
     const timestamp = new Date(parseInt(originalMessage.timestamp) * 1000);
 
-    // Ensure agency and conversation exist
-    const agency = await this.conversationService.getOrCreateAgency(from);
-    const conversation = await this.conversationService.getOrCreateConversation(agency.id, from);
-
-    // Persist incoming
-    await this.conversationService.saveIncomingMessage(
-      conversation.id,
-      messageId,
-      messageType,
-      originalMessage,
-      timestamp
-    );
-
-    // Persist outgoing if present
-    const outgoingMessageId: string | undefined = sent?.whatsappResponse?.messages?.[0]?.id;
-    if (outgoingMessageId && sent) {
-      let content: any = {};
-      if (sent.type === 'text' && sent.aiResponse?.message) {
-        content = { text: { body: sent.aiResponse.message } };
-      } else if (sent.type === 'image' && originalMessage.image?.id) {
-        content = { image: { id: originalMessage.image.id } };
-      }
-
+    // Persist outgoing message if present
+    const outgoingMessageId: string | undefined = sentMessage?.data?.whatsappResponse?.messages?.[0]?.id;
+    if (outgoingMessageId && agentResponse.message) {
       await this.conversationService.saveOutgoingMessage(
-        conversation.id,
+        agentResponse.conversationId,
         outgoingMessageId,
-        sent.type,
-        content,
+        agentResponse.messageType || 'text',
+        { text: { body: agentResponse.message } },
         new Date()
       );
     }
-  }
-
-  async sendAIResponse(to: string, aiResponse: AIResponse): Promise<any> {
-    this.logger.log(`Sending AI response to ${to}: ${aiResponse.message}`);
-    
-    const messageData: SendMessageDto = {
-      to: to,
-      type: aiResponse.type,
-      text: aiResponse.message,
-      mediaUrl: aiResponse.mediaUrl
-    };
-    
-    this.logger.log(`Sending message data: ${JSON.stringify(messageData, null, 2)}`);
-    
-    // Actually send the message via WhatsApp API
-    return await this.sendMessage(messageData);
   }
 
   async sendMessage(messageData: SendMessageDto): Promise<any> {

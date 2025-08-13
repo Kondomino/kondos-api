@@ -83,9 +83,9 @@ let UserRepository = class UserRepository {
         });
     }
 };
-UserRepository = __decorate([
+exports.UserRepository = UserRepository;
+exports.UserRepository = UserRepository = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(constants_1.USER_REPOSITORY_PROVIDER)),
     __metadata("design:paramtypes", [Object])
 ], UserRepository);
-exports.UserRepository = UserRepository;

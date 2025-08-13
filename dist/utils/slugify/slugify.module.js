@@ -11,10 +11,10 @@ const common_1 = require("@nestjs/common");
 const slugify_service_1 = require("./slugify.service");
 let SlugifyModule = class SlugifyModule {
 };
-SlugifyModule = __decorate([
+exports.SlugifyModule = SlugifyModule;
+exports.SlugifyModule = SlugifyModule = __decorate([
     (0, common_1.Module)({
         providers: [slugify_service_1.SlugifyService],
         exports: [slugify_service_1.SlugifyService]
     })
 ], SlugifyModule);
-exports.SlugifyModule = SlugifyModule;

@@ -14,10 +14,10 @@ const unit_provider_1 = require("./repository/unit.provider");
 const unit_repository_1 = require("./repository/unit.repository");
 let UnitModule = class UnitModule {
 };
-UnitModule = __decorate([
+exports.UnitModule = UnitModule;
+exports.UnitModule = UnitModule = __decorate([
     (0, common_1.Module)({
         controllers: [unit_controller_1.UnitController],
         providers: [unit_service_1.UnitService, ...unit_provider_1.unitProviders, unit_repository_1.UnitRepository],
     })
 ], UnitModule);
-exports.UnitModule = UnitModule;

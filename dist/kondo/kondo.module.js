@@ -17,11 +17,11 @@ const kondo_repository_1 = require("./repository/kondo.repository");
 const slugify_module_1 = require("../utils/slugify/slugify.module");
 let KondoModule = class KondoModule {
 };
-KondoModule = __decorate([
+exports.KondoModule = KondoModule;
+exports.KondoModule = KondoModule = __decorate([
     (0, common_1.Module)({
         controllers: [kondo_controller_1.KondoController],
         providers: [kondo_service_1.KondoService, ...kondo_provider_1.kondoProviders, kondo_repository_1.KondoRepository],
         imports: [sequelize_1.SequelizeModule.forFeature([kondo_entity_1.Kondo]), slugify_module_1.SlugifyModule]
     })
 ], KondoModule);
-exports.KondoModule = KondoModule;

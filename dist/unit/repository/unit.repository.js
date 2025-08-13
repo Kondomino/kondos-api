@@ -83,9 +83,9 @@ let UnitRepository = class UnitRepository {
         });
     }
 };
-UnitRepository = __decorate([
+exports.UnitRepository = UnitRepository;
+exports.UnitRepository = UnitRepository = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(constants_1.UNIT_REPOSITORY_PROVIDER)),
     __metadata("design:paramtypes", [Object])
 ], UnitRepository);
-exports.UnitRepository = UnitRepository;

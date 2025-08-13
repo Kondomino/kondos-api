@@ -62,6 +62,7 @@ let KondoController = class KondoController {
         return this.kondoService.deactivateKondo(+id);
     }
 };
+exports.KondoController = KondoController;
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)(),
@@ -108,9 +109,8 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], KondoController.prototype, "remove", null);
-KondoController = __decorate([
+exports.KondoController = KondoController = __decorate([
     (0, common_1.Controller)('kondo'),
     (0, common_1.UseInterceptors)(common_1.ClassSerializerInterceptor),
     __metadata("design:paramtypes", [kondo_service_1.KondoService])
 ], KondoController);
-exports.KondoController = KondoController;

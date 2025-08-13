@@ -37,6 +37,7 @@ exports.ConservationStatus = Object.freeze({
 });
 let Unit = class Unit extends sequelize_typescript_1.Model {
 };
+exports.Unit = Unit;
 __decorate([
     (0, sequelize_typescript_1.Column)({
         allowNull: false,
@@ -378,7 +379,6 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], Unit.prototype, "source_url", void 0);
-Unit = __decorate([
+exports.Unit = Unit = __decorate([
     sequelize_typescript_1.Table
 ], Unit);
-exports.Unit = Unit;

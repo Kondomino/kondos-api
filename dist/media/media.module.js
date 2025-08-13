@@ -16,7 +16,8 @@ const sequelize_1 = require("@nestjs/sequelize");
 const media_repository_1 = require("./repository/media.repository");
 let MediaModule = class MediaModule {
 };
-MediaModule = __decorate([
+exports.MediaModule = MediaModule;
+exports.MediaModule = MediaModule = __decorate([
     (0, common_1.Module)({
         controllers: [media_controller_1.MediaController],
         providers: [media_service_1.MediaService, ...media_provider_1.mediaProviders, media_repository_1.MediaRepository],
@@ -26,4 +27,3 @@ MediaModule = __decorate([
         ]
     })
 ], MediaModule);
-exports.MediaModule = MediaModule;

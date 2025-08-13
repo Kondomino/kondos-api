@@ -29,37 +29,35 @@ const whatsapp_module_1 = require("./whatsapp/whatsapp.module");
 const real_estate_agency_entity_1 = require("./whatsapp/entities/real-estate-agency.entity");
 const conversation_entity_1 = require("./whatsapp/entities/conversation.entity");
 const message_entity_1 = require("./whatsapp/entities/message.entity");
-const dotenv = require("dotenv");
-dotenv.config();
-const requireSSL_for_prod_only = process.env.NODE_ENV === 'PRODUCTION' ? { ssl: { require: true, rejectUnauthorized: false } } : {};
-// Debug environment variables
-console.log('🔍 Environment Variables Debug APP MODULE:');
-console.log('NODE_ENV:', process.env.NODE_ENV || 'undefined');
-console.log('DB_HOST:', process.env.DB_HOST || 'undefined (fallback: localhost)');
-console.log('DB_PORT:', process.env.DB_PORT || 'undefined (fallback: 5433)');
-console.log('DB_USER:', process.env.DB_USER || 'undefined (fallback: postgres)');
-console.log('DB_NAME:', process.env.DB_NAME || 'undefined (fallback: kondo)');
-console.log('DB_DIALECT:', process.env.DB_DIALECT || 'undefined (fallback: postgres)');
+// Environment configuration is handled by ConfigModule
 let AppModule = class AppModule {
 };
-AppModule = __decorate([
+exports.AppModule = AppModule;
+exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({ isGlobal: true }),
-            // DatabaseModule,  // TEMPORARILY DISABLED - might conflict with SequelizeModule.forRoot
-            sequelize_1.SequelizeModule.forRoot({
-                dialect: (process.env.DB_DIALECT || 'postgres'),
-                dialectOptions: requireSSL_for_prod_only,
-                host: process.env.DB_HOST || 'localhost',
-                port: parseInt(process.env.DB_PORT || '5433'),
-                username: process.env.DB_USER || 'postgres',
-                password: process.env.DB_PASSWORD || 'postgres',
-                database: process.env.DB_NAME || 'kondo',
-                models: [user_entity_1.User, kondo_entity_1.Kondo, media_entity_1.Media, unit_entity_1.Unit, like_entity_1.Like, real_estate_agency_entity_1.RealEstateAgency, conversation_entity_1.Conversation, message_entity_1.Message],
-                autoLoadModels: true,
-                logging: (msg) => console.log('🐘 DB Query:', msg),
-                logQueryParameters: true,
-                synchronize: false,
+            sequelize_1.SequelizeModule.forRootAsync({
+                imports: [config_1.ConfigModule],
+                inject: [config_1.ConfigService],
+                useFactory: (configService) => {
+                    const nodeEnv = configService.get('NODE_ENV');
+                    const requiresSsl = nodeEnv === 'PRODUCTION';
+                    return {
+                        dialect: (configService.get('DB_DIALECT') || 'postgres'),
+                        dialectOptions: requiresSsl ? { ssl: { require: true, rejectUnauthorized: false } } : {},
+                        host: configService.get('DB_HOST') || 'localhost',
+                        port: parseInt(configService.get('DB_PORT') || '5433', 10),
+                        username: configService.get('DB_USER') || 'postgres',
+                        password: configService.get('DB_PASSWORD') || 'postgres',
+                        database: configService.get('DB_NAME') || 'kondo',
+                        models: [user_entity_1.User, kondo_entity_1.Kondo, media_entity_1.Media, unit_entity_1.Unit, like_entity_1.Like, real_estate_agency_entity_1.RealEstateAgency, conversation_entity_1.Conversation, message_entity_1.Message],
+                        autoLoadModels: true,
+                        logging: (msg) => console.log('🐘 DB Query:', msg),
+                        logQueryParameters: true,
+                        synchronize: false,
+                    };
+                },
             }),
             user_module_1.UserModule,
             kondo_module_1.KondoModule,
@@ -80,4 +78,3 @@ AppModule = __decorate([
         providers: [...kondo_provider_1.kondoProviders, google_strategy_1.GoogleStrategy],
     })
 ], AppModule);
-exports.AppModule = AppModule;

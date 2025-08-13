@@ -38,6 +38,7 @@ let UnitController = class UnitController {
         return this.unitService.remove(+id);
     }
 };
+exports.UnitController = UnitController;
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)(),
@@ -76,8 +77,7 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UnitController.prototype, "remove", null);
-UnitController = __decorate([
+exports.UnitController = UnitController = __decorate([
     (0, common_1.Controller)('unit'),
     __metadata("design:paramtypes", [unit_service_1.UnitService])
 ], UnitController);
-exports.UnitController = UnitController;

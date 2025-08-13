@@ -16,9 +16,9 @@ const user_dto_1 = require("./user.dto");
 const swagger_1 = require("@nestjs/swagger");
 class UpdateUserDto extends (0, mapped_types_1.PartialType)(user_dto_1.UserDto) {
 }
+exports.UpdateUserDto = UpdateUserDto;
 __decorate([
     (0, swagger_1.ApiProperty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "name", void 0);
-exports.UpdateUserDto = UpdateUserDto;
