@@ -20,6 +20,7 @@ const MediaTypes = Object.freeze({
 module.exports.MediaTypes = MediaTypes;
 let Media = class Media extends sequelize_typescript_1.Model {
 };
+exports.Media = Media;
 __decorate([
     (0, sequelize_typescript_1.Column)({
         type: sequelize_typescript_1.DataType.STRING,
@@ -52,8 +53,7 @@ __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => unit_entity_1.Unit),
     __metadata("design:type", unit_entity_1.Unit)
 ], Media.prototype, "unit", void 0);
-Media = __decorate([
+exports.Media = Media = __decorate([
     sequelize_typescript_1.Table
 ], Media);
-exports.Media = Media;
 //Media.belongsTo(Kondo);

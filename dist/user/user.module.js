@@ -15,7 +15,8 @@ const user_entity_1 = require("./entities/user.entity");
 const sequelize_1 = require("@nestjs/sequelize");
 let UserModule = class UserModule {
 };
-UserModule = __decorate([
+exports.UserModule = UserModule;
+exports.UserModule = UserModule = __decorate([
     (0, common_1.Module)({
         controllers: [user_controller_1.UserController],
         providers: [user_service_1.UserService, ...user_provider_1.userProviders],
@@ -23,4 +24,3 @@ UserModule = __decorate([
         exports: [user_service_1.UserService]
     })
 ], UserModule);
-exports.UserModule = UserModule;

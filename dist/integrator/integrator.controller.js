@@ -21,6 +21,7 @@ let IntegratorController = class IntegratorController {
         return this.integratorService.run();
     }
 };
+exports.IntegratorController = IntegratorController;
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)('/run'),
@@ -28,8 +29,7 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], IntegratorController.prototype, "run", null);
-IntegratorController = __decorate([
+exports.IntegratorController = IntegratorController = __decorate([
     (0, common_1.Controller)('integrator'),
     __metadata("design:paramtypes", [integrator_service_1.IntegratorService])
 ], IntegratorController);
-exports.IntegratorController = IntegratorController;

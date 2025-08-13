@@ -92,9 +92,9 @@ let KondoService = class KondoService {
         });
     }
 };
-KondoService = __decorate([
+exports.KondoService = KondoService;
+exports.KondoService = KondoService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [slugify_service_1.SlugifyService,
         kondo_repository_1.KondoRepository])
 ], KondoService);
-exports.KondoService = KondoService;

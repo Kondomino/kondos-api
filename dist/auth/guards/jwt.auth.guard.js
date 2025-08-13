@@ -68,8 +68,8 @@ let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt') {
         return type === 'Bearer' ? token : undefined;
     }
 };
-JwtAuthGuard = __decorate([
+exports.JwtAuthGuard = JwtAuthGuard;
+exports.JwtAuthGuard = JwtAuthGuard = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [jwt_service_1.JwtService, reflector_service_1.Reflector])
 ], JwtAuthGuard);
-exports.JwtAuthGuard = JwtAuthGuard;

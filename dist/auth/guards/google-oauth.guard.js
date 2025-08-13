@@ -22,8 +22,8 @@ let GoogleOAuthGuard = class GoogleOAuthGuard extends (0, passport_1.AuthGuard)(
         this.configService = configService;
     }
 };
-GoogleOAuthGuard = __decorate([
+exports.GoogleOAuthGuard = GoogleOAuthGuard;
+exports.GoogleOAuthGuard = GoogleOAuthGuard = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [config_1.ConfigService])
 ], GoogleOAuthGuard);
-exports.GoogleOAuthGuard = GoogleOAuthGuard;

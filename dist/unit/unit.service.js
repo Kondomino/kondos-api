@@ -25,7 +25,7 @@ let UnitService = class UnitService {
         return `This action removes a #${id} unit`;
     }
 };
-UnitService = __decorate([
+exports.UnitService = UnitService;
+exports.UnitService = UnitService = __decorate([
     (0, common_1.Injectable)()
 ], UnitService);
-exports.UnitService = UnitService;

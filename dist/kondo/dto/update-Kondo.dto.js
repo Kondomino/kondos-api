@@ -15,6 +15,7 @@ const create_kondo_dto_1 = require("./create-kondo.dto");
 const class_validator_1 = require("class-validator");
 class UpdateKondoDto extends (0, mapped_types_1.PartialType)(create_kondo_dto_1.CreateKondoDto) {
 }
+exports.UpdateKondoDto = UpdateKondoDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsOptional)(),
@@ -136,4 +137,3 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateKondoDto.prototype, "phone", void 0);
-exports.UpdateKondoDto = UpdateKondoDto;

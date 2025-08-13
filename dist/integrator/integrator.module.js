@@ -15,11 +15,11 @@ const kondo_repository_1 = require("../kondo/repository/kondo.repository");
 const slugify_module_1 = require("../utils/slugify/slugify.module");
 let IntegratorModule = class IntegratorModule {
 };
-IntegratorModule = __decorate([
+exports.IntegratorModule = IntegratorModule;
+exports.IntegratorModule = IntegratorModule = __decorate([
     (0, common_1.Module)({
         controllers: [integrator_controller_1.IntegratorController],
         providers: [integrator_service_1.IntegratorService, ...kondo_provider_1.kondoProviders, kondo_repository_1.KondoRepository],
         imports: [slugify_module_1.SlugifyModule]
     })
 ], IntegratorModule);
-exports.IntegratorModule = IntegratorModule;

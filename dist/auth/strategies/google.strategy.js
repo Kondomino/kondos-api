@@ -46,8 +46,8 @@ let GoogleStrategy = class GoogleStrategy extends (0, passport_1.PassportStrateg
         });
     }
 };
-GoogleStrategy = __decorate([
+exports.GoogleStrategy = GoogleStrategy;
+exports.GoogleStrategy = GoogleStrategy = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [])
 ], GoogleStrategy);
-exports.GoogleStrategy = GoogleStrategy;

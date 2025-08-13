@@ -16,6 +16,7 @@ const unit_entity_1 = require("../../unit/entities/unit.entity");
 const user_entity_1 = require("../../user/entities/user.entity");
 let Like = class Like extends sequelize_typescript_1.Model {
 };
+exports.Like = Like;
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => user_entity_1.User),
     sequelize_typescript_1.Column,
@@ -43,7 +44,6 @@ __decorate([
     (0, sequelize_typescript_1.BelongsTo)(() => unit_entity_1.Unit),
     __metadata("design:type", unit_entity_1.Unit)
 ], Like.prototype, "unit", void 0);
-Like = __decorate([
+exports.Like = Like = __decorate([
     sequelize_typescript_1.Table
 ], Like);
-exports.Like = Like;

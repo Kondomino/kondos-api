@@ -83,9 +83,9 @@ let MediaRepository = class MediaRepository {
         });
     }
 };
-MediaRepository = __decorate([
+exports.MediaRepository = MediaRepository;
+exports.MediaRepository = MediaRepository = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(constants_1.MEDIA_REPOSITORY_PROVIDER)),
     __metadata("design:paramtypes", [Object])
 ], MediaRepository);
-exports.MediaRepository = MediaRepository;

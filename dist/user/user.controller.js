@@ -61,6 +61,7 @@ let UserController = class UserController {
         return this.userService.deactivateUser(+id);
     }
 };
+exports.UserController = UserController;
 __decorate([
     (0, public_decorator_1.Public)(),
     (0, common_1.Post)(),
@@ -104,8 +105,7 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UserController.prototype, "remove", null);
-UserController = __decorate([
+exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
     __metadata("design:paramtypes", [user_service_1.UserService])
 ], UserController);
-exports.UserController = UserController;

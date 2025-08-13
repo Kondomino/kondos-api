@@ -203,9 +203,9 @@ let IntegratorService = class IntegratorService {
         console.log('created', this.created);
     }
 };
-IntegratorService = __decorate([
+exports.IntegratorService = IntegratorService;
+exports.IntegratorService = IntegratorService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [slugify_service_1.SlugifyService,
         kondo_repository_1.KondoRepository])
 ], IntegratorService);
-exports.IntegratorService = IntegratorService;

@@ -70,9 +70,9 @@ let MediaService = class MediaService {
         });
     }
 };
-MediaService = __decorate([
+exports.MediaService = MediaService;
+exports.MediaService = MediaService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)(constants_1.MEDIA_REPOSITORY_PROVIDER)),
     __metadata("design:paramtypes", [Object])
 ], MediaService);
-exports.MediaService = MediaService;

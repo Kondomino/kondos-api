@@ -5,4 +5,4 @@ var Order;
 (function (Order) {
     Order["ASC"] = "ASC";
     Order["DSC"] = "DESC";
-})(Order = exports.Order || (exports.Order = {}));
+})(Order || (exports.Order = Order = {}));

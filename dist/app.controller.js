@@ -72,6 +72,7 @@ let AppController = class AppController {
         });
     }
 };
+exports.AppController = AppController;
 __decorate([
     (0, common_1.Get)('hello'),
     (0, public_decorator_1.Public)(),
@@ -133,8 +134,7 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "googleAuthRedirect", null);
-AppController = __decorate([
+exports.AppController = AppController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AppController);
-exports.AppController = AppController;

@@ -116,6 +116,7 @@ let Kondo = class Kondo extends sequelize_typescript_1.Model {
         return conveniences;
     }
 };
+exports.Kondo = Kondo;
 __decorate([
     (0, sequelize_typescript_1.Column)({
         //type: DataType.STRING,
@@ -491,8 +492,7 @@ __decorate([
     __metadata("design:type", Object),
     __metadata("design:paramtypes", [])
 ], Kondo.prototype, "address", null);
-Kondo = __decorate([
+exports.Kondo = Kondo = __decorate([
     sequelize_typescript_1.Table,
     __metadata("design:paramtypes", [Object])
 ], Kondo);
-exports.Kondo = Kondo;
