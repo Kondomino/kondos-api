@@ -8,6 +8,7 @@ import { Conversation } from '../whatsapp/entities/conversation.entity';
 import { Message } from '../whatsapp/entities/message.entity';
 import { AgentOrchestrator } from './orchestrator/agent.orchestrator';
 import { ChattyAgent } from './agents/chatty/chatty.agent';
+import { GrokService } from './agents/chatty/grok.service';
 import { ConversationTool } from './tools/conversation.tool';
 import { MessagePersistenceTool, RelevanceAssessmentTool } from './tools/message-persistence.tool';
 
@@ -20,6 +21,7 @@ import { MessagePersistenceTool, RelevanceAssessmentTool } from './tools/message
     AgentOrchestrator,
     VerificationService,
     ChattyAgent,
+    GrokService,
     ConversationTool,
     MessagePersistenceTool,
     RelevanceAssessmentTool,
