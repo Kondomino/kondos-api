@@ -5,8 +5,15 @@ services:
   github:
     repo: Kondomino/kondos-api
     branch: main
-  run_command: node dist/main.js
-  build_command: npm install --no-package-lock && npm run build && ls -la dist/
+  run_command: npm run start:prod
+  build_command: |
+    echo "Forcing npm usage..."
+    npm --version
+    rm -f pnpm-lock.yaml yarn.lock
+    npm install --no-package-lock
+    npm run build
+    echo "Build completed. Contents of dist/:"
+    ls -la dist/
   environment_slug: node-js
   instance_count: 1
   instance_size_slug: basic-xxs

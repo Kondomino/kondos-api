@@ -6,7 +6,7 @@ services:
     repo: Kondomino/kondos-api
     branch: main
   run_command: npm run start:prod
-  build_command: npm install && npm run build
+  build_command: npm install --no-package-lock && npm run build
   environment_slug: node-js
   instance_count: 1
   instance_size_slug: basic-xxs
