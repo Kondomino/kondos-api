@@ -5,6 +5,7 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "main": "dist/main.js",
   "packageManager": "npm@10.0.0",
   "scripts": {
     "preinstall": "node -e \"const ua=process.env.npm_config_user_agent||''; if(!ua.startsWith('npm/')){console.error('Error: Use npm only. Detected '+ua); process.exit(1)}\"",
@@ -115,10 +116,6 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node",
-    "engines": {
-      "node": "18"
-    },
-    "main": "dist/index.js"
+    "testEnvironment": "node"
   }
 }

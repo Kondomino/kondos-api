@@ -1,0 +1,26 @@
+name: kondos-api
+services:
+- name: api
+  source_dir: /
+  github:
+    repo: your-username/kondos-api
+    branch: main
+  run_command: npm run start:prod
+  build_command: npm ci && npm run build
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8080
+  routes:
+  - path: /
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: PORT
+    value: "8080"
+databases:
+- engine: PG
+  name: kondos-db
+  num_nodes: 1
+  size: db-s-dev-database
+  version: "12"
