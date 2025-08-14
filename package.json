@@ -5,7 +5,9 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "packageManager": "npm@10.0.0",
   "scripts": {
+    "preinstall": "node -e \"const ua=process.env.npm_config_user_agent||''; if(!ua.startsWith('npm/')){console.error('Error: Use npm only. Detected '+ua); process.exit(1)}\"",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
@@ -27,6 +29,10 @@
     "create:unit": "npx ts-node src/unit/scripts/create-mock-unit.ts",
     "seed": "npm run create:kondo && npm run create:unit",
     "token": "npx ts-node src/kondo/scripts/token-generator.ts"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=9"
   },
   "dependencies": {
     "@langchain/core": "^0.3.69",

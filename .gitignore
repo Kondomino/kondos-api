@@ -72,6 +72,11 @@ web_modules/
 # Yarn Integrity file
 .yarn-integrity
 
+# Enforce npm-only: ignore other lockfiles
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
 # dotenv environment variable files
 .env
 .env.development.local
