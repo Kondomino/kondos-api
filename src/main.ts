@@ -9,7 +9,7 @@ dotenv.config();
 
 async function bootstrap() {
 
-  const port = 3003;
+  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3003;
   const app = await NestFactory.create(AppModule, { cors: true });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
@@ -27,6 +27,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap();
