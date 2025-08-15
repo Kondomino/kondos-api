@@ -29,7 +29,8 @@
     "create:kondo": "npx ts-node src/kondo/scripts/create-mock-kondo.ts",
     "create:unit": "npx ts-node src/unit/scripts/create-mock-unit.ts",
     "seed": "npm run create:kondo && npm run create:unit",
-    "token": "npx ts-node src/kondo/scripts/token-generator.ts"
+    "token": "npx ts-node src/kondo/scripts/token-generator.ts",
+    "test:db-config": "node scripts/test-db-config.js"
   },
   "engines": {
     "node": ">=18",

@@ -1,0 +1,48 @@
+services:
+  - type: web
+    name: kondos-api
+    env: node
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_DIALECT
+        value: postgres
+      - key: RENDER_DB
+        fromDatabase:
+          name: kondos-db
+          property: database
+      - key: RENDER_USR
+        fromDatabase:
+          name: kondos-db
+          property: username
+      - key: RENDER_PWD
+        fromDatabase:
+          name: kondos-db
+          property: password
+      - key: RENDER_HOSTNAME
+        fromDatabase:
+          name: kondos-db
+          property: host
+      - key: RENDER_DB_PORT
+        fromDatabase:
+          name: kondos-db
+          property: port
+      - key: RENDER_INTERNAL_URL
+        fromDatabase:
+          name: kondos-db
+          property: internalDatabaseUrl
+      - key: RENDER_EXTERNAL_URL
+        fromDatabase:
+          name: kondos-db
+          property: externalDatabaseUrl
+
+databases:
+  - name: kondos-db
+    databaseName: kondos
+    user: kondos_user
+    plan: starter

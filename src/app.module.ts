@@ -31,15 +31,18 @@ import { Message } from './whatsapp/entities/message.entity';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const nodeEnv = configService.get<string>('NODE_ENV');
-        const requiresSsl = nodeEnv === 'PRODUCTION';
+        const isProduction = nodeEnv === 'PRODUCTION';
+        
+        console.log(`🌍 Environment: ${nodeEnv}`);
+        console.log(`🔗 Production mode: ${isProduction}`);
+        
+        // Get the appropriate database configuration
+        const dbConfig = require('./database/config.js')[nodeEnv || 'development'];
+        
+        console.log(`🏠 Using ${nodeEnv || 'development'} database configuration`);
+        
         return {
-          dialect: (configService.get<string>('DB_DIALECT') || 'postgres') as Dialect,
-          dialectOptions: requiresSsl ? { ssl: { require: true, rejectUnauthorized: false } } : {},
-          host: configService.get<string>('DB_HOST') || 'localhost',
-          port: parseInt(configService.get<string>('DB_PORT') || '5433', 10),
-          username: configService.get<string>('DB_USER') || 'postgres',
-          password: configService.get<string>('DB_PASSWORD') || 'postgres',
-          database: configService.get<string>('DB_NAME') || 'kondo',
+          ...dbConfig,
           models: [User, Kondo, Media, Unit, Like, RealEstateAgency, Conversation, Message],
           autoLoadModels: true,
           logging: (msg: string) => console.log('🐘 DB Query:', msg),
