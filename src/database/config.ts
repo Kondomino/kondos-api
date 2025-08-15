@@ -1,13 +1,16 @@
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+import { Dialect } from 'sequelize';
 
-module.exports = {
+dotenv.config();
+
+export const databaseConfig = {
     development: {
         username: process.env.DB_USER || 'postgres',
         password: process.env.DB_PASSWORD || 'postgres',
         database: process.env.DB_NAME_DEVELOPMENT || 'kondo',
         host: process.env.DB_HOST || 'localhost',
         port: parseInt(process.env.DB_PORT || '5432', 10),
-        dialect: process.env.DB_DIALECT || 'postgres',
+        dialect: (process.env.DB_DIALECT || 'postgres') as Dialect,
     },
     test: {
         username: process.env.DB_USER || 'postgres',
@@ -15,7 +18,7 @@ module.exports = {
         database: process.env.DB_NAME_TEST || 'kondo_test',
         host: process.env.DB_HOST || 'localhost',
         port: parseInt(process.env.DB_PORT || '5432', 10),
-        dialect: process.env.DB_DIALECT || 'postgres',
+        dialect: (process.env.DB_DIALECT || 'postgres') as Dialect,
     },
     production: {
         // Use Render.com URLs if available, otherwise fall back to individual env vars
@@ -26,9 +29,9 @@ module.exports = {
         database: process.env.RENDER_DB || process.env.DB_NAME_PRODUCTION,
         host: process.env.RENDER_HOSTNAME || process.env.DB_HOST,
         port: process.env.RENDER_DB_PORT || process.env.DB_PORT || 5432,
-        dialect: process.env.DB_DIALECT || 'postgres',
+        dialect: (process.env.DB_DIALECT || 'postgres') as Dialect,
         dialectOptions: {
             ssl: { require: true, rejectUnauthorized: false }
         },
     },
-}; 
+};

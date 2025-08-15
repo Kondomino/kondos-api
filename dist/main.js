@@ -54,7 +54,7 @@ const swagger_1 = require("@nestjs/swagger");
 dotenv.config();
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function* () {
-        const port = 3003;
+        const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3003;
         const app = yield core_1.NestFactory.create(app_module_1.AppModule, { cors: true });
         app.useGlobalPipes(new common_1.ValidationPipe({ transform: true }));
         app.use((0, cookie_parser_1.default)());
@@ -69,7 +69,7 @@ function bootstrap() {
             .build();
         const document = swagger_1.SwaggerModule.createDocument(app, config);
         swagger_1.SwaggerModule.setup('api', app, document);
-        yield app.listen(port);
+        yield app.listen(port, '0.0.0.0');
     });
 }
 bootstrap();

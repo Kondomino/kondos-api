@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const user_module_1 = require("./user/user.module");
 const config_1 = require("@nestjs/config");
 const sequelize_1 = require("@nestjs/sequelize");
+const config_2 = require("./database/config");
 const kondo_module_1 = require("./kondo/kondo.module");
 const app_controller_1 = require("./app.controller");
 const integrator_module_1 = require("./integrator/integrator.module");
@@ -42,21 +43,29 @@ exports.AppModule = AppModule = __decorate([
                 inject: [config_1.ConfigService],
                 useFactory: (configService) => {
                     const nodeEnv = configService.get('NODE_ENV');
-                    const requiresSsl = nodeEnv === 'PRODUCTION';
-                    return {
-                        dialect: (configService.get('DB_DIALECT') || 'postgres'),
-                        dialectOptions: requiresSsl ? { ssl: { require: true, rejectUnauthorized: false } } : {},
-                        host: configService.get('DB_HOST') || 'localhost',
-                        port: parseInt(configService.get('DB_PORT') || '5433', 10),
-                        username: configService.get('DB_USER') || 'postgres',
-                        password: configService.get('DB_PASSWORD') || 'postgres',
-                        database: configService.get('DB_NAME') || 'kondo',
-                        models: [user_entity_1.User, kondo_entity_1.Kondo, media_entity_1.Media, unit_entity_1.Unit, like_entity_1.Like, real_estate_agency_entity_1.RealEstateAgency, conversation_entity_1.Conversation, message_entity_1.Message],
-                        autoLoadModels: true,
-                        logging: (msg) => console.log('🐘 DB Query:', msg),
-                        logQueryParameters: true,
-                        synchronize: false,
-                    };
+                    const isProduction = nodeEnv === 'PRODUCTION';
+                    console.log(`🌍 Environment: ${nodeEnv}`);
+                    console.log(`🔗 Production mode: ${isProduction}`);
+                    console.log(`📦 Database config imported:`, !!config_2.databaseConfig);
+                    console.log(`📦 Database config keys:`, Object.keys(config_2.databaseConfig || {}));
+                    // Get the appropriate database configuration
+                    const environment = (nodeEnv || 'development').toLowerCase();
+                    const config = config_2.databaseConfig[environment];
+                    console.log(`🏠 Environment: ${environment}`);
+                    console.log(`🔧 Available configs:`, Object.keys(config_2.databaseConfig));
+                    if (!config) {
+                        throw new Error(`Database configuration not found for environment: ${environment}`);
+                    }
+                    console.log(`🔧 Database config:`, {
+                        host: config.host,
+                        port: config.port,
+                        database: config.database,
+                        dialect: config.dialect,
+                        hasUrl: !!config.url
+                    });
+                    // Ensure dialect is explicitly set for Sequelize v4+
+                    const sequelizeConfig = Object.assign(Object.assign({}, config), { dialect: config.dialect || 'postgres', models: [user_entity_1.User, kondo_entity_1.Kondo, media_entity_1.Media, unit_entity_1.Unit, like_entity_1.Like, real_estate_agency_entity_1.RealEstateAgency, conversation_entity_1.Conversation, message_entity_1.Message], autoLoadModels: true, logging: (msg) => console.log('🐘 DB Query:', msg), logQueryParameters: true, synchronize: false });
+                    return sequelizeConfig;
                 },
             }),
             user_module_1.UserModule,

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { databaseConfig } from './database/config';
 import { KondoModule } from './kondo/kondo.module';
 import { AppController } from './app.controller';
 import { IntegratorModule } from './integrator/integrator.module';
@@ -35,20 +36,40 @@ import { Message } from './whatsapp/entities/message.entity';
         
         console.log(`🌍 Environment: ${nodeEnv}`);
         console.log(`🔗 Production mode: ${isProduction}`);
+        console.log(`📦 Database config imported:`, !!databaseConfig);
+        console.log(`📦 Database config keys:`, Object.keys(databaseConfig || {}));
         
         // Get the appropriate database configuration
-        const dbConfig = require('./database/config.js')[nodeEnv || 'development'];
+        const environment = (nodeEnv || 'development').toLowerCase();
+        const config = databaseConfig[environment];
         
-        console.log(`🏠 Using ${nodeEnv || 'development'} database configuration`);
+        console.log(`🏠 Environment: ${environment}`);
+        console.log(`🔧 Available configs:`, Object.keys(databaseConfig));
         
-        return {
-          ...dbConfig,
+        if (!config) {
+          throw new Error(`Database configuration not found for environment: ${environment}`);
+        }
+        
+        console.log(`🔧 Database config:`, {
+          host: config.host,
+          port: config.port,
+          database: config.database,
+          dialect: config.dialect,
+          hasUrl: !!config.url
+        });
+        
+        // Ensure dialect is explicitly set for Sequelize v4+
+        const sequelizeConfig = {
+          ...config,
+          dialect: config.dialect || 'postgres',
           models: [User, Kondo, Media, Unit, Like, RealEstateAgency, Conversation, Message],
           autoLoadModels: true,
           logging: (msg: string) => console.log('🐘 DB Query:', msg),
           logQueryParameters: true,
           synchronize: false,
         };
+        
+        return sequelizeConfig;
       },
     }),
     UserModule, 
