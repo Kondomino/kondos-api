@@ -51,4 +51,28 @@ export class User extends Model<User> {
         defaultValue: true
     })
     active: boolean;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: true,
+    })
+    whatsapp_id: string;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: true,
+    })
+    phone_number: string;
+
+    @Column({
+        type: DataType.BOOLEAN,
+        defaultValue: false,
+    })
+    is_deleted: boolean;
+
+    @Column({
+        type: DataType.DATE,
+        allowNull: true,
+    })
+    deleted_at: Date;
 }
