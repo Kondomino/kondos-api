@@ -16,6 +16,17 @@ export class AgenticService {
     messageType: string = 'text',
     whatsappMessageId: string,
     mediaData?: any,
+    contactContext?: {
+      contactName?: string;
+      isBusinessAccount?: boolean;
+      businessProfile?: {
+        business_name?: string;
+        website?: string[];
+        email?: string;
+        category?: string;
+        description?: string;
+      };
+    },
   ): Promise<AgentResponse> {
     try {
       const message: IncomingMessage = {
@@ -25,6 +36,7 @@ export class AgenticService {
         timestamp: new Date(),
         whatsappMessageId,
         mediaData,
+        contactContext,
       };
 
       const response = await this.agentOrchestrator.processMessage(message);

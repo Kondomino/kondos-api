@@ -1,5 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 import { Dialect } from 'sequelize';
+import * as dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 interface DbConfig {
   dialect: Dialect;
@@ -23,49 +27,49 @@ interface SequelizeConfig {
   production: DbConfig;
 }
 
-const getConfig = (configService: ConfigService): SequelizeConfig => ({
+const getConfig = (): SequelizeConfig => ({
   development: {
-    dialect: (configService.get<string>('DB_DIALECT') || 'postgres') as Dialect,
-    host: configService.get<string>('DB_HOST') || 'localhost',
-    port: parseInt(configService.get<string>('DB_PORT') || '5432', 10),
-    username: configService.get<string>('DB_USER') || 'postgres',
-    password: configService.get<string>('DB_PASSWORD') || 'postgres',
-    database: configService.get<string>('DB_NAME_DEVELOPMENT') || 'kondo',
+    dialect: (process.env.DB_DIALECT || 'postgres') as Dialect,
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432', 10),
+    username: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
+    database: process.env.DB_NAME || 'kondo',
   },
   test: {
-    dialect: (configService.get<string>('DB_DIALECT') || 'postgres') as Dialect,
-    host: configService.get<string>('DB_HOST') || 'localhost',
-    port: parseInt(configService.get<string>('DB_PORT') || '5432', 10),
-    username: configService.get<string>('DB_USER') || 'postgres',
-    password: configService.get<string>('DB_PASSWORD') || 'postgres',
-    database: configService.get<string>('DB_NAME_TEST') || 'kondo_test',
+    dialect: (process.env.DB_DIALECT || 'postgres') as Dialect,
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT || '5432', 10),
+    username: process.env.DB_USER || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
+    database: process.env.DB_NAME_TEST || 'kondo_test',
     dialectOptions: {
       ssl: { require: false, rejectUnauthorized: false }
     },
   },
   production: {
-    // Use Render.com URLs if available, otherwise fall back to individual env vars
-    url: configService.get<string>('RENDER_INTERNAL_URL') || configService.get<string>('RENDER_EXTERNAL_URL') || undefined,
-    dialect: (configService.get<string>('DB_DIALECT') || 'postgres') as Dialect,
-    host: configService.get<string>('RENDER_HOSTNAME') || configService.get<string>('DB_HOST'),
-    port: parseInt(configService.get<string>('RENDER_DB_PORT') || configService.get<string>('DB_PORT') || '5432', 10),
-    username: configService.get<string>('RENDER_USR') || configService.get<string>('DB_USER'),
-    password: configService.get<string>('RENDER_PWD') || configService.get<string>('DB_PASSWORD'),
-    database: configService.get<string>('RENDER_DB') || configService.get<string>('DB_NAME_PRODUCTION'),
+    // Use DATABASE_URL if available, otherwise fall back to individual env vars
+    url: process.env.DATABASE_URL || process.env.RENDER_INTERNAL_URL || process.env.RENDER_EXTERNAL_URL || undefined,
+    dialect: (process.env.DB_DIALECT || 'postgres') as Dialect,
+    host: process.env.RENDER_HOSTNAME || process.env.DB_HOST,
+    port: parseInt(process.env.RENDER_DB_PORT || process.env.DB_PORT || '5432', 10),
+    username: process.env.RENDER_USR || process.env.DB_USER,
+    password: process.env.RENDER_PWD || process.env.DB_PASSWORD,
+    database: process.env.RENDER_DB || process.env.DB_NAME_PRODUCTION,
     dialectOptions: {
       ssl: { require: true, rejectUnauthorized: false }
     },
   },
 });
 
-// Export for NestJS runtime
-export const databaseConfig = (configService: ConfigService) => {
-  const env = (configService.get<string>('NODE_ENV') || 'development').toLowerCase();
-  return getConfig(configService)[env];
+// Export for NestJS runtime (keeping ConfigService parameter for compatibility)
+export const databaseConfig = (configService?: ConfigService) => {
+  const env = (process.env.NODE_ENV || 'development').toLowerCase();
+  return getConfig()[env];
 };
 
 // Export for Sequelize CLI
-export default (configService: ConfigService = new ConfigService()) => {
+export default () => {
   const env = (process.env.NODE_ENV || 'development').toLowerCase();
-  return getConfig(configService)[env];
+  return getConfig()[env];
 };

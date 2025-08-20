@@ -34,6 +34,33 @@ export class MessageDto {
   };
 }
 
+export class ContactProfileDto {
+  @ApiProperty({ description: 'Contact name' })
+  @IsString()
+  name: string;
+
+  @ApiProperty({ description: 'Business profile information', required: false })
+  @IsOptional()
+  business?: {
+    business_name?: string;
+    website?: string[];
+    email?: string;
+    category?: string;
+    description?: string;
+  };
+}
+
+export class ContactDto {
+  @ApiProperty({ description: 'WhatsApp ID' })
+  @IsString()
+  wa_id: string;
+
+  @ApiProperty({ description: 'Contact profile' })
+  @ValidateNested()
+  @Type(() => ContactProfileDto)
+  profile: ContactProfileDto;
+}
+
 export class ChangeValueDto {
   @ApiProperty({ description: 'WhatsApp Business Account ID' })
   @IsString()
@@ -53,6 +80,13 @@ export class ChangeValueDto {
   @Type(() => MessageDto)
   @IsOptional()
   messages?: MessageDto[];
+
+  @ApiProperty({ description: 'Contacts array', type: [ContactDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ContactDto)
+  @IsOptional()
+  contacts?: ContactDto[];
 }
 
 export class ChangeDto {

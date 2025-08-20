@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { VerificationService } from './verification.service';
 import { ChattyAgent } from '../agents/chatty/chatty.agent';
 import { DatabaseTool } from '../tools/database.tool';
+import { MessageQueueService } from '../services/message-queue.service';
 import { IncomingMessage, AgentResponse } from '../interfaces/agent.interface';
 
 @Injectable()
@@ -12,14 +13,24 @@ export class AgentOrchestrator {
     private readonly verificationService: VerificationService,
     private readonly chattyAgent: ChattyAgent,
     private readonly databaseTool: DatabaseTool,
+    private readonly messageQueueService: MessageQueueService,
   ) {}
 
   async processMessage(message: IncomingMessage): Promise<AgentResponse> {
     try {
+      // Log business account information if available
+      if (message.contactContext?.isBusinessAccount) {
+        this.logger.log(`Processing message from business account: ${message.contactContext.contactName || message.phoneNumber}`);
+        if (message.contactContext.businessProfile) {
+          this.logger.log(`Business details - Name: ${message.contactContext.businessProfile.business_name}, Category: ${message.contactContext.businessProfile.category}`);
+        }
+      }
+
       // 1. Verify if sender is a real estate agent
       const verification = await this.verificationService.verifyAgent(
         message.phoneNumber,
         message.content,
+        message.contactContext,
       );
 
       // 2. If not a real estate agent, return without response
@@ -52,15 +63,26 @@ export class AgentOrchestrator {
         message.phoneNumber,
       );
 
-      // 5. Process message with Chatty agent
-      const response = await this.chattyAgent.processMessage(message, conversation.id);
+      // 5. Instead of processing immediately, QUEUE the message
+      await this.messageQueueService.enqueueMessage({
+        message,
+        conversationId: conversation.id,
+        agencyId: agency.id,
+        verificationMetadata: {
+          verification_confidence: verification.confidence,
+          verification_reasoning: verification.reasoning,
+          agent_name: agency.name,
+        },
+      });
 
-      // 6. Return response with additional context
+      // 6. Return "no response" - let user hang, queue will process later
       return {
-        ...response,
+        shouldRespond: false,
+        message: 'Message queued for processing',
         agencyId: agency.id,
         conversationId: conversation.id,
         metadata: {
+          queued: true,
           verification_confidence: verification.confidence,
           verification_reasoning: verification.reasoning,
           agent_name: agency.name,

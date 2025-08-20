@@ -1,4 +1,5 @@
 import { Injectable, Logger, ForbiddenException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { WebhookDto } from './dto/webhook.dto';
 import { SendMessageDto } from './dto/send-message.dto';
 import { ConversationService } from './services/conversation.service';
@@ -7,117 +8,63 @@ import { AgenticService } from '../agentic/agentic.service';
 @Injectable()
 export class WhatsappService {
   private readonly logger = new Logger(WhatsappService.name);
-  private readonly verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || 'your_verify_token_here';
+  private readonly verifyToken: string;
+  private readonly accessToken: string;
+  private readonly phoneNumberId: string;
 
   constructor(
     private readonly conversationService: ConversationService,
     private readonly agenticService: AgenticService,
+    private readonly configService: ConfigService,
   ) {
-    this.logger.log(`WhatsApp Service initialized with verify token: ${this.verifyToken}`);
-    this.logger.log(`Environment variable WHATSAPP_VERIFY_TOKEN: ${process.env.WHATSAPP_VERIFY_TOKEN}`);
-    this.logger.log(`Environment variable WHATSAPP_PHONE_NUMBER_ID: ${process.env.WHATSAPP_PHONE_NUMBER_ID}`);
-    this.logger.log(`Environment variable WHATSAPP_ACCESS_TOKEN: ${process.env.WHATSAPP_ACCESS_TOKEN ? 'SET' : 'NOT SET'}`);
-    
-    // Validate token on startup
-    this.validateAndRefreshToken();
-  }
+    this.verifyToken = this.configService.get<string>('WHATSAPP_VERIFY_TOKEN') || 'your_verify_token_here';
+    this.accessToken = this.configService.get<string>('WHATSAPP_ACCESS_TOKEN');
+    this.phoneNumberId = this.configService.get<string>('WHATSAPP_PHONE_NUMBER_ID');
 
-  private async validateAccessToken(): Promise<boolean> {
-    const accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
+    this.logger.log(`WhatsApp Service initialized with verify token: ${this.verifyToken}`);
+    this.logger.log(`Environment variable WHATSAPP_VERIFY_TOKEN: ${this.verifyToken}`);
+    this.logger.log(`Environment variable WHATSAPP_PHONE_NUMBER_ID: ${this.phoneNumberId}`);
+    this.logger.log(`Environment variable WHATSAPP_ACCESS_TOKEN: ${this.accessToken ? 'SET' : 'NOT SET'}`);
     
-    if (!accessToken) {
-      this.logger.error('No access token found');
-      return false;
+    if (!this.accessToken) {
+      this.logger.error('WHATSAPP_ACCESS_TOKEN is not configured');
+      throw new Error('WHATSAPP_ACCESS_TOKEN is required');
     }
     
+    if (!this.phoneNumberId) {
+      this.logger.error('WHATSAPP_PHONE_NUMBER_ID is not configured');
+      throw new Error('WHATSAPP_PHONE_NUMBER_ID is required');
+    }
+    
+    this.logger.log('WhatsApp Service initialized with System User token (no refresh needed)');
+  }
+
+  async healthCheck(): Promise<{ success: boolean; message: string; phoneNumberId?: string }> {
     try {
-      const response = await fetch(`https://graph.facebook.com/v22.0/me?access_token=${accessToken}`);
+      const response = await fetch(`https://graph.facebook.com/v20.0/${this.phoneNumberId}?access_token=${this.accessToken}`);
       const data = await response.json();
       
       if (response.ok) {
-        this.logger.log('Access token is valid');
-        return true;
-      } else {
-        this.logger.error(`Token validation failed: ${JSON.stringify(data)}`);
-        return false;
-      }
-    } catch (error) {
-      this.logger.error('Error validating access token:', error);
-      return false;
-    }
-  }
-
-  private async refreshAccessToken(): Promise<string | null> {
-    const clientId = process.env.WHATSAPP_CLIENT_ID;
-    const clientSecret = process.env.WHATSAPP_CLIENT_SECRET;
-    const currentToken = process.env.WHATSAPP_ACCESS_TOKEN;
-    
-    if (!clientId || !clientSecret || !currentToken) {
-      this.logger.error('Missing required environment variables for token refresh');
-      return null;
-    }
-    
-    try {
-      const url = `https://graph.facebook.com/v22.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${clientId}&client_secret=${clientSecret}&fb_exchange_token=${currentToken}`;
-      
-      this.logger.log('Attempting to refresh access token...');
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      const data = await response.json();
-      
-      if (response.ok && data.access_token) {
-        this.logger.log('Access token refreshed successfully');
-        // Note: In a real application, you'd want to store this securely
-        // For now, we'll just log it and the user needs to update the env var
-        this.logger.log(`New access token: ${data.access_token}`);
-        this.logger.log(`Token expires in: ${data.expires_in} seconds`);
-        return data.access_token;
-      } else {
-        this.logger.error(`Token refresh failed: ${JSON.stringify(data)}`);
-        return null;
-      }
-    } catch (error) {
-      this.logger.error('Error refreshing access token:', error);
-      return null;
-    }
-  }
-
-  public async validateAndRefreshToken(): Promise<any> {
-    const isValid = await this.validateAccessToken();
-    
-    if (!isValid) {
-      this.logger.warn('Access token is invalid or expired, attempting to refresh...');
-      const newToken = await this.refreshAccessToken();
-      
-      if (newToken) {
-        this.logger.log('Token refreshed successfully. Please update your environment variable.');
+        this.logger.log('WhatsApp API health check passed');
         return {
           success: true,
-          message: 'Token refreshed successfully',
-          newToken: newToken,
-          note: 'Please update your WHATSAPP_ACCESS_TOKEN environment variable'
+          message: 'WhatsApp API connection is healthy',
+          phoneNumberId: this.phoneNumberId
         };
       } else {
-        this.logger.error('Failed to refresh token. Please manually update your WHATSAPP_ACCESS_TOKEN.');
+        this.logger.error(`WhatsApp API health check failed: ${JSON.stringify(data)}`);
         return {
           success: false,
-          message: 'Failed to refresh token',
-          note: 'Please manually update your WHATSAPP_ACCESS_TOKEN environment variable'
+          message: `Health check failed: ${data.error?.message || 'Unknown error'}`
         };
       }
+    } catch (error) {
+      this.logger.error('Error during WhatsApp API health check:', error);
+      return {
+        success: false,
+        message: `Health check error: ${error.message}`
+      };
     }
-    
-    return {
-      success: true,
-      message: 'Token is valid',
-      note: 'No refresh needed'
-    };
   }
 
   verifyWebhook(mode: string, verifyToken: string, challenge: string): string {
@@ -146,7 +93,11 @@ export class WhatsappService {
           for (const change of entry.changes || []) {
             if (change.value && change.value.messages) {
               for (const message of change.value.messages) {
-                await this.processMessage(message);
+                // Find the corresponding contact info for this message
+                const contactInfo = change.value.contacts?.find(
+                  contact => contact.wa_id === message.from
+                );
+                await this.processMessage(message, contactInfo);
               }
             }
           }
@@ -160,13 +111,22 @@ export class WhatsappService {
     }
   }
 
-  private async processMessage(message: any): Promise<void> {
+  private async processMessage(message: any, contactInfo?: any): Promise<void> {
     this.logger.log(`Processing message: ${JSON.stringify(message, null, 2)}`);
+    
+    if (contactInfo) {
+      this.logger.log(`Contact info: ${JSON.stringify(contactInfo, null, 2)}`);
+    }
 
     const from: string = message.from;
     const messageType: string = message.type;
     const textContent: string | undefined = messageType === 'text' ? message.text?.body : undefined;
     const messageId: string = message.id;
+
+    // Extract business profile information if available
+    const businessProfile = contactInfo?.profile?.business;
+    const contactName = contactInfo?.profile?.name;
+    const isBusinessAccount = !!businessProfile;
 
     // Extract media data if present
     let mediaData = undefined;
@@ -180,13 +140,18 @@ export class WhatsappService {
       };
     }
 
-    // Process message through Agentic service
+    // Process message through Agentic service with business profile context
     const agentResponse = await this.agenticService.processIncomingMessage(
       from,
       textContent || '[Media message]',
       messageType,
       messageId,
-      mediaData
+      mediaData,
+      {
+        contactName,
+        isBusinessAccount,
+        businessProfile
+      }
     );
 
     // If agent decides to respond, send the message
@@ -240,28 +205,7 @@ export class WhatsappService {
   async sendMessage(messageData: SendMessageDto): Promise<any> {
     this.logger.log(`Sending message: ${JSON.stringify(messageData, null, 2)}`);
     
-    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-    let accessToken = process.env.WHATSAPP_ACCESS_TOKEN;
-    
-    if (!phoneNumberId || !accessToken) {
-      this.logger.error('Missing WhatsApp configuration: PHONE_NUMBER_ID or ACCESS_TOKEN');
-      throw new Error('WhatsApp configuration missing');
-    }
-    
-    // Validate token before sending
-    const isTokenValid = await this.validateAccessToken();
-    if (!isTokenValid) {
-      this.logger.warn('Access token is invalid, attempting to refresh...');
-      const newToken = await this.refreshAccessToken();
-      if (newToken) {
-        accessToken = newToken;
-        this.logger.log('Using refreshed token for this request');
-      } else {
-        throw new Error('Failed to refresh access token');
-      }
-    }
-    
-    const url = `https://graph.facebook.com/v20.0/${phoneNumberId}/messages`;
+    const url = `https://graph.facebook.com/v20.0/${this.phoneNumberId}/messages`;
     
     // Build payload based on message type
     let payload: any = {
@@ -284,7 +228,7 @@ export class WhatsappService {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          'Authorization': `Bearer ${this.accessToken}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)

@@ -8,7 +8,7 @@ module.exports = {
    // Path to the directory containing database migrations (schema change scripts)
    'migrations-path': path.resolve('src/database', 'migrations'),
    // Database configuration file
-   'config': path.resolve('src/database', 'config'), 
+   'config': path.resolve('src/database/sequelize.config.js'),
    // Models
    'models-path': path.resolve('src/database/models'),
 }

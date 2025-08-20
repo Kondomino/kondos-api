@@ -10,6 +10,7 @@ import { Like } from '../../like/entities/like.entity';
 import { RealEstateAgency } from '../../whatsapp/entities/real-estate-agency.entity';
 import { Conversation } from '../../whatsapp/entities/conversation.entity';
 import { Message } from '../../whatsapp/entities/message.entity';
+import { MessageQueue } from '../../agentic/entities/message-queue.entity';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { Message } from '../../whatsapp/entities/message.entity';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         ...databaseConfig(configService),
-        models: [User, Kondo, Media, Unit, Like, RealEstateAgency, Conversation, Message],
+        models: [User, Kondo, Media, Unit, Like, RealEstateAgency, Conversation, Message, MessageQueue],
         autoLoadModels: true,
         synchronize: false, // Set to false to use migrations
         logging: (msg: string) => console.log('🐘 DB Query:', msg),

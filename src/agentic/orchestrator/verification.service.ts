@@ -7,6 +7,13 @@ import { VerificationResult } from '../interfaces/agent.interface';
 export class VerificationService {
   private readonly logger = new Logger(VerificationService.name);
 
+  // Test whitelist - phone numbers that should always be treated as real estate agents
+  private readonly testWhitelist = [
+    '553172079049', // Victor's test number
+    '553171669149', // Luiza
+    // Add more test numbers here as needed
+  ];
+
   // Real estate keywords in Portuguese
   private readonly realEstateKeywords = [
     'imoveis', 'imóveis', 'corretor', 'corretora', 'imobiliaria', 'imobiliária',
@@ -29,9 +36,23 @@ export class VerificationService {
     private realEstateAgencyModel: typeof RealEstateAgency,
   ) {}
 
-  async verifyAgent(phoneNumber: string, messageContent: string): Promise<VerificationResult> {
+  async verifyAgent(
+    phoneNumber: string, 
+    messageContent: string,
+    contactContext?: {
+      contactName?: string;
+      isBusinessAccount?: boolean;
+      businessProfile?: {
+        business_name?: string;
+        website?: string[];
+        email?: string;
+        category?: string;
+        description?: string;
+      };
+    }
+  ): Promise<VerificationResult> {
     try {
-      // 1. Check if agent already exists in database
+      // 1. Check if agent already exists in database (always check this first)
       const existingAgency = await this.checkExistingAgency(phoneNumber);
       if (existingAgency) {
         this.logger.log(`Found existing real estate agency for phone: ${phoneNumber}`);
@@ -48,12 +69,32 @@ export class VerificationService {
         };
       }
 
-      // 2. Analyze message content
+      // 2. Check test whitelist (for testing purposes)
+      if (this.testWhitelist.includes(phoneNumber)) {
+        this.logger.log(`Phone number ${phoneNumber} found in test whitelist - treating as real estate agent`);
+        return {
+          isRealEstateAgent: true,
+          confidence: 1.0,
+          reasoning: 'Phone number in test whitelist for development/testing',
+          shouldAskForClarification: false,
+        };
+      }
+
+      // 3. If not in database, check if it's a business account first
+      if (contactContext?.isBusinessAccount) {
+        const businessAnalysis = this.analyzeBusinessProfile(contactContext, messageContent);
+        if (businessAnalysis.isRealEstateAgent) {
+          this.logger.log(`Business account verified as real estate agent: ${phoneNumber}`);
+          return businessAnalysis;
+        }
+      }
+
+      // 4. If not a business account or business analysis failed, analyze message content
       const contentAnalysis = this.analyzeMessageContent(messageContent);
       
       this.logger.log(`Content analysis for phone ${phoneNumber}: confidence=${contentAnalysis.confidence}, keywords=${contentAnalysis.keywordMatches}`);
 
-      // 3. Determine verification result based on confidence
+      // 5. Determine verification result based on confidence
       if (contentAnalysis.confidence >= 0.7) {
         return {
           isRealEstateAgent: true,
@@ -96,6 +137,73 @@ export class VerificationService {
       this.logger.error(`Error checking existing agency for phone ${phoneNumber}:`, error);
       return null;
     }
+  }
+
+  private analyzeBusinessProfile(
+    contactContext: {
+      contactName?: string;
+      isBusinessAccount?: boolean;
+      businessProfile?: {
+        business_name?: string;
+        website?: string[];
+        email?: string;
+        category?: string;
+        description?: string;
+      };
+    },
+    messageContent: string
+  ): VerificationResult {
+    const businessProfile = contactContext.businessProfile;
+    const businessName = businessProfile?.business_name || contactContext.contactName || '';
+    const category = businessProfile?.category || '';
+    const description = businessProfile?.description || '';
+    const website = businessProfile?.website?.join(' ') || '';
+    const email = businessProfile?.email || '';
+
+    // Combine all business profile text for analysis
+    const businessText = `${businessName} ${category} ${description} ${website} ${email}`.toLowerCase();
+    
+    // Check for real estate indicators in business profile
+    const realEstateMatches = this.realEstateKeywords.filter(keyword => 
+      businessText.includes(keyword.toLowerCase())
+    );
+
+    // Check message content as well
+    const messageAnalysis = this.analyzeMessageContent(messageContent);
+    
+    // Calculate confidence based on business profile and message
+    let confidence = 0;
+    let reasoning = '';
+
+    if (realEstateMatches.length > 0) {
+      confidence += 0.8; // High confidence from business profile
+      reasoning = `Business profile contains real estate keywords: ${realEstateMatches.join(', ')}`;
+    }
+
+    // Add message content confidence (weighted less for business accounts)
+    confidence += messageAnalysis.confidence * 0.3;
+
+    if (messageAnalysis.keywordMatches.length > 0) {
+      reasoning += ` Message also contains: ${messageAnalysis.keywordMatches.join(', ')}`;
+    }
+
+    // Real estate categories that are common
+    const realEstateCategories = [
+      'real estate', 'imobiliaria', 'imobiliária', 'corretor', 'corretora',
+      'property', 'rental', 'aluguel', 'venda', 'housing'
+    ];
+
+    if (realEstateCategories.some(cat => category.toLowerCase().includes(cat))) {
+      confidence = Math.max(confidence, 0.9);
+      reasoning = `Business category indicates real estate: ${category}`;
+    }
+
+    return {
+      isRealEstateAgent: confidence >= 0.6,
+      confidence: Math.min(confidence, 1.0),
+      reasoning,
+      shouldAskForClarification: confidence < 0.6 && confidence > 0.3,
+    };
   }
 
   private analyzeMessageContent(content: string): {

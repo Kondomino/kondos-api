@@ -6,6 +6,7 @@ import { SendMessageDto } from './dto/send-message.dto';
 import { DataDeletionDto, DataDeletionResponseDto } from './dto/data-deletion.dto';
 import { DataDeletionService } from './services/data-deletion.service';
 import { Public } from '../auth/decorators/public.decorator';
+import { GrokService } from '../agentic/agents/chatty/grok.service';
 
 @ApiTags('whatsapp')
 @Controller('whatsapp')
@@ -13,6 +14,7 @@ export class WhatsappController {
   constructor(
     private readonly whatsappService: WhatsappService,
     private readonly dataDeletionService: DataDeletionService,
+    private readonly grokService: GrokService,
   ) {}
 
   @Public()
@@ -47,11 +49,19 @@ export class WhatsappController {
     return this.whatsappService.sendMessage(messageData);
   }
 
-  @Post('validate-token')
-  @ApiOperation({ summary: 'Validate and refresh WhatsApp access token' })
-  @ApiResponse({ status: 200, description: 'Token validation completed' })
-  async validateToken(): Promise<any> {
-    return this.whatsappService.validateAndRefreshToken();
+  @Get('health')
+  @ApiOperation({ summary: 'Check WhatsApp API health' })
+  @ApiResponse({ status: 200, description: 'Health check completed' })
+  async healthCheck(): Promise<any> {
+    return this.whatsappService.healthCheck();
+  }
+
+  @Get('test-grok')
+  @Public()
+  @ApiOperation({ summary: 'Test Grok API credentials' })
+  @ApiResponse({ status: 200, description: 'Grok API test completed' })
+  async testGrok(): Promise<any> {
+    return this.grokService.testCredentials();
   }
 
   @Public()

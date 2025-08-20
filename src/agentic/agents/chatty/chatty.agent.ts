@@ -82,14 +82,10 @@ Responda como Victor Melo, mantendo a conversa natural e buscando informações 
 
   async processMessage(message: IncomingMessage, conversationId: number): Promise<AgentResponse> {
     try {
-      const conversation = await this.databaseTool.findOrCreateConversation(
-        Number(message.phoneNumber), // Convert phone number to numeric ID
-        message.whatsappMessageId,
-      );
-
+      // Use the conversation ID provided by the orchestrator
       const response = await this.chain.invoke({
         message,
-        conversationId: conversation.id,
+        conversationId: conversationId,
       });
 
       return response;

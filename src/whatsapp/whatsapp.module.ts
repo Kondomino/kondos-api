@@ -9,6 +9,7 @@ import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 import { User } from '../user/entities/user.entity';
 import { AgenticModule } from '../agentic/agentic.module';
+import { GrokService } from '../agentic/agents/chatty/grok.service';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { AgenticModule } from '../agentic/agentic.module';
     AgenticModule,
   ],
   controllers: [WhatsappController],
-  providers: [WhatsappService, ConversationService, DataDeletionService],
+  providers: [WhatsappService, ConversationService, DataDeletionService, GrokService],
   exports: [WhatsappService, ConversationService, DataDeletionService],
 })
 export class WhatsappModule {}

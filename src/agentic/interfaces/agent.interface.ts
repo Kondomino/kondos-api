@@ -11,6 +11,17 @@ export interface IncomingMessage {
     mimeType?: string;
     size?: number;
   };
+  contactContext?: {
+    contactName?: string;
+    isBusinessAccount?: boolean;
+    businessProfile?: {
+      business_name?: string;
+      website?: string[];
+      email?: string;
+      category?: string;
+      description?: string;
+    };
+  };
 }
 
 export interface AgentResponse {
