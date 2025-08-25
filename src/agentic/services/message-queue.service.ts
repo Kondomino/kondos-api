@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { MessageQueue } from '../entities/message-queue.entity';
 import { ChattyAgent } from '../agents/chatty/chatty.agent';
-import { WhatsappService } from '../../whatsapp/whatsapp.service';
+import { OutboundWhatsAppClient } from './outbound-whatsapp.client';
 import { IncomingMessage } from '../interfaces/agent.interface';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class MessageQueueService {
     @InjectModel(MessageQueue)
     private messageQueueModel: typeof MessageQueue,
     private readonly chattyAgent: ChattyAgent,
-    private readonly whatsappService: WhatsappService,
+    private readonly outboundClient: OutboundWhatsAppClient,
   ) {
     // Start processing queue on service initialization
     this.startQueueProcessor();
@@ -137,10 +137,10 @@ export class MessageQueueService {
       const response = await this.chattyAgent.processMessage(message, queueItem.conversationId);
 
       if (response.shouldRespond && response.message) {
-        // Send WhatsApp response
-        await this.whatsappService.sendMessage({
+        // Send WhatsApp response via outbound client
+        await this.outboundClient.send({
           to: queueItem.phoneNumber,
-          type: response.messageType || 'text',
+          type: (response.messageType as any) || 'text',
           text: response.message,
         });
 

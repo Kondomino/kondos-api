@@ -13,12 +13,11 @@ import { ChattyAgent } from './agents/chatty/chatty.agent';
 import { GrokService } from './agents/chatty/grok.service';
 import { ConversationTool } from './tools/conversation.tool';
 import { MessagePersistenceTool, RelevanceAssessmentTool } from './tools/message-persistence.tool';
-import { WhatsappModule } from '../whatsapp/whatsapp.module';
+import { OutboundWhatsAppClient } from './services/outbound-whatsapp.client';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([RealEstateAgency, Conversation, Message, MessageQueue]),
-    WhatsappModule, // Import WhatsappModule to access WhatsappService
   ],
   providers: [
     AgenticService,
@@ -27,6 +26,7 @@ import { WhatsappModule } from '../whatsapp/whatsapp.module';
     ChattyAgent,
     GrokService,
     MessageQueueService,
+    OutboundWhatsAppClient,
     ConversationTool,
     MessagePersistenceTool,
     RelevanceAssessmentTool,
