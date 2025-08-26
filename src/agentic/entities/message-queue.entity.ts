@@ -12,6 +12,7 @@ import {
 @Table({
   tableName: 'MessageQueue',
   timestamps: true,
+  underscored: true,
 })
 export class MessageQueue extends Model<MessageQueue> {
   @PrimaryKey
@@ -19,29 +20,29 @@ export class MessageQueue extends Model<MessageQueue> {
   @Column
   id: number;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ field: 'phone_number', type: DataType.STRING, allowNull: false })
   phoneNumber: string;
 
-  @Column({ type: DataType.TEXT, allowNull: false })
+  @Column({ field: 'message_content', type: DataType.TEXT, allowNull: false })
   messageContent: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ field: 'whatsapp_message_id', type: DataType.STRING, allowNull: false })
   whatsappMessageId: string;
 
-  @Column({ type: DataType.INTEGER, allowNull: false })
+  @Column({ field: 'conversation_id', type: DataType.INTEGER, allowNull: false })
   conversationId: number;
 
-  @Column({ type: DataType.INTEGER, allowNull: false })
+  @Column({ field: 'agency_id', type: DataType.INTEGER, allowNull: false })
   agencyId: number;
 
-  @Column({ type: DataType.JSONB, allowNull: false })
+  @Column({ field: 'message_data', type: DataType.JSONB, allowNull: false })
   messageData: {
     messageType: string;
     mediaData?: any;
     contactContext?: any;
   };
 
-  @Column({ type: DataType.JSONB, allowNull: false })
+  @Column({ field: 'verification_metadata', type: DataType.JSONB, allowNull: false })
   verificationMetadata: {
     confidence: number;
     reasoning: string;
@@ -54,24 +55,26 @@ export class MessageQueue extends Model<MessageQueue> {
   })
   status: 'pending' | 'processing' | 'completed' | 'failed';
 
-  @Column({ type: DataType.INTEGER, defaultValue: 0 })
+  @Column({ field: 'retry_count', type: DataType.INTEGER, defaultValue: 0 })
   retryCount: number;
 
-  @Column({ type: DataType.INTEGER, defaultValue: 3 })
+  @Column({ field: 'max_retries', type: DataType.INTEGER, defaultValue: 3 })
   maxRetries: number;
 
-  @Column({ type: DataType.DATE, allowNull: true })
+  @Column({ field: 'processed_at', type: DataType.DATE, allowNull: true })
   processedAt: Date;
 
-  @Column({ type: DataType.TEXT, allowNull: true })
+  @Column({ field: 'error_message', type: DataType.TEXT, allowNull: true })
   errorMessage: string;
 
-  @Column({ type: DataType.TEXT, allowNull: true })
+  @Column({ field: 'grok_response', type: DataType.TEXT, allowNull: true })
   grokResponse: string;
 
   @CreatedAt
+  @Column({ field: 'created_at' })
   createdAt: Date;
 
   @UpdatedAt
+  @Column({ field: 'updated_at' })
   updatedAt: Date;
 }
