@@ -4,6 +4,12 @@ import { WhatsappController } from './whatsapp.controller';
 import { WhatsappService } from './whatsapp.service';
 import { ConversationService } from './services/conversation.service';
 import { DataDeletionService } from './services/data-deletion.service';
+import { MediaProcessingService } from './services/media-processing.service';
+import { AdobePdfService } from './services/adobe-pdf.service';
+import { MediaUploadService } from './services/media-upload.service';
+import { VerifiedMediaProcessorService } from './services/verified-media-processor.service';
+import { DigitalOceanSpacesService } from './services/digital-ocean-spaces.service';
+import { WhatsAppMediaService } from './services/whatsapp-media.service';
 import { RealEstateAgency } from './entities/real-estate-agency.entity';
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
@@ -17,7 +23,18 @@ import { GrokService } from '../agentic/agents/chatty/grok.service';
     AgenticModule,
   ],
   controllers: [WhatsappController],
-  providers: [WhatsappService, ConversationService, DataDeletionService, GrokService],
-  exports: [WhatsappService, ConversationService, DataDeletionService],
+  providers: [
+    WhatsappService, 
+    ConversationService, 
+    DataDeletionService, 
+    GrokService,
+    MediaProcessingService,
+    AdobePdfService,
+    MediaUploadService,
+    VerifiedMediaProcessorService,
+    DigitalOceanSpacesService,
+    WhatsAppMediaService,
+  ],
+  exports: [WhatsappService, ConversationService, DataDeletionService, MediaProcessingService],
 })
 export class WhatsappModule {}

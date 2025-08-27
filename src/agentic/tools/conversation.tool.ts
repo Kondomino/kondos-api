@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { StructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { DatabaseTool } from './database.tool';
@@ -14,6 +14,7 @@ export class ConversationTool extends StructuredTool<any, any, any, string> {
   name = 'get_conversation_history';
   description = 'Fetches the conversation history for a specific conversation ID. Returns the last N messages in chronological order with sender information.';
   schema: any = ConversationHistorySchema as any;
+  private readonly logger = new Logger(ConversationTool.name);
 
   constructor(private readonly databaseTool: DatabaseTool) {
     super();
@@ -25,12 +26,14 @@ export class ConversationTool extends StructuredTool<any, any, any, string> {
     _parentConfig?: any,
   ): Promise<string> {
     try {
+      this.logger.log(`Fetching conversation history: id=${input.conversationId} limit=${input.limit || 20}`);
       const context = await this.databaseTool.getConversationContext(
         input.conversationId,
         input.limit
       );
 
       if (!context) {
+        this.logger.log(`No conversation found with ID ${input.conversationId}`);
         return `No conversation found with ID ${input.conversationId}`;
       }
 
@@ -51,6 +54,8 @@ export class ConversationTool extends StructuredTool<any, any, any, string> {
         lastInteraction: new Date(context.lastInteraction).toLocaleString('pt-BR'),
         history: formattedHistory,
       };
+
+      this.logger.log(`Fetched history for conversation ${input.conversationId}: ${context.messageHistory.length} messages`);
 
       return `HISTÓRICO DA CONVERSA:
 Conversa ID: ${summary.conversationId}

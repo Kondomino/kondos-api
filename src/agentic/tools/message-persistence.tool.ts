@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { StructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { DatabaseTool } from './database.tool';
@@ -18,6 +18,7 @@ export class MessagePersistenceTool extends StructuredTool<any, any, any, string
   name = 'save_message';
   description = 'Saves a message to the database. Use this tool to persist important messages from the conversation, especially those containing real estate information, property details, or client preferences.';
   schema: any = MessagePersistenceSchema as any;
+  private readonly logger = new Logger(MessagePersistenceTool.name);
 
   constructor(private readonly databaseTool: DatabaseTool) {
     super();
@@ -29,9 +30,11 @@ export class MessagePersistenceTool extends StructuredTool<any, any, any, string
     _parentConfig?: any,
   ): Promise<string> {
     try {
+      this.logger.log(`Saving message: conv=${input.conversationId} dir=${input.direction} type=${input.messageType || 'text'}`);
       // Check if message is relevant enough to save
       const minRelevanceThreshold = 0.3;
       if (input.relevanceScore && input.relevanceScore < minRelevanceThreshold) {
+        this.logger.log(`Skip save due to low relevance (${input.relevanceScore}) for conv=${input.conversationId}`);
         return `Message not saved - relevance score ${input.relevanceScore} below threshold ${minRelevanceThreshold}`;
       }
 
@@ -57,9 +60,11 @@ export class MessagePersistenceTool extends StructuredTool<any, any, any, string
         { metadata: messageMetadata }
       );
 
+      this.logger.log(`Message saved: id=${savedMessage.id} conv=${input.conversationId}`);
       return `Message saved successfully with ID ${savedMessage.id}. Content: "${input.messageContent.substring(0, 100)}${input.messageContent.length > 100 ? '...' : ''}"`;
 
     } catch (error) {
+      this.logger.error(`Error saving message for conv=${input.conversationId}: ${error.message}`);
       return `Error saving message: ${error.message}`;
     }
   }
@@ -76,6 +81,7 @@ export class RelevanceAssessmentTool extends StructuredTool<any, any, any, strin
   name = 'assess_message_relevance';
   description = 'Assesses how relevant a message is for saving to the database. Returns a relevance score and reasoning.';
   schema: any = RelevanceAssessmentSchema as any;
+  private readonly logger = new Logger(RelevanceAssessmentTool.name);
 
   constructor() {
     super();
@@ -87,6 +93,7 @@ export class RelevanceAssessmentTool extends StructuredTool<any, any, any, strin
     _parentConfig?: any,
   ): Promise<string> {
     try {
+      this.logger.log(`Assessing relevance for message preview: "${(input.messageContent || '').slice(0, 40)}${(input.messageContent || '').length > 40 ? '...' : ''}"`);
       const content = input.messageContent.toLowerCase();
       let relevanceScore = 0;
       const reasons: string[] = [];
@@ -154,13 +161,16 @@ export class RelevanceAssessmentTool extends StructuredTool<any, any, any, strin
         message_preview: input.messageContent.substring(0, 100),
       };
 
-      return `AVALIAÇÃO DE RELEVÂNCIA:
+      const result = `AVALIAÇÃO DE RELEVÂNCIA:
 Pontuação: ${assessment.relevance_score.toFixed(2)}
 Deve Salvar: ${assessment.should_save ? 'Sim' : 'Não'}
 Motivos: ${assessment.reasoning}
 Prévia: "${assessment.message_preview}${input.messageContent.length > 100 ? '...' : ''}"`;
+      this.logger.log(`Relevance assessed: score=${assessment.relevance_score.toFixed(2)} should_save=${assessment.should_save}`);
+      return result;
 
     } catch (error) {
+      this.logger.error(`Error assessing relevance: ${error.message}`);
       return `Erro ao avaliar relevância: ${error.message}`;
     }
   }

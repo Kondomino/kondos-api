@@ -29,6 +29,7 @@ export class AgenticService {
     },
   ): Promise<AgentResponse> {
     try {
+      this.logger.log(`Incoming message received: phone=${phoneNumber} type=${messageType} id=${whatsappMessageId}`);
       const message: IncomingMessage = {
         phoneNumber,
         content,

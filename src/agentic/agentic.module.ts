@@ -14,6 +14,11 @@ import { GrokService } from './agents/chatty/grok.service';
 import { ConversationTool } from './tools/conversation.tool';
 import { MessagePersistenceTool, RelevanceAssessmentTool } from './tools/message-persistence.tool';
 import { OutboundWhatsAppClient } from './services/outbound-whatsapp.client';
+import { VerifiedMediaProcessorService } from '../whatsapp/services/verified-media-processor.service';
+import { MediaProcessingService } from '../whatsapp/services/media-processing.service';
+import { AdobePdfService } from '../whatsapp/services/adobe-pdf.service';
+import { MediaUploadService } from '../whatsapp/services/media-upload.service';
+import { DigitalOceanSpacesService } from '../whatsapp/services/digital-ocean-spaces.service';
 
 @Module({
   imports: [
@@ -31,6 +36,11 @@ import { OutboundWhatsAppClient } from './services/outbound-whatsapp.client';
     MessagePersistenceTool,
     RelevanceAssessmentTool,
     DatabaseTool,
+    VerifiedMediaProcessorService,
+    MediaProcessingService,
+    AdobePdfService,
+    MediaUploadService,
+    DigitalOceanSpacesService,
   ],
   exports: [AgenticService],
 })

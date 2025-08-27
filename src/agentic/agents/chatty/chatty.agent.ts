@@ -25,6 +25,7 @@ export class ChattyAgent {
 
   private async callGrokModel(messages: any[]): Promise<string> {
     try {
+      this.logger.log(`Calling Grok model with ${messages.length} messages`);
       return await this.grokService.generateResponse(messages);
     } catch (error) {
       this.logger.error(`Error calling Grok model: ${error.message}`, error.stack);
@@ -35,6 +36,7 @@ export class ChattyAgent {
   private createConversationChain(): RunnableSequence {
     return RunnableSequence.from([
       async (input: { message: IncomingMessage; conversationId: number }) => {
+        this.logger.log(`Chain step: fetch history + assess relevance (conv=${input.conversationId})`);
         const history = await this.conversationTool.call({
           conversationId: input.conversationId,
           limit: 10,
@@ -45,6 +47,7 @@ export class ChattyAgent {
         return { ...input, history, relevance };
       },
       async (ctx: { message: IncomingMessage; conversationId: number; history: string; relevance: string }) => {
+        this.logger.log(`Chain step: build LLM messages and call Grok (conv=${ctx.conversationId})`);
         const messages = [
           new SystemMessage(CHATTY_SYSTEM_PROMPT),
           new HumanMessage(`CONTEXTO DA CONVERSA:
@@ -62,6 +65,7 @@ Responda como Victor Melo, mantendo a conversa natural e buscando informações 
         return { response, conversationId: ctx.conversationId };
       },
       async (payload: { response: string; conversationId: number }) => {
+        this.logger.log(`Chain step: persist agent response (conv=${payload.conversationId})`);
         await this.messagePersistenceTool.call({
           conversationId: payload.conversationId,
           messageContent: payload.response,
@@ -82,12 +86,14 @@ Responda como Victor Melo, mantendo a conversa natural e buscando informações 
 
   async processMessage(message: IncomingMessage, conversationId: number): Promise<AgentResponse> {
     try {
+      this.logger.log(`Agent processing message for conv=${conversationId} waId=${message.whatsappMessageId}`);
       // Use the conversation ID provided by the orchestrator
       const response = await this.chain.invoke({
         message,
         conversationId: conversationId,
       });
 
+      this.logger.log(`Agent generated response for conv=${conversationId}: ${response?.message ? 'ok' : 'none'}`);
       return response;
     } catch (error) {
       this.logger.error(`Error processing message: ${error.message}`, error.stack);

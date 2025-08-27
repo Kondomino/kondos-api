@@ -31,6 +31,34 @@ export class MessageDto {
     id: string;
     mime_type: string;
     sha256: string;
+    caption?: string;
+  };
+
+  @ApiProperty({ description: 'Message document content', required: false })
+  @IsOptional()
+  document?: {
+    id: string;
+    filename: string;
+    mime_type: string;
+    sha256: string;
+    caption?: string;
+  };
+
+  @ApiProperty({ description: 'Message video content', required: false })
+  @IsOptional()
+  video?: {
+    id: string;
+    mime_type: string;
+    sha256: string;
+    caption?: string;
+  };
+
+  @ApiProperty({ description: 'Message audio content', required: false })
+  @IsOptional()
+  audio?: {
+    id: string;
+    mime_type: string;
+    sha256: string;
   };
 }
 

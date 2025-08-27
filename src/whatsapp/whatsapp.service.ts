@@ -4,6 +4,7 @@ import { WebhookDto } from './dto/webhook.dto';
 import { SendMessageDto } from './dto/send-message.dto';
 import { ConversationService } from './services/conversation.service';
 import { AgenticService } from '../agentic/agentic.service';
+import { WhatsAppMediaService } from './services/whatsapp-media.service';
 
 @Injectable()
 export class WhatsappService {
@@ -16,6 +17,7 @@ export class WhatsappService {
     private readonly conversationService: ConversationService,
     private readonly agenticService: AgenticService,
     private readonly configService: ConfigService,
+    private readonly whatsappMediaService: WhatsAppMediaService,
   ) {
     this.verifyToken = this.configService.get<string>('WHATSAPP_VERIFY_TOKEN') || 'your_verify_token_here';
     this.accessToken = this.configService.get<string>('WHATSAPP_ACCESS_TOKEN');
@@ -130,14 +132,36 @@ export class WhatsappService {
 
     // Extract media data if present
     let mediaData = undefined;
-    if (messageType === 'image' || messageType === 'document' || messageType === 'video') {
-      mediaData = {
-        mediaId: message[messageType]?.id,
-        mediaUrl: message[messageType]?.link,
-        filename: message[messageType]?.filename,
-        mimeType: message[messageType]?.mime_type,
-        size: message[messageType]?.size,
-      };
+    if (messageType === 'image' || messageType === 'document' || messageType === 'video' || messageType === 'audio') {
+      const mediaInfo = message[messageType];
+      if (mediaInfo?.id) {
+        try {
+          // Get media URL from WhatsApp API using media ID
+          this.logger.log(`Getting media URL for ${messageType} with ID: ${mediaInfo.id}`);
+          const whatsappMediaInfo = await this.whatsappMediaService.getMediaInfo(mediaInfo.id);
+          
+          mediaData = {
+            mediaId: mediaInfo.id,
+            mediaUrl: whatsappMediaInfo.url,
+            filename: mediaInfo.filename || `media_${messageId}`,
+            mimeType: whatsappMediaInfo.mimeType,
+            size: whatsappMediaInfo.fileSize,
+            sha256: whatsappMediaInfo.sha256,
+          };
+          
+          this.logger.log(`Media URL resolved: ${whatsappMediaInfo.url.substring(0, 100)}...`);
+        } catch (error) {
+          this.logger.error(`Failed to get media URL for ${messageType} ${mediaInfo.id}: ${error.message}`);
+          // Fallback: create mediaData without URL (will be handled gracefully downstream)
+          mediaData = {
+            mediaId: mediaInfo.id,
+            filename: mediaInfo.filename || `media_${messageId}`,
+            mimeType: mediaInfo.mime_type,
+            size: mediaInfo.file_size,
+            sha256: mediaInfo.sha256,
+          };
+        }
+      }
     }
 
     // Process message through Agentic service with business profile context

@@ -7,6 +7,9 @@ import { DataDeletionDto, DataDeletionResponseDto } from './dto/data-deletion.dt
 import { DataDeletionService } from './services/data-deletion.service';
 import { Public } from '../auth/decorators/public.decorator';
 import { GrokService } from '../agentic/agents/chatty/grok.service';
+import { VerifiedMediaProcessorService } from './services/verified-media-processor.service';
+import { DigitalOceanSpacesService } from './services/digital-ocean-spaces.service';
+import { WhatsAppMediaService } from './services/whatsapp-media.service';
 
 @ApiTags('whatsapp')
 @Controller('whatsapp')
@@ -15,6 +18,9 @@ export class WhatsappController {
     private readonly whatsappService: WhatsappService,
     private readonly dataDeletionService: DataDeletionService,
     private readonly grokService: GrokService,
+    private readonly verifiedMediaProcessor: VerifiedMediaProcessorService,
+    private readonly digitalOceanSpaces: DigitalOceanSpacesService,
+    private readonly whatsappMediaService: WhatsAppMediaService,
   ) {}
 
   @Public()
@@ -62,6 +68,30 @@ export class WhatsappController {
   @ApiResponse({ status: 200, description: 'Grok API test completed' })
   async testGrok(): Promise<any> {
     return this.grokService.testCredentials();
+  }
+
+  @Get('test-media-processing')
+  @Public()
+  @ApiOperation({ summary: 'Test media processing services' })
+  @ApiResponse({ status: 200, description: 'Media processing test completed' })
+  async testMediaProcessing(): Promise<any> {
+    return this.verifiedMediaProcessor.testMediaProcessing();
+  }
+
+  @Get('test-digital-ocean-spaces')
+  @Public()
+  @ApiOperation({ summary: 'Test DigitalOcean Spaces connection' })
+  @ApiResponse({ status: 200, description: 'DigitalOcean Spaces test completed' })
+  async testDigitalOceanSpaces(): Promise<any> {
+    return this.digitalOceanSpaces.testConnection();
+  }
+
+  @Get('test-whatsapp-media')
+  @Public()
+  @ApiOperation({ summary: 'Test WhatsApp Media API connection' })
+  @ApiResponse({ status: 200, description: 'WhatsApp Media API test completed' })
+  async testWhatsAppMedia(): Promise<any> {
+    return this.whatsappMediaService.testConnection();
   }
 
   @Public()
