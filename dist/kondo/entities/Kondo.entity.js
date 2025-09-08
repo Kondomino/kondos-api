@@ -470,6 +470,40 @@ __decorate([
     __metadata("design:type", String)
 ], Kondo.prototype, "video", void 0);
 __decorate([
+    (0, sequelize_typescript_1.Column)({
+        allowNull: true,
+        type: sequelize_typescript_1.DataType.DATE,
+        comment: 'Timestamp of the last data quality update'
+    }),
+    __metadata("design:type", Date)
+], Kondo.prototype, "kondo_data_updated", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        allowNull: true,
+        type: sequelize_typescript_1.DataType.DECIMAL(3, 2),
+        defaultValue: 0.00,
+        validate: {
+            min: 0.00,
+            max: 1.00
+        },
+        comment: 'Content quality score from 0.00 to 1.00'
+    }),
+    __metadata("design:type", Number)
+], Kondo.prototype, "kondo_data_content_quality", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        allowNull: true,
+        type: sequelize_typescript_1.DataType.DECIMAL(3, 2),
+        defaultValue: 0.00,
+        validate: {
+            min: 0.00,
+            max: 1.00
+        },
+        comment: 'Media quality score from 0.00 to 1.00'
+    }),
+    __metadata("design:type", Number)
+], Kondo.prototype, "kondo_data_media_quality", void 0);
+__decorate([
     (0, sequelize_typescript_1.HasMany)(() => media_entity_1.Media),
     __metadata("design:type", Array)
 ], Kondo.prototype, "medias", void 0);

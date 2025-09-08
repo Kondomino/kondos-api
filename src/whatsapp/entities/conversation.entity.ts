@@ -32,10 +32,10 @@ export class Conversation extends Model {
   agent_name: string;
 
   @Column({
-    type: DataType.ENUM('active', 'paused', 'closed'),
+    type: DataType.ENUM('active', 'paused', 'closed', 'archived'),
     defaultValue: 'active',
   })
-  status: 'active' | 'paused' | 'closed';
+  status: 'active' | 'paused' | 'closed' | 'archived';
 
   @Column({
     type: DataType.TEXT,

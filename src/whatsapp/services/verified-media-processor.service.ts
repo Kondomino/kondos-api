@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MediaProcessingService, MediaData, ProcessedMedia } from './media-processing.service';
 import { DigitalOceanSpacesService, BatchUploadResult } from './digital-ocean-spaces.service';
+import { MediaRepository } from '../../media/repository/media.repository';
 
 export interface MediaProcessingResult {
   shouldProcessMedia: boolean;
@@ -16,6 +17,7 @@ export class VerifiedMediaProcessorService {
   constructor(
     private readonly mediaProcessingService: MediaProcessingService,
     private readonly digitalOceanSpaces: DigitalOceanSpacesService,
+    private readonly mediaRepository: MediaRepository,
   ) {}
 
   /**
@@ -124,8 +126,49 @@ export class VerifiedMediaProcessorService {
         };
       }
 
+      // NEW: Save media as draft entities in the database
+      let savedMediaEntities: any[] = [];
+      try {
+        this.logger.log(`[VERIFIED-MEDIA] Saving media entities as draft for agency ${agencyId}`);
+        
+        // Save original file as draft media entity
+        if (spacesResult?.originalFileUrl) {
+          const originalMediaEntity = await this.mediaRepository.create({
+            filename: mediaData.filename || `media_${messageId}`,
+            type: this.getMediaTypeForEntity(messageType),
+            status: 'draft',
+            storage_url: spacesResult.originalFileUrl,
+            // kondoId will be null initially - to be associated later when Kondo is identified
+            kondoId: null,
+            unitId: null,
+          });
+          savedMediaEntities.push(originalMediaEntity);
+          this.logger.log(`[VERIFIED-MEDIA] Saved original media entity: ID ${originalMediaEntity.id}`);
+        }
+
+        // Save extracted images as draft media entities
+        if (spacesResult?.extractedImageUrls && spacesResult.extractedImageUrls.length > 0) {
+          for (let i = 0; i < spacesResult.extractedImageUrls.length; i++) {
+            const imageUrl = spacesResult.extractedImageUrls[i];
+            const imageMediaEntity = await this.mediaRepository.create({
+              filename: `extracted_image_${i + 1}_${messageId}.jpg`,
+              type: 'image',
+              status: 'draft',
+              storage_url: imageUrl,
+              kondoId: null,
+              unitId: null,
+            });
+            savedMediaEntities.push(imageMediaEntity);
+          }
+          this.logger.log(`[VERIFIED-MEDIA] Saved ${spacesResult.extractedImageUrls.length} extracted image entities`);
+        }
+      } catch (mediaEntityError) {
+        this.logger.error(`[VERIFIED-MEDIA] Error saving media entities: ${mediaEntityError.message}`);
+        // Don't fail the entire process if media entity saving fails
+      }
+
       const finalTotalTime = Date.now() - processStart;
-      this.logger.log(`[VERIFIED-MEDIA] SUCCESS: extracted ${processedMedia.extractedText?.length || 0} chars, total time ${finalTotalTime}ms`);
+      this.logger.log(`[VERIFIED-MEDIA] SUCCESS: extracted ${processedMedia.extractedText?.length || 0} chars, saved ${savedMediaEntities.length} media entities, total time ${finalTotalTime}ms`);
 
       return {
         shouldProcessMedia: true,
@@ -257,6 +300,20 @@ export class VerifiedMediaProcessorService {
         return 'Vídeo';
       default:
         return 'Arquivo';
+    }
+  }
+
+  private getMediaTypeForEntity(messageType: string): string {
+    switch (messageType) {
+      case 'image':
+        return 'image';
+      case 'video':
+        return 'video';
+      case 'document':
+        // For documents, we default to image since they might contain extracted images
+        return 'image';
+      default:
+        return 'image';
     }
   }
 

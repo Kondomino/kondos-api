@@ -17,7 +17,12 @@ const MediaTypes = Object.freeze({
     Video: 'video',
     Image: 'image',
 });
+const MediaStatus = Object.freeze({
+    Final: 'final',
+    Draft: 'draft',
+});
 module.exports.MediaTypes = MediaTypes;
+module.exports.MediaStatus = MediaStatus;
 let Media = class Media extends sequelize_typescript_1.Model {
 };
 exports.Media = Media;
@@ -35,6 +40,20 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], Media.prototype, "type", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.ENUM('final', 'draft'),
+        defaultValue: 'draft',
+    }),
+    __metadata("design:type", String)
+], Media.prototype, "status", void 0);
+__decorate([
+    (0, sequelize_typescript_1.Column)({
+        type: sequelize_typescript_1.DataType.STRING,
+        allowNull: true,
+    }),
+    __metadata("design:type", String)
+], Media.prototype, "storage_url", void 0);
 __decorate([
     (0, sequelize_typescript_1.ForeignKey)(() => kondo_entity_1.Kondo),
     sequelize_typescript_1.Column,

@@ -14,12 +14,15 @@ import { RealEstateAgency } from './entities/real-estate-agency.entity';
 import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 import { User } from '../user/entities/user.entity';
+import { Media } from '../media/entities/media.entity';
 import { AgenticModule } from '../agentic/agentic.module';
 import { GrokService } from '../agentic/agents/chatty/grok.service';
+import { MediaRepository } from '../media/repository/media.repository';
+import { mediaProviders } from '../media/repository/media.provider';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([RealEstateAgency, Conversation, Message, User]),
+    SequelizeModule.forFeature([RealEstateAgency, Conversation, Message, User, Media]),
     AgenticModule,
   ],
   controllers: [WhatsappController],
@@ -34,6 +37,8 @@ import { GrokService } from '../agentic/agents/chatty/grok.service';
     VerifiedMediaProcessorService,
     DigitalOceanSpacesService,
     WhatsAppMediaService,
+    MediaRepository,
+    ...mediaProviders,
   ],
   exports: [WhatsappService, ConversationService, DataDeletionService, MediaProcessingService],
 })

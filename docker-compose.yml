@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16
-    container_name: kondo
+    container_name: kondo-postgres
     environment:
       POSTGRES_DB: kondo
       POSTGRES_USER: postgres
@@ -15,6 +15,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - kondo-network
+
+networks:
+  kondo-network:
+    external: true
 
 volumes:
   postgres_data: 

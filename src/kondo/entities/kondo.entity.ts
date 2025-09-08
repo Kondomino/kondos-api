@@ -342,6 +342,43 @@ export class Kondo extends Model {
     })
     video: string;
 
+    /**
+     * KONDO DATA QUALITY TRACKING
+     */
+    @Column({
+        allowNull: true,
+        type: DataType.DATE,
+        comment: 'Timestamp of the last data quality update'
+    })
+    kondo_data_updated: Date;
+
+    @Column({
+        allowNull: true,
+        type: DataType.DECIMAL(3, 2),
+        defaultValue: 0.00,
+        validate: {
+            min: 0.00,
+            max: 1.00
+        },
+        comment: 'Content quality score from 0.00 to 1.00'
+    })
+    kondo_data_content_quality: number;
+
+    @Column({
+        allowNull: true,
+        type: DataType.DECIMAL(3, 2),
+        defaultValue: 0.00,
+        validate: {
+            min: 0.00,
+            max: 1.00
+        },
+        comment: 'Media quality score from 0.00 to 1.00'
+    })
+    kondo_data_media_quality: number;
+    /**
+     * END OF KONDO DATA QUALITY TRACKING
+     */
+
     // @Column({
     //     allowNull: true,
     // })

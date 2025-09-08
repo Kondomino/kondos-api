@@ -19,10 +19,13 @@ import { MediaProcessingService } from '../whatsapp/services/media-processing.se
 import { AdobePdfService } from '../whatsapp/services/adobe-pdf.service';
 import { MediaUploadService } from '../whatsapp/services/media-upload.service';
 import { DigitalOceanSpacesService } from '../whatsapp/services/digital-ocean-spaces.service';
+import { Media } from '../media/entities/media.entity';
+import { MediaRepository } from '../media/repository/media.repository';
+import { mediaProviders } from '../media/repository/media.provider';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([RealEstateAgency, Conversation, Message, MessageQueue]),
+    SequelizeModule.forFeature([RealEstateAgency, Conversation, Message, MessageQueue, Media]),
   ],
   providers: [
     AgenticService,
@@ -41,6 +44,8 @@ import { DigitalOceanSpacesService } from '../whatsapp/services/digital-ocean-sp
     AdobePdfService,
     MediaUploadService,
     DigitalOceanSpacesService,
+    MediaRepository,
+    ...mediaProviders,
   ],
   exports: [AgenticService],
 })
