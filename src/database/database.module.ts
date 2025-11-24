@@ -1,6 +1,6 @@
 // src/modules/database/database.module.ts
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { databaseConfig } from './config';
 
@@ -12,12 +12,11 @@ import { databaseConfig } from './config';
     }),
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        ...databaseConfig(configService),
+      useFactory: () => ({
+        ...databaseConfig(),
         autoLoadModels: true,
         synchronize: false, // Set to false to use migrations
       }),
-      inject: [ConfigService],
     }),
   ],
 })

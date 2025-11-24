@@ -82,7 +82,7 @@ export class DigitalOceanSpacesService {
         },
       };
 
-      const result = await this.s3Client.upload(uploadParams).promise();
+      await this.s3Client.upload(uploadParams).promise();
       const uploadTime = Date.now() - uploadStart;
       const cdnUrl = this.generateCdnUrl(key);
 

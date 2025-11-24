@@ -5,7 +5,7 @@ import { UpdateUnitDto } from './dto/update-unit.dto';
 @Injectable()
 export class UnitService {
   create(createUnitDto: CreateUnitDto) {
-    return 'This action adds a new unit';
+    return `This action adds a new unit with payload ${JSON.stringify(createUnitDto)}`;
   }
 
   findAll() {
@@ -17,7 +17,7 @@ export class UnitService {
   }
 
   update(id: number, updateUnitDto: UpdateUnitDto) {
-    return `This action updates a #${id} unit`;
+    return `This action updates a #${id} unit with payload ${JSON.stringify(updateUnitDto)}`;
   }
 
   remove(id: number) {

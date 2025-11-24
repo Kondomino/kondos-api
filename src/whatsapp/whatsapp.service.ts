@@ -202,16 +202,11 @@ export class WhatsappService {
     agentResponse: any;
     sentMessage?: any;
   }): Promise<void> {
-    const { originalMessage, agentResponse, sentMessage } = input;
+    const { agentResponse, sentMessage } = input;
 
     if (!agentResponse.conversationId) {
       return; // No persistence needed
     }
-
-    const from = originalMessage.from;
-    const messageId = originalMessage.id;
-    const messageType = originalMessage.type;
-    const timestamp = new Date(parseInt(originalMessage.timestamp) * 1000);
 
     // Persist outgoing message if present
     const outgoingMessageId: string | undefined = sentMessage?.data?.whatsappResponse?.messages?.[0]?.id;
@@ -232,7 +227,7 @@ export class WhatsappService {
     const url = `https://graph.facebook.com/v20.0/${this.phoneNumberId}/messages`;
     
     // Build payload based on message type
-    let payload: any = {
+    const payload: any = {
       messaging_product: "whatsapp",
       to: messageData.to,
       type: messageData.type

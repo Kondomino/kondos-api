@@ -1,5 +1,4 @@
 import { KondoContentAnalyzerService } from '../../services/kondo-content-analyzer.service';
-import { DEFAULT_KONDO_QUALITY_CONFIG } from '../../../config/kondo-quality.config';
 
 // Mock data interfaces for testing (avoiding Sequelize model instantiation)
 interface MockKondo {
@@ -63,7 +62,7 @@ describe('KondoContentAnalyzerService', () => {
         description: 'A beautiful condominium',
       };
 
-      const breakdown = service.analyzeContentQuality(kondo as any, DEFAULT_KONDO_QUALITY_CONFIG);
+      const breakdown = service.analyzeContentQuality(kondo as any);
 
       expect(breakdown.basicInfo).toBe(0.4); // 4 core attributes × 0.1 each
       expect(breakdown.pricing).toBe(0); // No other attributes
@@ -81,7 +80,7 @@ describe('KondoContentAnalyzerService', () => {
         city: 'Belo Horizonte',
       };
 
-      const breakdown = service.analyzeContentQuality(kondo as any, DEFAULT_KONDO_QUALITY_CONFIG);
+      const breakdown = service.analyzeContentQuality(kondo as any);
 
       expect(breakdown.basicInfo).toBe(0); // No core attributes
       expect(breakdown.pricing).toBe(0); // No other attributes
@@ -104,7 +103,7 @@ describe('KondoContentAnalyzerService', () => {
         infra_gym: true,
       };
 
-      const breakdown = service.analyzeContentQuality(kondo as any, DEFAULT_KONDO_QUALITY_CONFIG);
+      const breakdown = service.analyzeContentQuality(kondo as any);
 
       expect(breakdown.basicInfo).toBe(0); // No core attributes
       expect(breakdown.pricing).toBeCloseTo(0.1, 2); // 10 other attributes × 0.01 each
@@ -127,7 +126,7 @@ describe('KondoContentAnalyzerService', () => {
         infra_pool: true,
       };
 
-      const breakdown = service.analyzeContentQuality(kondo as any, DEFAULT_KONDO_QUALITY_CONFIG);
+      const breakdown = service.analyzeContentQuality(kondo as any);
 
       expect(breakdown.basicInfo).toBe(0.2); // 2 core attributes × 0.1 each
       expect(breakdown.pricing).toBe(0.03); // 3 other attributes × 0.01 each
@@ -147,7 +146,6 @@ describe('KondoContentAnalyzerService', () => {
       const breakdown = service.analyzeMediaQuality(
         { id: 1 } as any, 
         medias as any, 
-        DEFAULT_KONDO_QUALITY_CONFIG
       );
 
       expect(breakdown.images).toBe(0.27); // 3 final media × 0.09 each
@@ -166,7 +164,6 @@ describe('KondoContentAnalyzerService', () => {
       const breakdown = service.analyzeMediaQuality(
         { id: 1 } as any, 
         medias as any, 
-        DEFAULT_KONDO_QUALITY_CONFIG
       );
 
       expect(breakdown.images).toBe(0.09); // Only 1 final media × 0.09
@@ -183,7 +180,6 @@ describe('KondoContentAnalyzerService', () => {
       const breakdown = service.analyzeMediaQuality(
         { id: 1 } as any, 
         medias as any, 
-        DEFAULT_KONDO_QUALITY_CONFIG
       );
 
       expect(breakdown.images).toBe(0.27); // 3 final media × 0.09 each
@@ -193,7 +189,6 @@ describe('KondoContentAnalyzerService', () => {
       const breakdown = service.analyzeMediaQuality(
         { id: 1 } as any, 
         [], 
-        DEFAULT_KONDO_QUALITY_CONFIG
       );
 
       expect(breakdown.images).toBe(0);
@@ -211,7 +206,6 @@ describe('KondoContentAnalyzerService', () => {
       const breakdown = service.analyzeMediaQuality(
         { id: 1 } as any, 
         medias as any, 
-        DEFAULT_KONDO_QUALITY_CONFIG
       );
 
       expect(breakdown.images).toBe(0); // No final media
@@ -227,7 +221,7 @@ describe('KondoContentAnalyzerService', () => {
         details: 0.25,     // Secondary attributes
       };
 
-      const score = service.calculateContentScore(breakdown, DEFAULT_KONDO_QUALITY_CONFIG);
+      const score = service.calculateContentScore(breakdown);
 
       // Expected: 0.4 + 0.1 + 0.25 = 0.75
       expect(score).toBeCloseTo(0.75, 2);
@@ -241,7 +235,7 @@ describe('KondoContentAnalyzerService', () => {
         details: 0.3,      // High secondary score
       };
 
-      const score = service.calculateContentScore(highBreakdown, DEFAULT_KONDO_QUALITY_CONFIG);
+      const score = service.calculateContentScore(highBreakdown);
       // 0.8 + 0.5 + 0.3 = 1.6, should be clamped to 1.0
       expect(score).toBe(1.0);
     });
@@ -254,7 +248,7 @@ describe('KondoContentAnalyzerService', () => {
         details: 0,
       };
 
-      const score = service.calculateContentScore(zeroBreakdown, DEFAULT_KONDO_QUALITY_CONFIG);
+      const score = service.calculateContentScore(zeroBreakdown);
       expect(score).toBe(0);
     });
   });
@@ -268,7 +262,7 @@ describe('KondoContentAnalyzerService', () => {
         recency: 0,        // Not used
       };
 
-      const score = service.calculateMediaScore(breakdown, DEFAULT_KONDO_QUALITY_CONFIG);
+      const score = service.calculateMediaScore(breakdown);
 
       // Expected: just the images value (0.27)
       expect(score).toBeCloseTo(0.27, 2);
@@ -282,7 +276,7 @@ describe('KondoContentAnalyzerService', () => {
         recency: 0,
       };
 
-      const score = service.calculateMediaScore(breakdown, DEFAULT_KONDO_QUALITY_CONFIG);
+      const score = service.calculateMediaScore(breakdown);
       expect(score).toBe(1.0);
     });
   });
@@ -328,7 +322,7 @@ describe('KondoContentAnalyzerService', () => {
         lot_avg_price: null as any,
       };
 
-      const breakdown = service.analyzeContentQuality(kondo as any, DEFAULT_KONDO_QUALITY_CONFIG);
+      const breakdown = service.analyzeContentQuality(kondo as any);
 
       expect(breakdown.basicInfo).toBe(0); // No valid core attributes
       expect(breakdown.pricing).toBe(0); // No valid other attributes
@@ -346,7 +340,6 @@ describe('KondoContentAnalyzerService', () => {
       const breakdown = service.analyzeMediaQuality(
         { id: 1 } as any, 
         medias as any, 
-        DEFAULT_KONDO_QUALITY_CONFIG
       );
 
       expect(breakdown.images).toBe(0.09); // Only 1 valid final media
@@ -366,7 +359,7 @@ describe('KondoContentAnalyzerService', () => {
         cep: '   ', // Only whitespace
       };
 
-      const breakdown = service.analyzeContentQuality(kondo as any, DEFAULT_KONDO_QUALITY_CONFIG);
+      const breakdown = service.analyzeContentQuality(kondo as any);
 
       expect(breakdown.basicInfo).toBe(0.2); // Only type and description valid (2 × 0.1)
       expect(breakdown.pricing).toBe(0); // No other attributes
@@ -395,11 +388,11 @@ describe('KondoContentAnalyzerService', () => {
         { type: 'image', status: 'draft', filename: 'draft.jpg' }, // Draft doesn't count
       ];
 
-      const contentBreakdown = service.analyzeContentQuality(lowQualityKondo as any, DEFAULT_KONDO_QUALITY_CONFIG);
-      const mediaBreakdown = service.analyzeMediaQuality(lowQualityKondo as any, lowQualityMedia as any, DEFAULT_KONDO_QUALITY_CONFIG);
+      const contentBreakdown = service.analyzeContentQuality(lowQualityKondo as any);
+      const mediaBreakdown = service.analyzeMediaQuality(lowQualityKondo as any, lowQualityMedia as any);
       
-      const contentScore = service.calculateContentScore(contentBreakdown, DEFAULT_KONDO_QUALITY_CONFIG);
-      const mediaScore = service.calculateMediaScore(mediaBreakdown, DEFAULT_KONDO_QUALITY_CONFIG);
+      const contentScore = service.calculateContentScore(contentBreakdown);
+      const mediaScore = service.calculateMediaScore(mediaBreakdown);
       const overallScore = service.calculateOverallScore(contentScore, mediaScore);
 
       // Expected scores:
@@ -409,7 +402,6 @@ describe('KondoContentAnalyzerService', () => {
       expect(contentScore).toBeCloseTo(0.27, 2);
       expect(mediaScore).toBeCloseTo(0.09, 2);
       expect(overallScore).toBeCloseTo(0.36, 2);
-      expect(overallScore).toBeLessThan(DEFAULT_KONDO_QUALITY_CONFIG.threshold); // Should fail 0.7 threshold
     });
 
     it('should pass quality threshold with comprehensive attributes', () => {
@@ -481,11 +473,11 @@ describe('KondoContentAnalyzerService', () => {
         { type: 'image', status: 'draft', filename: 'draft-photo.jpg' }, // Draft doesn't count
       ];
 
-      const contentBreakdown = service.analyzeContentQuality(highQualityKondo as any, DEFAULT_KONDO_QUALITY_CONFIG);
-      const mediaBreakdown = service.analyzeMediaQuality(highQualityKondo as any, highQualityMedia as any, DEFAULT_KONDO_QUALITY_CONFIG);
+      const contentBreakdown = service.analyzeContentQuality(highQualityKondo as any);
+      const mediaBreakdown = service.analyzeMediaQuality(highQualityKondo as any, highQualityMedia as any);
       
-      const contentScore = service.calculateContentScore(contentBreakdown, DEFAULT_KONDO_QUALITY_CONFIG);
-      const mediaScore = service.calculateMediaScore(mediaBreakdown, DEFAULT_KONDO_QUALITY_CONFIG);
+      const contentScore = service.calculateContentScore(contentBreakdown);
+      const mediaScore = service.calculateMediaScore(mediaBreakdown);
       const overallScore = service.calculateOverallScore(contentScore, mediaScore);
 
       // Expected scores:
@@ -495,7 +487,6 @@ describe('KondoContentAnalyzerService', () => {
       expect(contentScore).toBe(1.0); // Should be capped at 1.0
       expect(mediaScore).toBeCloseTo(0.63, 2);
       expect(overallScore).toBe(1.0); // Should be capped at 1.0
-      expect(overallScore).toBeGreaterThan(DEFAULT_KONDO_QUALITY_CONFIG.threshold); // Should pass 0.7 threshold
     });
   });
 });

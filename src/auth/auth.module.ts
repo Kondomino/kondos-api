@@ -8,6 +8,7 @@ import { JwtAuthGuard } from './guards/jwt.auth.guard';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       useClass: JwtAuthGuard,
     },
     AuthService,
-    JwtStrategy
+    JwtStrategy,
+    GoogleStrategy,
   ],
   exports: [AuthService]
 })

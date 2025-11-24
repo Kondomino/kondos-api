@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -286,7 +287,7 @@ export class AdobePdfService {
   async testCredentials(): Promise<{ success: boolean; message: string }> {
     try {
       // Simple test - try to create PDFServices instance
-      const pdfServices = new PDFServices({ credentials: this.credentials });
+      new PDFServices({ credentials: this.credentials });
       
       this.logger.log('Adobe PDF Services credentials test successful');
       return {

@@ -12,7 +12,7 @@ describe('StoragePathGeneratorService', () => {
       const paths = service.generatePdfPaths(123, 'msg456', 'document.pdf');
 
       expect(paths.rawContentBase).toBe('raw-content/agency-123/pdfs/msg456');
-      expect(paths.originalFile).toBe('raw-content/agency-123/pdfs/msg456/original.pdf');
+      expect(paths.originalFile).toBe('raw-content/agency-123/pdfs/msg456/document.pdf');
       expect(paths.extractedBase).toBe('raw-content/agency-123/pdfs/msg456/extracted');
       expect(paths.extractedText).toBe('raw-content/agency-123/pdfs/msg456/extracted/text.json');
       expect(paths.extractedTables).toBe('raw-content/agency-123/pdfs/msg456/extracted/tables.json');

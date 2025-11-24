@@ -10,7 +10,6 @@ import { MediaModule } from './media/media.module';
 import { UnitModule } from './unit/unit.module';
 import { LikeModule } from './like/like.module';
 import { AuthModule } from './auth/auth.module';
-import { GoogleStrategy } from './auth/strategies/google.strategy';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
 // Environment configuration is handled by ConfigModule
 
@@ -34,7 +33,7 @@ import { WhatsappModule } from './whatsapp/whatsapp.module';
     //SequelizeModule.forFeature([User, Kondo])
   ],
   controllers: [AppController],
-  providers: [...kondoProviders, GoogleStrategy],
+  providers: [...kondoProviders],
 })
 
 

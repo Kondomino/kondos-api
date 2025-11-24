@@ -74,8 +74,6 @@ export class VerifiedMediaProcessorService {
       const enhancedContent = this.buildEnhancedContent(processedMedia, messageType);
       const contentBuildTime = Date.now() - contentBuildStart;
       
-      const totalTime = Date.now() - processStart;
-      
       this.logger.log(`[VERIFIED-MEDIA] Content enhancement complete in ${contentBuildTime}ms`);
 
       // NEW: Upload to DigitalOcean Spaces (using already-downloaded buffer)
@@ -127,7 +125,7 @@ export class VerifiedMediaProcessorService {
       }
 
       // NEW: Save media as draft entities in the database
-      let savedMediaEntities: any[] = [];
+      const savedMediaEntities: any[] = [];
       try {
         this.logger.log(`[VERIFIED-MEDIA] Saving media entities as draft for agency ${agencyId}`);
         

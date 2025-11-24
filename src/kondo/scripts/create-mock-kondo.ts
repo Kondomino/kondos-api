@@ -4,7 +4,6 @@ import {
   mockKondoData, 
   mockKondoBairroData, 
   mockKondoComercialData, 
-  mockKondoWithRelationsData,
   mockKondoCasas2Data,
   mockKondoCasas3Data,
   mockKondoCasas4Data,

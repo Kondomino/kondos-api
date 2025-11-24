@@ -1,6 +1,5 @@
 import { Injectable, Inject } from "@nestjs/common";
 import { LIKE_REPOSITORY_PROVIDER } from "src/core/constants";
-import { CreateLikeDto } from "../dto/create-like.dto";
 import { UpdateLikeDto } from "../dto/update-like.dto";
 import { Like } from "../entities/like.entity";
 

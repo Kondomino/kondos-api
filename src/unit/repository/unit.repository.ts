@@ -1,6 +1,5 @@
 import { Injectable, Inject } from "@nestjs/common";
 import { UNIT_REPOSITORY_PROVIDER } from "src/core/constants";
-import { CreateUnitDto } from "../dto/create-unit.dto";
 import { UpdateUnitDto } from "../dto/update-unit.dto";
 import { Unit } from "../entities/unit.entity";
 

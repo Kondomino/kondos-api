@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import { RunnableSequence } from '@langchain/core/runnables';
-import { CHATTY_SYSTEM_PROMPT, CONVERSATION_STARTERS, RESPONSE_TEMPLATES } from './chatty.prompts';
+import { CHATTY_SYSTEM_PROMPT } from './chatty.prompts';
 import { ConversationTool } from '../../tools/conversation.tool';
 import { MessagePersistenceTool, RelevanceAssessmentTool } from '../../tools/message-persistence.tool';
 import { DatabaseTool } from '../../tools/database.tool';

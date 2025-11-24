@@ -20,11 +20,7 @@ export class ConversationTool extends StructuredTool<any, any, any, string> {
     super();
   }
 
-  protected async _call(
-    input: any,
-    _runManager?: any,
-    _parentConfig?: any,
-  ): Promise<string> {
+  protected async _call(input: any): Promise<string> {
     try {
       this.logger.log(`Fetching conversation history: id=${input.conversationId} limit=${input.limit || 20}`);
       const context = await this.databaseTool.getConversationContext(
@@ -88,11 +84,7 @@ export class ConversationSummaryTool extends StructuredTool<any, any, any, strin
     super();
   }
 
-  protected async _call(
-    input: any,
-    _runManager?: any,
-    _parentConfig?: any,
-  ): Promise<string> {
+  protected async _call(input: any): Promise<string> {
     try {
       const context = await this.databaseTool.getConversationContext(input.conversationId, 50);
 

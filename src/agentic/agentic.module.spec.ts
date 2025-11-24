@@ -103,7 +103,10 @@ describe('AgenticModule integration', () => {
         } as any;
       },
       async createAgencyFromVerification(phoneNumber: string, messageContent: string) {
-        const agency = { id: agencies.length + 1, name: `Agência ${phoneNumber}`, phone_number: phoneNumber } as any;
+        const derivedName = messageContent
+          ? `Agência ${messageContent.slice(0, 25).trim() || phoneNumber}`
+          : `Agência ${phoneNumber}`;
+        const agency = { id: agencies.length + 1, name: derivedName, phone_number: phoneNumber } as any;
         agencies.push(agency);
         return agency;
       },

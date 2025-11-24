@@ -24,11 +24,7 @@ export class MessagePersistenceTool extends StructuredTool<any, any, any, string
     super();
   }
 
-  protected async _call(
-    input: any,
-    _runManager?: any,
-    _parentConfig?: any,
-  ): Promise<string> {
+  protected async _call(input: any): Promise<string> {
     try {
       this.logger.log(`Saving message: conv=${input.conversationId} dir=${input.direction} type=${input.messageType || 'text'}`);
       // Check if message is relevant enough to save
@@ -87,11 +83,7 @@ export class RelevanceAssessmentTool extends StructuredTool<any, any, any, strin
     super();
   }
 
-  protected async _call(
-    input: any,
-    _runManager?: any,
-    _parentConfig?: any,
-  ): Promise<string> {
+  protected async _call(input: any): Promise<string> {
     try {
       this.logger.log(`Assessing relevance for message preview: "${(input.messageContent || '').slice(0, 40)}${(input.messageContent || '').length > 40 ? '...' : ''}"`);
       const content = input.messageContent.toLowerCase();

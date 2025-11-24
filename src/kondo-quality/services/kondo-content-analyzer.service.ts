@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Kondo } from '../../kondo/entities/kondo.entity';
 import { Media } from '../../media/entities/media.entity';
 import { ContentQualityBreakdown, MediaQualityBreakdown } from '../interfaces/quality-assessment.interface';
-import { KondoQualityConfig } from '../../config/kondo-quality.config';
 
 @Injectable()
 export class KondoContentAnalyzerService {
@@ -12,7 +11,7 @@ export class KondoContentAnalyzerService {
    * Analyzes the content quality of a Kondo based on available data
    * Uses new scoring system: core attributes (0.1 each) + secondary attributes (0.05 each) + other attributes (0.01 each) + media (0.09 each)
    */
-  analyzeContentQuality(kondo: Kondo, config: KondoQualityConfig): ContentQualityBreakdown {
+  analyzeContentQuality(kondo: Kondo): ContentQualityBreakdown {
     const coreScore = this.assessCoreAttributes(kondo);
     const secondaryScore = this.assessSecondaryAttributes(kondo);
     const otherScore = this.assessOtherAttributes(kondo);
@@ -32,7 +31,7 @@ export class KondoContentAnalyzerService {
    * Analyzes the media quality of a Kondo based on associated media
    * Uses new scoring system: each 'final' status media adds 0.09 points
    */
-  analyzeMediaQuality(kondo: Kondo, medias: Media[], config: KondoQualityConfig): MediaQualityBreakdown {
+  analyzeMediaQuality(kondo: Kondo, medias: Media[]): MediaQualityBreakdown {
     const mediaScore = this.assessFinalMediaCount(medias);
     
     const breakdown: MediaQualityBreakdown = {
@@ -50,7 +49,7 @@ export class KondoContentAnalyzerService {
    * Calculates content quality score using new system
    * Core attributes (0.1 each) + Secondary attributes (0.05 each) + Other attributes (0.01 each)
    */
-  calculateContentScore(breakdown: ContentQualityBreakdown, config: KondoQualityConfig): number {
+  calculateContentScore(breakdown: ContentQualityBreakdown): number {
     // In new system: basicInfo = core attributes, details = secondary attributes, pricing = other attributes
     const score = breakdown.basicInfo + breakdown.details + breakdown.pricing;
     return Math.min(1.0, Math.max(0.0, score));
@@ -60,7 +59,7 @@ export class KondoContentAnalyzerService {
    * Calculates media quality score using new system
    * Each 'final' status media adds 0.09 points
    */
-  calculateMediaScore(breakdown: MediaQualityBreakdown, config: KondoQualityConfig): number {
+  calculateMediaScore(breakdown: MediaQualityBreakdown): number {
     // In new system: images field contains the total media contribution
     const score = breakdown.images;
     return Math.min(1.0, Math.max(0.0, score));
@@ -116,11 +115,6 @@ export class KondoContentAnalyzerService {
    */
   private assessOtherAttributes(kondo: Kondo): number {
     let score = 0;
-
-    // Define core and secondary attributes to exclude
-    const coreAttributes = ['name', 'status', 'type', 'description'];
-    const secondaryAttributes = ['minutes_from_bh', 'cep', 'address_street_and_numbers', 'neighborhood', 'city'];
-    const excludedAttributes = [...coreAttributes, ...secondaryAttributes, 'id', 'createdAt', 'updatedAt'];
 
     // Other attributes (0.01 points each)
     const otherAttributes = [

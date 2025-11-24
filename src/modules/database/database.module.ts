@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { databaseConfig } from '../../database/config';
 import { User } from '../../user/entities/user.entity';
@@ -20,15 +20,14 @@ import { MessageQueue } from '../../agentic/entities/message-queue.entity';
     }),
     SequelizeModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        ...databaseConfig(configService),
+      useFactory: () => ({
+        ...databaseConfig(),
         models: [User, Kondo, Media, Unit, Like, RealEstateAgency, Conversation, Message, MessageQueue],
         autoLoadModels: true,
         synchronize: false, // Set to false to use migrations
         logging: (msg: string) => console.log('🐘 DB Query:', msg),
         logQueryParameters: true,
       }),
-      inject: [ConfigService],
     }),
   ],
 })

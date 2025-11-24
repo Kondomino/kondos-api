@@ -29,7 +29,7 @@ export class LikeService {
   }
 
   update(id: number, updateLikeDto: UpdateLikeDto) {
-    return `This action updates a #${id} like`;
+    return `This action updates a #${id} like with payload ${JSON.stringify(updateLikeDto)}`;
   }
 
   remove(id: number) {

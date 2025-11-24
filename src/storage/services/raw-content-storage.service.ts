@@ -3,8 +3,6 @@ import { DigitalOceanSpacesService } from '../../whatsapp/services/digital-ocean
 import { StoragePathGeneratorService } from './storage-path-generator.service';
 import { 
   RawContentStorageResult, 
-  BatchUploadResult, 
-  StorageFile,
   RawContentEntry 
 } from '../interfaces/storage-result.interface';
 
@@ -119,7 +117,6 @@ export class RawContentStorageService {
       }
 
       // Extracted images
-      const extractedImageFiles: StorageFile[] = [];
       if (params.extractedContent.images && params.extractedContent.images.length > 0) {
         params.extractedContent.images.forEach((imageBuffer, index) => {
           const imagePath = this.pathGenerator.generateExtractedImagePath(

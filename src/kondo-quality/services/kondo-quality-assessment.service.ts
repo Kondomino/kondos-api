@@ -233,12 +233,12 @@ export class KondoQualityAssessmentService {
     const medias = kondo.medias || [];
 
     // Analyze content and media quality
-    const contentBreakdown = this.contentAnalyzer.analyzeContentQuality(kondo, this.config);
-    const mediaBreakdown = this.contentAnalyzer.analyzeMediaQuality(kondo, medias, this.config);
+    const contentBreakdown = this.contentAnalyzer.analyzeContentQuality(kondo);
+    const mediaBreakdown = this.contentAnalyzer.analyzeMediaQuality(kondo, medias);
 
     // Calculate weighted scores
-    const contentQuality = this.contentAnalyzer.calculateContentScore(contentBreakdown, this.config);
-    const mediaQuality = this.contentAnalyzer.calculateMediaScore(mediaBreakdown, this.config);
+    const contentQuality = this.contentAnalyzer.calculateContentScore(contentBreakdown);
+    const mediaQuality = this.contentAnalyzer.calculateMediaScore(mediaBreakdown);
     const overallQuality = this.contentAnalyzer.calculateOverallScore(contentQuality, mediaQuality);
 
     // Determine if threshold is met

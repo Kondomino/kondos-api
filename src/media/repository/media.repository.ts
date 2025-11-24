@@ -1,6 +1,5 @@
 import { Injectable, Inject } from "@nestjs/common";
 import { MEDIA_REPOSITORY_PROVIDER } from "src/core/constants";
-import { CreateMediaDto } from "../dto/create-media.dto";
 import { UpdateMediaDto } from "../dto/update-media.dto";
 import { Media } from "../entities/media.entity";
 

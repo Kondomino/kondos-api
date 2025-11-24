@@ -17,10 +17,11 @@ export class StoragePathGeneratorService {
    */
   generatePdfPaths(agencyId: number, messageId: string, originalFilename: string): StoragePaths {
     const baseDir = `raw-content/agency-${agencyId}/pdfs/${messageId}`;
+    const sanitizedOriginal = this.sanitizeFilename(originalFilename, 'original.pdf');
     
     return {
       rawContentBase: baseDir,
-      originalFile: `${baseDir}/original.pdf`,
+      originalFile: `${baseDir}/${sanitizedOriginal}`,
       extractedBase: `${baseDir}/extracted`,
       extractedText: `${baseDir}/extracted/text.json`,
       extractedTables: `${baseDir}/extracted/tables.json`,
@@ -77,11 +78,21 @@ export class StoragePathGeneratorService {
     return lastDotIndex !== -1 ? filename.substring(lastDotIndex) : '';
   }
 
+  private sanitizeFilename(filename: string, fallback: string): string {
+    if (!filename || !filename.trim()) {
+      return fallback;
+    }
+    return filename
+      .trim()
+      .replace(/\s+/g, '_')
+      .replace(/[^a-zA-Z0-9._-]/g, '_');
+  }
+
   /**
    * Validates that a storage path follows our raw content structure
    */
   validateRawContentPath(path: string): boolean {
-    const rawContentPattern = /^raw-content\/agency-\d+\/(pdfs|images|videos)\/[^\/]+\//;
+    const rawContentPattern = /^raw-content\/agency-\d+\/(pdfs|images|videos)\/[^/]+\//;
     return rawContentPattern.test(path);
   }
 
@@ -97,7 +108,7 @@ export class StoragePathGeneratorService {
    * Extracts message ID from a raw content path
    */
   extractMessageIdFromPath(path: string): string | null {
-    const match = path.match(/^raw-content\/agency-\d+\/(?:pdfs|images|videos)\/([^\/]+)\//);
+    const match = path.match(/^raw-content\/agency-\d+\/(?:pdfs|images|videos)\/([^/]+)\//);
     return match ? match[1] : null;
   }
 

@@ -1,5 +1,4 @@
 import {
-  KondoQualityConfig,
   DEFAULT_KONDO_QUALITY_CONFIG,
   validateKondoQualityConfig,
   createKondoQualityConfigFromEnv,

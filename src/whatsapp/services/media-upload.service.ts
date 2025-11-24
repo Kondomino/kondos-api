@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
@@ -176,7 +177,7 @@ export class MediaUploadService {
    * TODO: Implement AWS S3 upload
    */
   private async uploadToS3(buffer: Buffer, key: string, mimeType: string): Promise<string> {
-    // Implementation for AWS S3
+    this.logger.warn(`[MEDIA-UPLOAD] S3 upload pending implementation (key=${key}, size=${buffer.length}, mime=${mimeType})`);
     throw new Error('S3 upload not implemented yet');
   }
 
@@ -184,7 +185,7 @@ export class MediaUploadService {
    * TODO: Implement DigitalOcean Spaces upload
    */
   private async uploadToSpaces(buffer: Buffer, key: string, mimeType: string): Promise<string> {
-    // Implementation for DigitalOcean Spaces
+    this.logger.warn(`[MEDIA-UPLOAD] Spaces upload pending implementation (key=${key}, size=${buffer.length}, mime=${mimeType})`);
     throw new Error('Spaces upload not implemented yet');
   }
 
@@ -192,7 +193,7 @@ export class MediaUploadService {
    * TODO: Implement Google Cloud Storage upload
    */
   private async uploadToGCS(buffer: Buffer, key: string, mimeType: string): Promise<string> {
-    // Implementation for Google Cloud Storage
+    this.logger.warn(`[MEDIA-UPLOAD] GCS upload pending implementation (key=${key}, size=${buffer.length}, mime=${mimeType})`);
     throw new Error('GCS upload not implemented yet');
   }
 
