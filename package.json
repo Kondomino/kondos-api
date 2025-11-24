@@ -69,6 +69,7 @@
     "sequelize": "^6.37.1",
     "sequelize-typescript": "^2.1.6",
     "sequelize-typescript-migration-lts": "^3.2.5",
+    "stytch": "^12.43.1",
     "xlsx": "^0.18.5",
     "zod": "^3.25.76"
   },

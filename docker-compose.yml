@@ -15,12 +15,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-    networks:
-      - kondo-network
+    #networks:
+    #  - kondo-network
 
-networks:
-  kondo-network:
-    external: true
+#networks:
+  #kondo-network:
+  #  external: true
 
 volumes:
   postgres_data: 
