@@ -1,4 +1,10 @@
+import { ENUM } from 'sequelize';
 import { Table, Column, Model, DataType } from 'sequelize-typescript';
+
+export enum Gender {
+  Male = 'male',
+  Female = 'female'
+}
 
 @Table
 export class User extends Model<User> {
@@ -36,10 +42,10 @@ export class User extends Model<User> {
 
     @Column({
         type: DataType.ENUM,
-        values: ['male', 'female'],
+        values: [Gender.Male, Gender.Female],
         allowNull: true,
     })
-    gender: string;
+    gender: Gender;
 
     @Column({
         type: DataType.INTEGER,

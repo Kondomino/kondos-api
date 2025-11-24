@@ -65,7 +65,10 @@ const getConfig = (): SequelizeConfig => ({
 // Export for NestJS runtime (keeping ConfigService parameter for compatibility)
 export const databaseConfig = (configService?: ConfigService) => {
   const env = (process.env.NODE_ENV || 'development').toLowerCase();
-  return getConfig()[env];
+  const dbconfig = getConfig()[env];
+  console.log(`📦 Loading database config for environment: ${env.toUpperCase()}`);
+  console.log(dbconfig);
+  return dbconfig;
 };
 
 // Export for Sequelize CLI

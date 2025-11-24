@@ -34,14 +34,17 @@ export interface PdfExtractionResult {
 export class AdobePdfService {
   private readonly logger = new Logger(AdobePdfService.name);
   private readonly credentials: ServicePrincipalCredentials;
+  public readonly adobePdfEnabled: boolean = true;
 
   constructor(private readonly configService: ConfigService) {
     const clientId = this.configService.get<string>('ADOBE_EXTRACT_API_CLIENT_ID');
     const clientSecret = this.configService.get<string>('ADOBE_EXTRACT_API_CLIENT_SECRET');
 
     if (!clientId || !clientSecret) {
-      this.logger.error('Adobe PDF Services credentials not configured');
-      throw new Error('Adobe PDF Services credentials are required');
+      this.logger.error('Adobe PDF Services credentials not configured. Service disabled.');
+      this.adobePdfEnabled = false;
+      return;
+      //throw new Error('Adobe PDF Services credentials are required');
     }
 
     this.credentials = new ServicePrincipalCredentials({

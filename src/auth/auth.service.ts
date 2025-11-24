@@ -53,15 +53,12 @@ export class AuthService {
 
     async register(createUserDto: CreateUserDto): Promise<object> {
       
-      const { name } = createUserDto;
-
-      const names = name.split(" ");
+      const { firstName } = createUserDto;
 
       const userDTO: UserDto = {
         email: createUserDto.email,
         password: createUserDto.password,
-        firstName: names[0],
-        lastName: names[1]? names[1] : '',
+        firstName: firstName,
       }
 
       // FIND OR CREATE USER

@@ -6,7 +6,5 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UpdateUserDto extends PartialType(UserDto) {
     @ApiProperty()
     @IsString()
-    readonly name: string;
-    
-    readonly gender: string;
+    readonly firstName: string;
 }

@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsOptional, IsString } from "class-validator";
+import { IsEmail, IsEnum, IsOptional, IsString } from "class-validator";
+import { Gender } from "../entities/user.entity";
 
 export class UserDto {
 
@@ -13,9 +14,9 @@ export class UserDto {
     readonly password?: string;
     
     @ApiProperty()
-    @IsString()
+    @IsEnum(Gender)
     @IsOptional()
-    readonly gender?: string;
+    readonly gender?: Gender;
 
     @ApiProperty()
     @IsString()

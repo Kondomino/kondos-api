@@ -14,11 +14,13 @@ export class UserController {
     return this.userService.create(userDto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this.userService.findActives();
   }
 
+  @Public()
   @Get('current')
   async getCurrent(@Req() request: Request) {
     const { email } = request['user'];
@@ -34,11 +36,13 @@ export class UserController {
     }
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.userService.findOne(Number(id));
   }
 
+  @Public()
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(+id, updateUserDto);

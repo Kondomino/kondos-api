@@ -1,0 +1,383 @@
+{
+  "info": {
+    "name": "Kondos API",
+    "description": "Kondos API Collection with Authentication",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "api_base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "unitId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "kondoId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "mediaId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Unit",
+      "item": [
+        {
+          "name": "Create Unit (Public)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Unit 101\",\n  \"description\": \"Sample unit\"\n}"
+            },
+            "url": {
+              "raw": "{{api_base_url}}/unit",
+              "host": ["{{api_base_url}}"],
+              "path": ["unit"]
+            }
+          }
+        },
+        {
+          "name": "List Units (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/unit",
+              "host": ["{{api_base_url}}"],
+              "path": ["unit"]
+            }
+          }
+        },
+        {
+          "name": "Get Unit by ID (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/unit/{{unitId}}",
+              "host": ["{{api_base_url}}"],
+              "path": ["unit", "{{unitId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Unit",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Unit Name\"\n}"
+            },
+            "url": {
+              "raw": "{{api_base_url}}/unit/{{unitId}}",
+              "host": ["{{api_base_url}}"],
+              "path": ["unit", "{{unitId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Unit",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/unit/{{unitId}}",
+              "host": ["{{api_base_url}}"],
+              "path": ["unit", "{{unitId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Kondo",
+      "item": [
+        {
+          "name": "Create Kondo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kondo 1\",\n  \"description\": \"Sample kondo\",\n  \"unitId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{api_base_url}}/kondo",
+              "host": ["{{api_base_url}}"],
+              "path": ["kondo"]
+            }
+          }
+        },
+        {
+          "name": "List Kondos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/kondo",
+              "host": ["{{api_base_url}}"],
+              "path": ["kondo"]
+            }
+          }
+        },
+        {
+          "name": "Get Kondo by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/kondo/{{kondoId}}",
+              "host": ["{{api_base_url}}"],
+              "path": ["kondo", "{{kondoId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Kondo",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Kondo Name\"\n}"
+            },
+            "url": {
+              "raw": "{{api_base_url}}/kondo/{{kondoId}}",
+              "host": ["{{api_base_url}}"],
+              "path": ["kondo", "{{kondoId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Kondo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/kondo/{{kondoId}}",
+              "host": ["{{api_base_url}}"],
+              "path": ["kondo", "{{kondoId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Media",
+      "item": [
+        {
+          "name": "Create Media",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Media File\",\n  \"url\": \"https://example.com/image.jpg\",\n  \"type\": \"image\"\n}"
+            },
+            "url": {
+              "raw": "{{api_base_url}}/media",
+              "host": ["{{api_base_url}}"],
+              "path": ["media"]
+            }
+          }
+        },
+        {
+          "name": "List Media",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/media",
+              "host": ["{{api_base_url}}"],
+              "path": ["media"]
+            }
+          }
+        },
+        {
+          "name": "Get Media by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/media/{{mediaId}}",
+              "host": ["{{api_base_url}}"],
+              "path": ["media", "{{mediaId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Media",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Media Name\"\n}"
+            },
+            "url": {
+              "raw": "{{api_base_url}}/media/{{mediaId}}",
+              "host": ["{{api_base_url}}"],
+              "path": ["media", "{{mediaId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Media",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/media/{{mediaId}}",
+              "host": ["{{api_base_url}}"],
+              "path": ["media", "{{mediaId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{api_base_url}}/user",
+              "host": ["{{api_base_url}}"],
+              "path": ["user"]
+            }
+          }
+        },
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/user",
+              "host": ["{{api_base_url}}"],
+              "path": ["user"]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/user/{{userId}}",
+              "host": ["{{api_base_url}}"],
+              "path": ["user", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\"\n}"
+            },
+            "url": {
+              "raw": "{{api_base_url}}/user/{{userId}}",
+              "host": ["{{api_base_url}}"],
+              "path": ["user", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{api_base_url}}/user/{{userId}}",
+              "host": ["{{api_base_url}}"],
+              "path": ["user", "{{userId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

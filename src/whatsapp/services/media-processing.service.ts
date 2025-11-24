@@ -195,6 +195,11 @@ export class MediaProcessingService {
     try {
       this.logger.log(`[PDF-PROCESS-BUFFER] Starting PDF processing from buffer for message ${messageId}`);
 
+      if (!this.adobePdfService.adobePdfEnabled) {
+        this.logger.error(`[PDF-PROCESS-BUFFER] Adobe PDF Service is DISABLED. Verify credentials.`);
+        return;
+      }
+
       // Extract content using Adobe PDF Service (buffer-based)
       const extractionResult: PdfExtractionResult = await this.adobePdfService.extractPdfFromBuffer(
         mediaBuffer,

@@ -28,7 +28,8 @@
     "migrate:status": "NODE_ENV=development npm run build && NODE_ENV=development sequelize-cli db:migrate:status",
     "create:kondo": "npx ts-node src/kondo/scripts/create-mock-kondo.ts",
     "create:unit": "npx ts-node src/unit/scripts/create-mock-unit.ts",
-    "seed": "npm run create:kondo && npm run create:unit",
+    "create:user": "npx ts-node src/user/scripts/create-mock-user.ts",
+    "seed": "npm run create:kondo && npm run create:unit && npm run create:user",
     "token": "npx ts-node src/kondo/scripts/token-generator.ts",
     "test:db-config": "node scripts/test-db-config.js"
   },
