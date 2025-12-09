@@ -12,6 +12,14 @@ import { RetryService } from './core/retry.service';
 import { SomattosScraperService } from './engines/somattos/somattos-scraper.service';
 import { SomattosParserService } from './engines/somattos/somattos-parser.service';
 
+// Conartes engine
+import { ConartesScraperService } from './engines/conartes/conartes-scraper.service';
+import { ConartesParserService } from './engines/conartes/conartes-parser.service';
+
+// Canopus engine
+import { CanopusScraperService } from './engines/canopus/canopus-scraper.service';
+import { CanopusParserService } from './engines/canopus/canopus-parser.service';
+
 // Providers
 import { kondoProviders } from '../kondo/repository/kondo.provider';
 
@@ -32,6 +40,14 @@ import { kondoProviders } from '../kondo/repository/kondo.provider';
     // Somattos engine
     SomattosParserService,
     SomattosScraperService,
+
+    // Conartes engine
+    ConartesParserService,
+    ConartesScraperService,
+
+    // Canopus engine
+    CanopusParserService,
+    CanopusScraperService,
 
     // Main orchestration
     ScrapingService,

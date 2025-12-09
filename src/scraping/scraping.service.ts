@@ -5,6 +5,10 @@ import { Media } from '../media/entities/media.entity';
 import { KONDO_REPOSITORY_PROVIDER } from '../core/constants';
 import { SomattosScraperService } from './engines/somattos/somattos-scraper.service';
 import { isSomattosUrl } from './engines/somattos/somattos.config';
+import { ConartesScraperService } from './engines/conartes/conartes-scraper.service';
+import { isConartesUrl } from './engines/conartes/conartes.config';
+import { CanopusScraperService } from './engines/canopus/canopus-scraper.service';
+import { isCanopusUrl } from './engines/canopus/canopus.config';
 import { ScrapeResult, ScrapeError } from './dto/scraping-result.dto';
 import { ScrapeOptions } from './interfaces/scraper-config.interface';
 import { ScrapedKondoDto } from './dto/scraped-kondo.dto';
@@ -22,6 +26,8 @@ export class ScrapingService {
     @Inject(KONDO_REPOSITORY_PROVIDER)
     private readonly kondoRepository: typeof Kondo,
     private readonly somattosScraperService: SomattosScraperService,
+    private readonly conartesScraperService: ConartesScraperService,
+    private readonly canopusScraperService: CanopusScraperService,
     private readonly configService: ConfigService,
     // Add other platform scrapers here as they are implemented
   ) {
@@ -155,6 +161,14 @@ export class ScrapingService {
     // If platform filter is specified, validate it matches
     if (platformFilter === 'somattos' || isSomattosUrl(url)) {
       return this.somattosScraperService;
+    }
+
+    if (platformFilter === 'conartes' || isConartesUrl(url)) {
+      return this.conartesScraperService;
+    }
+
+    if (platformFilter === 'canopus' || isCanopusUrl(url)) {
+      return this.canopusScraperService;
     }
 
     // Add more platform detection here
