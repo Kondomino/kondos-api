@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { Dialect } from 'sequelize';
+import type { Dialect } from 'sequelize';
 import * as dotenv from 'dotenv';
 
 // Load environment variables

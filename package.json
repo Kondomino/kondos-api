@@ -26,12 +26,16 @@
     "migrate": "NODE_ENV=development npm run build && NODE_ENV=development sequelize-cli db:migrate",
     "migrate:undo": "NODE_ENV=development npm run build && NODE_ENV=development sequelize-cli db:migrate:undo",
     "migrate:status": "NODE_ENV=development npm run build && NODE_ENV=development sequelize-cli db:migrate:status",
+    "migrate:reset": "NODE_ENV=development npm run build && NODE_ENV=development sequelize-cli db:migrate:undo:all && NODE_ENV=development sequelize-cli db:migrate",
+    "migrate:drop": "NODE_ENV=development npm run build && NODE_ENV=development node scripts/database.dropAll.ts",
     "create:kondo": "npx ts-node src/kondo/scripts/create-mock-kondo.ts",
     "create:unit": "npx ts-node src/unit/scripts/create-mock-unit.ts",
     "create:user": "npx ts-node src/user/scripts/create-mock-user.ts",
     "seed": "npm run create:kondo && npm run create:unit && npm run create:user",
     "token": "npx ts-node src/kondo/scripts/token-generator.ts",
-    "test:db-config": "node scripts/test-db-config.js"
+    "test:db-config": "node scripts/test-db-config.js",
+    "scrape": "npx ts-node -r tsconfig-paths/register src/scraping/scraping.cli.ts scrape",
+    "scrape:dry": "npx ts-node -r tsconfig-paths/register src/scraping/scraping.cli.ts scrape --dry-run"
   },
   "engines": {
     "node": "24.11.0",
@@ -49,9 +53,12 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/sequelize": "^10.0.1",
     "@nestjs/swagger": "^7.4.2",
+    "@types/cheerio": "^0.22.35",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/sequelize": "^4.28.20",
     "aws-sdk": "^2.1692.0",
+    "axios": "^1.13.2",
+    "cheerio": "^1.1.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
@@ -71,6 +78,7 @@
     "sequelize-typescript": "^2.1.6",
     "sequelize-typescript-migration-lts": "^3.2.5",
     "stytch": "^12.43.1",
+    "unzipper": "^0.12.3",
     "xlsx": "^0.18.5",
     "zod": "^3.25.76"
   },

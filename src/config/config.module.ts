@@ -3,6 +3,10 @@ import {
   KondoQualityConfig, 
   createKondoQualityConfigFromEnv 
 } from './kondo-quality.config';
+import {
+  ScrapingConfig,
+  createScrapingConfigFromEnv
+} from './scraping.config';
 
 @Module({
   providers: [
@@ -12,7 +16,13 @@ import {
         return createKondoQualityConfigFromEnv();
       },
     },
+    {
+      provide: 'SCRAPING_CONFIG',
+      useFactory: (): ScrapingConfig => {
+        return createScrapingConfigFromEnv();
+      },
+    },
   ],
-  exports: ['KONDO_QUALITY_CONFIG'],
+  exports: ['KONDO_QUALITY_CONFIG', 'SCRAPING_CONFIG'],
 })
 export class ConfigModule {}

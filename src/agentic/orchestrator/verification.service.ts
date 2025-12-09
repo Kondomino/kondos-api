@@ -14,17 +14,22 @@ export class VerificationService {
     // Add more test numbers here as needed
   ];
 
-  // Real estate keywords in Portuguese
+  // High-confidence keywords - Definitive real estate terms (0.7 weight)
+  // These words strongly indicate real estate agent identity
   private readonly realEstateKeywords = [
-    'imoveis', 'imóveis', 'corretor', 'corretora', 'imobiliaria', 'imobiliária',
-    'apartamento', 'casa', 'terreno', 'lote', 'condominio', 'condomínio',
-    'venda', 'aluguel', 'locacao', 'locação', 'investimento', 'propriedade',
-    'metro quadrado', 'm²', 'dormitorio', 'dormitório', 'suite', 'suíte',
-    'garagem', 'vaga', 'financiamento', 'creci', 'planta', 'obra',
-    'lancamento', 'lançamento', 'empreendimento', 'construtora'
+    'imovel', 'imóvel', 'empreendimento', 'condominio', 'condomínio',
+    'casa', 'lote', 'terreno', 'imobiliaria', 'imobiliário', 'lançamento',
+    'lancamento', 'construtora', 'obra', 'obras'
   ];
 
-  private readonly businessIndicators = [
+  // Low-confidence keywords - General real estate/business terms (0.3 weight)
+  // These can appear in real estate context but are less definitive
+  private readonly possibleRealEstateKeywords = [
+    // Additional real estate terms
+    'corretor', 'corretora', 'apartamento', 'venda', 'aluguel', 'locacao', 'locação',
+    'investimento', 'propriedade', 'metro quadrado', 'm²', 'dormitorio', 'dormitório',
+    'suite', 'suíte', 'garagem', 'vaga', 'financiamento', 'creci', 'planta',
+    // Business indicators
     'whatsapp', 'contato', 'telefone', 'celular', 'email', 'site',
     'visita', 'apresentar', 'mostrar', 'oportunidade', 'negocio', 'negócio',
     'cliente', 'interessado', 'proposta', 'documentacao', 'documentação',
@@ -52,35 +57,20 @@ export class VerificationService {
     }
   ): Promise<VerificationResult> {
     try {
-      // 1. Check if agent already exists in database (always check this first)
+      // 1. Check if agent already exists in database
       const existingAgency = await this.checkExistingAgency(phoneNumber);
       if (existingAgency) {
         this.logger.log(`Found existing real estate agency for phone: ${phoneNumber}`);
-        return {
-          isRealEstateAgent: true,
-          confidence: 1.0,
-          reasoning: 'Phone number found in real estate agencies database',
-          shouldAskForClarification: false,
-          existingAgency: {
-            id: existingAgency.id,
-            name: existingAgency.name,
-            phone_number: existingAgency.phone_number,
-          },
-        };
+        return this.createVerifiedResult(existingAgency);
       }
 
-      // 2. Check test whitelist (for testing purposes)
+      // 2. Check test whitelist
       if (this.testWhitelist.includes(phoneNumber)) {
-        this.logger.log(`Phone number ${phoneNumber} found in test whitelist - treating as real estate agent`);
-        return {
-          isRealEstateAgent: true,
-          confidence: 1.0,
-          reasoning: 'Phone number in test whitelist for development/testing',
-          shouldAskForClarification: false,
-        };
+        this.logger.log(`Phone number ${phoneNumber} found in test whitelist`);
+        return this.createWhitelistResult();
       }
 
-      // 3. If not in database, check if it's a business account first
+      // 3. Check business account
       if (contactContext?.isBusinessAccount) {
         const businessAnalysis = this.analyzeBusinessProfile(contactContext, messageContent);
         if (businessAnalysis.isRealEstateAgent) {
@@ -89,42 +79,25 @@ export class VerificationService {
         }
       }
 
-      // 4. If not a business account or business analysis failed, analyze message content
+      // 4. Analyze message content
       const contentAnalysis = this.analyzeMessageContent(messageContent);
-      
-      this.logger.log(`Content analysis for phone ${phoneNumber}: confidence=${contentAnalysis.confidence}, keywords=${contentAnalysis.keywordMatches}`);
+      this.logger.log(
+        `Content analysis for phone ${phoneNumber}: confidence=${contentAnalysis.confidence}, ` +
+        `highConfidenceKeywords=${contentAnalysis.keywordMatches.length}, ` +
+        `lowConfidenceKeywords=${contentAnalysis.businessIndicators.length}`
+      );
 
-      // 5. Determine verification result based on confidence
+      // 5. Determine result based on confidence
       if (contentAnalysis.confidence >= 0.7) {
-        return {
-          isRealEstateAgent: true,
-          confidence: contentAnalysis.confidence,
-          reasoning: `High confidence based on real estate keywords: ${contentAnalysis.keywordMatches.join(', ')}`,
-          shouldAskForClarification: false,
-        };
-      } else if (contentAnalysis.confidence >= 0.3) {
-        return {
-          isRealEstateAgent: false,
-          confidence: contentAnalysis.confidence,
-          reasoning: `Medium confidence - requires clarification. Keywords found: ${contentAnalysis.keywordMatches.join(', ')}`,
-          shouldAskForClarification: true,
-        };
+        return this.createHighConfidenceResult(contentAnalysis.keywordMatches);
+      } else if (contentAnalysis.confidence >= 0.3 && contentAnalysis.confidence < 0.7) {
+        return this.createMediumConfidenceResult(contentAnalysis.confidence, contentAnalysis.keywordMatches);
       } else {
-        return {
-          isRealEstateAgent: false,
-          confidence: contentAnalysis.confidence,
-          reasoning: 'Low confidence - no significant real estate indicators found',
-          shouldAskForClarification: false,
-        };
+        return this.createLowConfidenceResult();
       }
     } catch (error) {
       this.logger.error(`Error verifying agent for phone ${phoneNumber}:`, error);
-      return {
-        isRealEstateAgent: false,
-        confidence: 0,
-        reasoning: 'Error during verification process',
-        shouldAskForClarification: false,
-      };
+      return this.createErrorResult();
     }
   }
 
@@ -163,8 +136,11 @@ export class VerificationService {
     // Combine all business profile text for analysis
     const businessText = `${businessName} ${category} ${description} ${website} ${email}`.toLowerCase();
     
-    // Check for real estate indicators in business profile
-    const realEstateMatches = this.realEstateKeywords.filter(keyword => 
+    // Separate high-confidence and low-confidence keyword matches
+    const highConfidenceMatches = this.realEstateKeywords.filter(keyword => 
+      businessText.includes(keyword.toLowerCase())
+    );
+    const lowConfidenceMatches = this.possibleRealEstateKeywords.filter(keyword => 
       businessText.includes(keyword.toLowerCase())
     );
 
@@ -175,17 +151,19 @@ export class VerificationService {
     let confidence = 0;
     let reasoning = '';
 
-    if (realEstateMatches.length > 0) {
-      confidence += 0.8; // High confidence from business profile
-      reasoning = `Business profile contains real estate keywords: ${realEstateMatches.join(', ')}`;
+    if (highConfidenceMatches.length > 0) {
+      confidence += 0.85; // Very high confidence from high-confidence keywords
+      reasoning = `Business profile contains definitive real estate keywords: ${highConfidenceMatches.join(', ')}`;
+    }
+
+    if (lowConfidenceMatches.length > 0) {
+      confidence += 0.3; // Lower confidence from general business keywords
+      if (reasoning) reasoning += `. Also contains: ${lowConfidenceMatches.join(', ')}`;
+      else reasoning = `Business profile contains real estate indicators: ${lowConfidenceMatches.join(', ')}`;
     }
 
     // Add message content confidence (weighted less for business accounts)
     confidence += messageAnalysis.confidence * 0.3;
-
-    if (messageAnalysis.keywordMatches.length > 0) {
-      reasoning += ` Message also contains: ${messageAnalysis.keywordMatches.join(', ')}`;
-    }
 
     // Real estate categories that are common
     const realEstateCategories = [
@@ -198,12 +176,8 @@ export class VerificationService {
       reasoning = `Business category indicates real estate: ${category}`;
     }
 
-    return {
-      isRealEstateAgent: confidence >= 0.6,
-      confidence: Math.min(confidence, 1.0),
-      reasoning,
-      shouldAskForClarification: confidence < 0.6 && confidence > 0.3,
-    };
+    const finalConfidence = Math.min(confidence, 1.0);
+    return this.createBusinessProfileResult(finalConfidence, reasoning);
   }
 
   private analyzeMessageContent(content: string): {
@@ -215,24 +189,24 @@ export class VerificationService {
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, ''); // Remove accents
 
-    // Find real estate keyword matches
-    const keywordMatches = this.realEstateKeywords.filter(keyword => 
+    // Find high-confidence keyword matches (definitive real estate terms)
+    const highConfidenceMatches = this.realEstateKeywords.filter(keyword => 
       normalizedContent.includes(keyword.toLowerCase())
     );
 
-    // Find business indicator matches
-    const businessMatches = this.businessIndicators.filter(indicator => 
+    // Find low-confidence keyword matches (general business/real estate terms)
+    const lowConfidenceMatches = this.possibleRealEstateKeywords.filter(indicator => 
       normalizedContent.includes(indicator.toLowerCase())
     );
 
     // Calculate confidence score
     let confidence = 0;
 
-    // Real estate keywords have higher weight
-    confidence += keywordMatches.length * 0.3;
+    // High-confidence keywords have much higher weight (definitive real estate)
+    confidence += highConfidenceMatches.length * 0.7;
     
-    // Business indicators have medium weight
-    confidence += businessMatches.length * 0.15;
+    // Low-confidence keywords have lower weight (general business terms)
+    confidence += lowConfidenceMatches.length * 0.3;
 
     // Professional language patterns (bonus)
     if (this.hasBusinessLanguagePatterns(normalizedContent)) {
@@ -249,8 +223,8 @@ export class VerificationService {
 
     return {
       confidence,
-      keywordMatches,
-      businessIndicators: businessMatches,
+      keywordMatches: highConfidenceMatches.length > 0 ? highConfidenceMatches : lowConfidenceMatches,
+      businessIndicators: lowConfidenceMatches,
     };
   }
 
@@ -333,5 +307,80 @@ export class VerificationService {
     }
 
     return null;
+  }
+
+  // ============================================================================
+  // Factory methods for creating verification results
+  // ============================================================================
+
+  private createVerifiedResult(agency: RealEstateAgency): VerificationResult {
+    return {
+      isRealEstateAgent: true,
+      confidence: 1.0,
+      reasoning: 'Phone number found in real estate agencies database',
+      shouldAskForClarification: false,
+      existingAgency: {
+        id: agency.id,
+        name: agency.name,
+        phone_number: agency.phone_number,
+      },
+    };
+  }
+
+  private createWhitelistResult(): VerificationResult {
+    return {
+      isRealEstateAgent: true,
+      confidence: 1.0,
+      reasoning: 'Phone number in test whitelist for development/testing',
+      shouldAskForClarification: false,
+    };
+  }
+
+  private createHighConfidenceResult(keywords: string[]): VerificationResult {
+    return {
+      isRealEstateAgent: true,
+      confidence: 1.0,
+      reasoning: `High confidence based on real estate keywords: ${keywords.join(', ')}`,
+      shouldAskForClarification: false,
+    };
+  }
+
+  private createMediumConfidenceResult(confidence: number, keywords: string[]): VerificationResult {
+    return {
+      isRealEstateAgent: false,
+      confidence,
+      reasoning: `Medium confidence - requires clarification. Keywords found: ${keywords.join(', ')}`,
+      shouldAskForClarification: true,
+      clarificationPrompt: 'Opa, tudo bem? Como posso ajudar?',
+    };
+  }
+
+  private createLowConfidenceResult(): VerificationResult {
+    return {
+      isRealEstateAgent: false,
+      confidence: 0,
+      reasoning: 'Low confidence - no significant real estate indicators found',
+      shouldAskForClarification: false,
+    };
+  }
+
+  private createErrorResult(): VerificationResult {
+    return {
+      isRealEstateAgent: false,
+      confidence: 0,
+      reasoning: 'Error during verification process',
+      shouldAskForClarification: false,
+    };
+  }
+
+  private createBusinessProfileResult(confidence: number, reasoning: string): VerificationResult {
+    const needsClarification = confidence < 0.6 && confidence > 0.3;
+    return {
+      isRealEstateAgent: confidence >= 0.6,
+      confidence,
+      reasoning,
+      shouldAskForClarification: needsClarification,
+      clarificationPrompt: needsClarification ? 'Opa, tudo bem? Como posso ajudar?' : undefined,
+    };
   }
 }

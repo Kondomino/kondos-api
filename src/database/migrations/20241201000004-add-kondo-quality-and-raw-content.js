@@ -157,9 +157,19 @@ module.exports = {
       console.log('Removing kondo_data_updated column...');
       await queryInterface.removeColumn('Kondos', 'kondo_data_updated');
 
-      // Revert Conversation status enum (this is complex and may require manual intervention)
-      console.log('Note: Conversation status enum reversion may require manual database intervention');
-      console.log('The "archived" value has been added and may need to be manually removed if no longer needed');
+      // Revert Conversation status enum by recreating it without 'archived'
+      console.log('Reverting Conversation status enum...');
+      await queryInterface.sequelize.query(`
+        ALTER TABLE "Conversations" ALTER COLUMN "status" TYPE VARCHAR(255);
+        DROP TYPE IF EXISTS "enum_Conversations_status" CASCADE;
+        CREATE TYPE "enum_Conversations_status" AS ENUM ('active', 'paused', 'closed');
+        ALTER TABLE "Conversations" ALTER COLUMN "status" TYPE "enum_Conversations_status" USING status::"enum_Conversations_status";
+        ALTER TABLE "Conversations" ALTER COLUMN "status" SET DEFAULT 'active';
+      `);
+      
+      // Drop enum types for RawContentEntries
+      await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_RawContentEntries_content_type" CASCADE;');
+      await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_RawContentEntries_processing_status" CASCADE;');
 
       console.log('Rollback completed!');
     } catch (error) {

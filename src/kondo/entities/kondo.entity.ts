@@ -1,4 +1,4 @@
-import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany, BeforeSave } from 'sequelize-typescript';
 import { KondoAddressType } from './kondo.address.abstract.entity';
 import { Expose } from 'class-transformer';
 import { KondoConveniencesType, basic_conveniences, conveniences_conveniences, extra_conveniences, security_conveniences } from './kondo.conveniences.abstract.entity';
@@ -19,6 +19,7 @@ export const KondoStatus = Object.freeze({
     TEXT_READY: 'text_ready',
     MEDIA_GATHERING: 'media_gathering',
     DONE: 'done',
+    SCRAPING: 'scraping',
   });
 
 module.exports.KondoTypes = KondoTypes;
@@ -42,6 +43,14 @@ export class Kondo extends Model {
         defaultValue: true
     })
     active: boolean;
+
+    @BeforeSave
+    static normalizeType(instance: Kondo) {
+        // Ensure empty string does not violate enum constraint; allow default/null to apply
+        if (instance.type === '') {
+            instance.type = null as any;
+        }
+    }
 
     @Column({
         values: Object.values(KondoStatus),
@@ -318,7 +327,12 @@ export class Kondo extends Model {
     @Column({
         allowNull: true,
     })
-    immediate_delivery: boolean; // Entrega imediata do lote
+    immediate_delivery: boolean; // Entrega imediata do empreendimento?
+
+    @Column({
+        allowNull: true,
+    })
+    delivery: string; // Prazo de entrega do empreendimento
 
     @Column({
         allowNull: true,
@@ -423,6 +437,7 @@ export class Kondo extends Model {
             finance_fees: this.finance_fees,
             entry_value_percentage: this.entry_value_percentage,
             immediate_delivery: this.immediate_delivery,
+            delivery: this.delivery,
             infra_description: this.infra_description,
         }
     }

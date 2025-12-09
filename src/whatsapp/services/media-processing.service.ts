@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { AdobePdfService, PdfExtractionResult } from './adobe-pdf.service';
 import { MediaUploadService, UploadResult } from './media-upload.service';
+import { AdobePdfService, PdfExtractionResult } from 'src/pdf-extraction/adobe-pdf.service';
 
 export interface MediaData {
   mediaId?: string;
@@ -38,6 +38,13 @@ export class MediaProcessingService {
     private readonly mediaUploadService: MediaUploadService,
   ) {}
 
+  /**
+   * DEPRECATED - NOT BEING USED ANYWHERE
+   * 
+   * @param mediaData 
+   * @param messageId 
+   * @returns 
+   */
   async processMedia(mediaData: MediaData, messageId: string): Promise<ProcessedMedia> {
     const startTime = Date.now();
     
@@ -213,26 +220,13 @@ export class MediaProcessingService {
         throw new Error(extractionResult.error || 'PDF extraction failed');
       }
 
-      this.logger.log(`[PDF-PROCESS-BUFFER] Adobe extraction successful in ${pdfProcessTime}ms: text=${extractionResult.text.length}chars tables=${extractionResult.tables.length} images=${extractionResult.images.length}`);
+      this.logger.log(`[PDF-PROCESS-BUFFER] Adobe extraction successful in ${pdfProcessTime}ms: text=${extractionResult.text.length}chars tables=${extractionResult.tables.length} media=${extractionResult.mediaUrls.length}`);
 
-      // Upload extracted images if any (keep local upload for backward compatibility)
-      let extractedImageUrls: string[] = [];
-      if (extractionResult.images.length > 0) {
-        this.logger.log(`[PDF-PROCESS-BUFFER] Uploading ${extractionResult.images.length} extracted images to local storage...`);
-        const imageUploadPromises = extractionResult.images.map((imageBuffer, index) =>
-          this.mediaUploadService.uploadMedia(
-            imageBuffer,
-            `${messageId}_extracted_image_${index}.jpg`,
-            'image/jpeg'
-          )
-        );
-
-        const imageUploadResults = await Promise.all(imageUploadPromises);
-        extractedImageUrls = imageUploadResults
-          .filter(result => result.success && result.url)
-          .map(result => result.url!);
-          
-        this.logger.log(`[PDF-PROCESS-BUFFER] Image uploads complete: ${extractedImageUrls.length}/${extractionResult.images.length} successful`);
+      // Use extracted media URLs from CDN (already uploaded by StorageStreamCdnService)
+      const extractedImageUrls = extractionResult.mediaUrls;
+      if (extractedImageUrls.length > 0) {
+        this.logger.log(`[PDF-PROCESS-BUFFER] Adobe extraction returned ${extractedImageUrls.length} media files already uploaded to CDN`);
+        this.logger.log(`[PDF-PROCESS-BUFFER] Media URLs: ${extractedImageUrls.map((url, i) => `${i + 1}.${url.substring(url.lastIndexOf('.') + 1)}`).join(', ')}`);
       }
 
       // Format extracted text for better readability

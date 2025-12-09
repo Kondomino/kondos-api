@@ -25,7 +25,7 @@ $$;
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'enum_Kondos_status') THEN
-        CREATE TYPE "enum_Kondos_status" AS ENUM ('draft', 'text_ready', 'media_gathering', 'done');
+        CREATE TYPE "enum_Kondos_status" AS ENUM ('draft', 'text_ready', 'media_gathering', 'done', 'scraping');
     END IF;
 END
 $$;

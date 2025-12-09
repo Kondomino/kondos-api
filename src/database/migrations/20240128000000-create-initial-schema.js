@@ -73,7 +73,7 @@ module.exports = {
         defaultValue: true,
       },
       status: {
-        type: Sequelize.ENUM('draft', 'text_ready', 'media_gathering', 'done'),
+        type: Sequelize.ENUM('draft', 'text_ready', 'media_gathering', 'done', 'scraping'),
         defaultValue: 'draft',
       },
       highlight: {
@@ -278,6 +278,10 @@ module.exports = {
       },
       immediate_delivery: {
         type: Sequelize.BOOLEAN,
+        allowNull: true,
+      },
+      delivery: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
       url: {
@@ -536,11 +540,19 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    // Drop tables in reverse order to handle foreign key constraints
-    await queryInterface.dropTable('Likes');
-    await queryInterface.dropTable('Media');
-    await queryInterface.dropTable('Units');
-    await queryInterface.dropTable('Kondos');
-         await queryInterface.dropTable('Users');
+      // Drop tables in reverse order to handle foreign key constraints
+      await queryInterface.dropTable('Likes');
+      await queryInterface.dropTable('Media');
+      await queryInterface.dropTable('Units');
+      await queryInterface.dropTable('Kondos');
+      await queryInterface.dropTable('Users');
+      
+      // Drop enum types
+      await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Users_gender" CASCADE;');
+      await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Kondos_status" CASCADE;');
+      await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Kondos_type" CASCADE;');
+      await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Units_status" CASCADE;');
+      await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Units_unit_type" CASCADE;');
+      await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Media_type" CASCADE;');
    }
  }; 

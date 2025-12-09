@@ -5,7 +5,6 @@ import { WhatsappService } from './whatsapp.service';
 import { ConversationService } from './services/conversation.service';
 import { DataDeletionService } from './services/data-deletion.service';
 import { MediaProcessingService } from './services/media-processing.service';
-import { AdobePdfService } from './services/adobe-pdf.service';
 import { MediaUploadService } from './services/media-upload.service';
 import { VerifiedMediaProcessorService } from './services/verified-media-processor.service';
 import { DigitalOceanSpacesService } from './services/digital-ocean-spaces.service';
@@ -16,14 +15,17 @@ import { Message } from './entities/message.entity';
 import { User } from '../user/entities/user.entity';
 import { Media } from '../media/entities/media.entity';
 import { AgenticModule } from '../agentic/agentic.module';
+import { StorageModule } from '../storage/storage.module';
 import { GrokService } from '../agentic/agents/chatty/grok.service';
 import { MediaRepository } from '../media/repository/media.repository';
 import { mediaProviders } from '../media/repository/media.provider';
+import { AdobePdfService } from 'src/pdf-extraction/adobe-pdf.service';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([RealEstateAgency, Conversation, Message, User, Media]),
     AgenticModule,
+    StorageModule,
   ],
   controllers: [WhatsappController],
   providers: [

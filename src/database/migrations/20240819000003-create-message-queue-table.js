@@ -114,5 +114,8 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('MessageQueue');
+    
+    // Drop enum types
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_MessageQueue_status" CASCADE;');
   }
 };

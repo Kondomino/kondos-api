@@ -138,3 +138,6 @@ dist/
 
 # references
 references/
+
+# tests
+test-results/

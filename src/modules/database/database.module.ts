@@ -25,8 +25,8 @@ import { MessageQueue } from '../../agentic/entities/message-queue.entity';
         models: [User, Kondo, Media, Unit, Like, RealEstateAgency, Conversation, Message, MessageQueue],
         autoLoadModels: true,
         synchronize: false, // Set to false to use migrations
-        logging: (msg: string) => console.log('🐘 DB Query:', msg),
-        logQueryParameters: true,
+        //logging: (msg: string) => console.log('🐘 DB Query:', msg),
+        logQueryParameters: false,
       }),
       inject: [ConfigService],
     }),

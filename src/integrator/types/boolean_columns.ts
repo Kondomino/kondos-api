@@ -32,5 +32,6 @@ export const boolean_columns = [
     'infra_lounge_bar',
     'infra_party_saloon',
     'infra_market_nearby',
-    'immediate_delivery'
+    'immediate_delivery',
+    'active'
     ];

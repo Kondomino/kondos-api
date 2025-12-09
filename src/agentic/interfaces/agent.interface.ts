@@ -38,6 +38,7 @@ export interface VerificationResult {
   confidence: number; // 0-1
   reasoning: string;
   shouldAskForClarification: boolean;
+  clarificationPrompt?: string;
   existingAgency?: {
     id: number;
     name: string;

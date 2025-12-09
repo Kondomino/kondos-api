@@ -20,7 +20,7 @@ export class MessageQueueService {
     private readonly outboundClient: OutboundWhatsAppClient,
   ) {
     // Start processing queue on service initialization
-    this.startQueueProcessor();
+    //this.startQueueProcessor();
     this.logger.log('MessageQueueService initialized with 60-second rate limiting');
   }
 

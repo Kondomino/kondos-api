@@ -239,4 +239,8 @@ export class CreateKondoDto {
     @IsString()
     @IsOptional()
     video: string;
+
+    @IsString()
+    @IsOptional()
+    delivery: string;
 }

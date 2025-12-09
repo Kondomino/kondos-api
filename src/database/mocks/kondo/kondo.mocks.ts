@@ -76,7 +76,8 @@ export const mockKondoData: CreateKondoDto = {
     // Contact Information
     url: "https://vilaverdepremium.com.br",
     phone: "(31) 99999-8888",
-    video: "https://youtube.com/watch?v=exemplo-vila-verde"
+    video: "https://youtube.com/watch?v=exemplo-vila-verde",
+    delivery: ""
 };
 
 // Alternative mock data for different types
@@ -153,7 +154,8 @@ export const mockKondoBairroData: CreateKondoDto = {
     // Contact Information
     url: "https://bairroorizonte.com.br",
     phone: "(31) 98765-4321",
-    video: "https://youtube.com/watch?v=exemplo-bairro-horizonte"
+    video: "https://youtube.com/watch?v=exemplo-bairro-horizonte",
+    delivery: ""
 };
 
 // Mock data for commercial type
@@ -230,7 +232,8 @@ export const mockKondoComercialData: CreateKondoDto = {
     // Contact Information
     url: "https://techpark.com.br",
     phone: "(31) 91234-5678",
-    video: "https://youtube.com/watch?v=exemplo-tech-park"
+    video: "https://youtube.com/watch?v=exemplo-tech-park",
+    delivery: ""
 };
 
 // Mock data with relations
@@ -309,6 +312,7 @@ export const mockKondoWithRelationsData: CreateKondoWithRelationsDto = {
     url: "https://vilaverdepremium.com.br",
     phone: "(31) 99999-8888",
     video: "https://youtube.com/watch?v=exemplo-vila-verde",
+    delivery: "",
 
     // Relations - Media
     medias: [
@@ -429,7 +433,8 @@ export const mockKondoCasas2Data: CreateKondoDto = {
     // Contact Information
     url: "https://reservadovale.com.br",
     phone: "(31) 94444-5555",
-    video: "https://youtube.com/watch?v=reserva-vale-video"
+    video: "https://youtube.com/watch?v=reserva-vale-video",
+    delivery: ""
 };
 
 export const mockKondoCasas3Data: CreateKondoDto = {
@@ -505,7 +510,8 @@ export const mockKondoCasas3Data: CreateKondoDto = {
     // Contact Information
     url: "https://sunsethills.com.br",
     phone: "(31) 93333-4444",
-    video: "https://youtube.com/watch?v=sunset-hills-tour"
+    video: "https://youtube.com/watch?v=sunset-hills-tour",
+    delivery: ""
 };
 
 export const mockKondoCasas4Data: CreateKondoDto = {
@@ -581,7 +587,8 @@ export const mockKondoCasas4Data: CreateKondoDto = {
     // Contact Information
     url: "https://pedraazul.com.br",
     phone: "(31) 92222-3333",
-    video: "https://youtube.com/watch?v=pedra-azul-video"
+    video: "https://youtube.com/watch?v=pedra-azul-video",
+    delivery: ""
 };
 
 export const mockKondoCasas5Data: CreateKondoDto = {
@@ -657,5 +664,6 @@ export const mockKondoCasas5Data: CreateKondoDto = {
     // Contact Information
     url: "https://portalaguas.com.br",
     phone: "(31) 91111-2222",
-    video: "https://youtube.com/watch?v=portal-aguas-drone"
+    video: "https://youtube.com/watch?v=portal-aguas-drone",
+    delivery: ""
 };

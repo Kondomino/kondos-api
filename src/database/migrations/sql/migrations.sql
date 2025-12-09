@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS "Kondos" (
   "entry_value_percentage" VARCHAR(255),
   "total_area" VARCHAR(255),
   "immediate_delivery" BOOLEAN,
+  "delivery" VARCHAR(255),
   "url" TEXT,
   "phone" VARCHAR(255),
   "video" TEXT,

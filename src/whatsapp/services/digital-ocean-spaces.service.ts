@@ -36,7 +36,8 @@ export class DigitalOceanSpacesService {
     const secretAccessKey = this.configService.get<string>('DIGITAL_OCEAN_STORAGE_SECRET');
     this.originEndpoint = this.configService.get<string>('DIGITAL_OCEAN_ORIGIN_ENDPOINT');
     this.cdnEndpoint = this.configService.get<string>('DIGITAL_OCEAN_CDN_ENDPOINT');
-    this.bucketName = this.extractBucketName(this.originEndpoint);
+    //this.bucketName = this.extractBucketName(this.originEndpoint);
+    this.bucketName = this.configService.get<string>('DIGITAL_OCEAN_STORAGE_BUCKET');
 
     if (!accessKeyId || !secretAccessKey || !this.originEndpoint || !this.cdnEndpoint) {
       this.logger.error('DigitalOcean Spaces credentials not properly configured');
@@ -44,10 +45,10 @@ export class DigitalOceanSpacesService {
     }
 
     // Convert bucket-specific endpoint to region endpoint for S3 client
-    const regionEndpoint = this.convertToRegionEndpoint(this.originEndpoint);
+    //const regionEndpoint = this.convertToRegionEndpoint(this.originEndpoint);
     
     this.s3Client = new AWS.S3({
-      endpoint: regionEndpoint,
+      endpoint: this.originEndpoint,
       accessKeyId,
       secretAccessKey,
       s3ForcePathStyle: false, // Use virtual-hosted style for DigitalOcean Spaces
@@ -55,7 +56,7 @@ export class DigitalOceanSpacesService {
     });
 
     this.logger.log(`DigitalOcean Spaces service initialized - bucket: ${this.bucketName}`);
-    this.logger.log(`Using region endpoint: ${regionEndpoint}`);
+    //this.logger.log(`Using region endpoint: ${regionEndpoint}`);
   }
 
   async uploadFile(
@@ -322,6 +323,7 @@ export class DigitalOceanSpacesService {
   }
 
   private extractBucketName(endpoint: string): string {
+    console.log('Extracting bucket name from endpoint:', endpoint);
     // Extract bucket name from endpoint like "https://kondo-spaces-storage.nyc3.digitaloceanspaces.com"
     const match = endpoint.match(/https:\/\/([^.]+)\./);
     if (match && match[1]) {

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { StorageModule } from '../storage/storage.module';
 import { VerificationService } from './orchestrator/verification.service';
 import { AgenticService } from './agentic.service';
 import { DatabaseTool } from './tools/database.tool';
@@ -16,16 +17,17 @@ import { MessagePersistenceTool, RelevanceAssessmentTool } from './tools/message
 import { OutboundWhatsAppClient } from './services/outbound-whatsapp.client';
 import { VerifiedMediaProcessorService } from '../whatsapp/services/verified-media-processor.service';
 import { MediaProcessingService } from '../whatsapp/services/media-processing.service';
-import { AdobePdfService } from '../whatsapp/services/adobe-pdf.service';
 import { MediaUploadService } from '../whatsapp/services/media-upload.service';
 import { DigitalOceanSpacesService } from '../whatsapp/services/digital-ocean-spaces.service';
 import { Media } from '../media/entities/media.entity';
 import { MediaRepository } from '../media/repository/media.repository';
 import { mediaProviders } from '../media/repository/media.provider';
+import { AdobePdfService } from 'src/pdf-extraction/adobe-pdf.service';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([RealEstateAgency, Conversation, Message, MessageQueue, Media]),
+    StorageModule,
   ],
   providers: [
     AgenticService,

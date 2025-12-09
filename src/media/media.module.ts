@@ -11,7 +11,6 @@ import { MediaRepository } from './repository/media.repository';
   providers: [MediaService, ...mediaProviders, MediaRepository],
   imports: [
     SequelizeModule.forFeature([Media]), 
-    //SeederModule.forFeature([SeedMedia])
   ]
 })
 export class MediaModule {}

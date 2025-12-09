@@ -249,6 +249,11 @@ module.exports = {
     await queryInterface.dropTable('Messages');
     await queryInterface.dropTable('Conversations');
     await queryInterface.dropTable('RealEstateAgencies');
+    
+    // Drop enum types
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Conversations_status" CASCADE;');
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Messages_direction" CASCADE;');
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_Messages_message_type" CASCADE;');
   }
 };
 

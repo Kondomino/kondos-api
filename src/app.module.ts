@@ -12,11 +12,15 @@ import { LikeModule } from './like/like.module';
 import { AuthModule } from './auth/auth.module';
 import { GoogleStrategy } from './auth/strategies/google.strategy';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
+import { ScrapingModule } from './scraping/scraping.module';
 // Environment configuration is handled by ConfigModule
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ 
+      isGlobal: true,
+      envFilePath: '.env'
+     }),
     DatabaseModule,
     UserModule, 
     KondoModule,
@@ -25,7 +29,8 @@ import { WhatsappModule } from './whatsapp/whatsapp.module';
     UnitModule,
     LikeModule,
     AuthModule,
-    WhatsappModule
+    WhatsappModule,
+    ScrapingModule
   //   SeederModule.forRoot({
   //     // Activate this if you want to run the seeders if the table is empty in the database
   //     runOnlyIfTableIsEmpty: true,

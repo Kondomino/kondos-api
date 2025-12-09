@@ -38,7 +38,16 @@ export class AgentOrchestrator {
 
       this.logger.log(`Verification result for ${message.phoneNumber}: isAgent=${verification.isRealEstateAgent} confidence=${verification.confidence}`);
 
-      // 2. If not a real estate agent, return without response
+      // 2. If verification requires clarification (medium confidence), respond with clarification prompt
+      if (verification.shouldAskForClarification && verification.clarificationPrompt) {
+        this.logger.log(`Medium confidence for ${message.phoneNumber}. Sending clarification request.`);
+        return {
+          shouldRespond: true,
+          message: verification.clarificationPrompt,
+        };
+      }
+
+      // 3. If not a real estate agent, return without response
       if (!verification.isRealEstateAgent) {
         this.logger.log(`Non-real estate agent message from ${message.phoneNumber}. Ignoring.`);
         return {
@@ -47,7 +56,7 @@ export class AgentOrchestrator {
         };
       }
 
-      // 3. If verified, ensure agent exists in database
+      // 4. If verified, ensure agent exists in database
       let agency = verification.existingAgency;
       if (!agency) {
         this.logger.log(`No existing agency for ${message.phoneNumber}. Creating from verification data...`);
