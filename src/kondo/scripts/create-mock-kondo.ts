@@ -43,14 +43,14 @@ async function makeRequest(url: string, method: string = 'GET', data?: any) {
 }
 
 async function createMockKondos() {
-  console.log('🏠 Creating mock Kondo data in the database...\n');
+  //console.log('🏠 Creating mock Kondo data in the database...\n');
 
   try {
     // Check if server is running
-    console.log('🔍 Checking if server is running...');
+    //console.log('🔍 Checking if server is running...');
     try {
       await makeRequest(`${API_BASE_URL}/kondo`);
-      console.log('✅ Server is running!\n');
+      //console.log('✅ Server is running!\n');
     } catch (error) {
       console.error('❌ Server is not running. Please start the server first:');
       console.error('   npm run start:dev\n');

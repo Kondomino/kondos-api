@@ -46,9 +46,9 @@ export async function loginAndGetToken(email: string, password: string): Promise
 
 // For testing the token generation
 if (require.main === module) {
-  const token = generateMockToken();
-  console.log('Generated JWT Token:');
-  console.log(token);
-  console.log('\nUse this token in your Authorization header:');
-  console.log(`Authorization: Bearer ${token}`);
+  //const token = generateMockToken();
+  // console.log('Generated JWT Token:');
+  // console.log(token);
+  // console.log('\nUse this token in your Authorization header:');
+  // console.log(`Authorization: Bearer ${token}`);
 } 

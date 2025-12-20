@@ -2,7 +2,7 @@ import { CommandFactory } from 'nest-commander';
 import { AppModule } from '../app.module';
 
 async function bootstrap() {
-  console.log('🚀 Initializing scraping CLI...\n');
+  //console.log('🚀 Initializing scraping CLI...\n');
   
   await CommandFactory.run(AppModule, {
     logger: ['debug', 'error', 'warn', 'log', 'verbose'],

@@ -18,7 +18,7 @@ export class KondoRepository {
     }
 
     async findOne(where: FindOptions): Promise<Kondo> {
-        console.log('kondo.repository findOne', where);
+        //console.log('kondo.repository findOne', where);
         return await this.KondoRepositoryProvider.findOne<Kondo>(where);
     }
 
@@ -85,7 +85,7 @@ export class KondoRepository {
      * @returns 
      */
     async findOrCreate(findOrCreate: { where: { id?: number, slug?: string }, defaults: Partial<Kondo>}): Promise<findOrCreateType> {
-        console.log('....findOrCreate ', findOrCreate.where);
+        //console.log('....findOrCreate ', findOrCreate.where);
         return await this.KondoRepositoryProvider.findOrCreate<Kondo>(findOrCreate);    
     }
 

@@ -33,7 +33,7 @@ const config = {
   }
 };
 
-console.log('✅ Sequelize config loaded successfully');
-console.log('📋 Available environments:', Object.keys(config));
+//console.log('✅ Sequelize config loaded successfully');
+//console.log('📋 Available environments:', Object.keys(config));
 
 module.exports = config;

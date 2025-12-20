@@ -66,8 +66,8 @@ const getConfig = (): SequelizeConfig => ({
 export const databaseConfig = (configService?: ConfigService) => {
   const env = (process.env.NODE_ENV || 'development').toLowerCase();
   const dbconfig = getConfig()[env];
-  console.log(`📦 Loading database config for environment: ${env.toUpperCase()}`);
-  console.log(dbconfig);
+  //console.log(`📦 Loading database config for environment: ${env.toUpperCase()}`);
+  //console.log(dbconfig);
   return dbconfig;
 };
 
