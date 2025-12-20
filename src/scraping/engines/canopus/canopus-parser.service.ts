@@ -18,6 +18,8 @@ export class CanopusParserService {
 
     try {
       const name = this.extractName($);
+      const amenities = this.extractAmenitiesAsFields($);
+      
       return {
         name,
         description: this.extractDescription($),
@@ -30,8 +32,11 @@ export class CanopusParserService {
 
         lot_avg_price: this.extractPrice($),
         infra_description: this.extractInfraDescription($),
+        
+        // Merge extracted amenity fields
+        ...amenities,
 
-        status: KondoStatus.MEDIA_GATHERING,
+        status: KondoStatus.DONE,
         active: true,
       };
     } catch (error) {
@@ -43,26 +48,70 @@ export class CanopusParserService {
   extractMediaUrls(html: string): string[] {
     const $ = cheerio.load(html);
     const urls: string[] = [];
+    const seenUrls = new Set<string>();
 
     try {
-      $('img').each((_, el) => {
-        const src = $(el).attr('src') || $(el).attr('data-src') || $(el).attr('data-lazy-src');
-        if (src && this.isMedia(src)) {
-          urls.push(this.normalizeUrl(src));
+      // Strategy 1: Extract from srcSet (Next.js optimized images)
+      $('img[srcset]').each((_, el) => {
+        const srcset = $(el).attr('srcset');
+        if (srcset) {
+          // srcSet format: "url1 1x, url2 2x" or "url 1024w, url 2048w"
+          srcset.split(',').forEach(entry => {
+            const [url] = entry.trim().split(/\s+/);
+            if (url && this.isValidMediaUrl(url)) {
+              const decoded = this.decodeNextjsImageUrl(url);
+              if (!seenUrls.has(decoded)) {
+                urls.push(decoded);
+                seenUrls.add(decoded);
+              }
+            }
+          });
         }
       });
 
-      $('video source').each((_, el) => {
+      // Strategy 2: Fallback to src attribute
+      $('img[src]').each((_, el) => {
         const src = $(el).attr('src');
-        if (src) urls.push(this.normalizeUrl(src));
+        if (src && this.isValidMediaUrl(src)) {
+          const decoded = this.decodeNextjsImageUrl(src);
+          if (!seenUrls.has(decoded)) {
+            urls.push(decoded);
+            seenUrls.add(decoded);
+          }
+        }
       });
 
+      // Strategy 3: data-src (lazy loading)
+      $('img[data-src]').each((_, el) => {
+        const src = $(el).attr('data-src');
+        if (src && this.isValidMediaUrl(src)) {
+          const decoded = this.decodeNextjsImageUrl(src);
+          if (!seenUrls.has(decoded)) {
+            urls.push(decoded);
+            seenUrls.add(decoded);
+          }
+        }
+      });
+
+      // Strategy 4: Video sources
+      $('video source[src]').each((_, el) => {
+        const src = $(el).attr('src');
+        if (src && !seenUrls.has(src)) {
+          urls.push(this.normalizeUrl(src));
+          seenUrls.add(src);
+        }
+      });
+
+      // Strategy 5: iframes (YouTube, Vimeo)
       $('iframe[src*="youtube"], iframe[src*="vimeo"]').each((_, el) => {
         const src = $(el).attr('src');
-        if (src) urls.push(src);
+        if (src && !seenUrls.has(src)) {
+          urls.push(src);
+          seenUrls.add(src);
+        }
       });
 
-      return [...new Set(urls)];
+      return Array.from(urls);
     } catch (error) {
       this.logger.error(`Error extracting media URLs: ${error.message}`);
       return [];
@@ -77,22 +126,64 @@ export class CanopusParserService {
   }
 
   private extractDescription($: CheerioRoot): string {
+    // Priority 1: Meta tags (most reliable for SSR sites)
     const og = $('meta[property="og:description"]').attr('content');
+    if (og && og.length > 20) return og.trim();
+    
     const desc = $('meta[name="description"]').attr('content');
-    const body = $('.description, .sobre, .about, .text').first().text().trim();
-    return og || desc || body || '';
+    if (desc && desc.length > 20) return desc.trim();
+    
+    // Priority 2: Styled-components Typography pattern
+    const paragraphs = $('[class*="Typography__Text"]');
+    
+    for (let i = 0; i < paragraphs.length; i++) {
+      const text = $(paragraphs[i]).text().trim();
+      // Find first substantial paragraph (likely intro text)
+      if (text.length > 100) {
+        return text;
+      }
+    }
+    
+    return '';
   }
 
   private extractStreet($: CheerioRoot): string {
-    const selectors = ['.address', '.endereco', '.localizacao', '[itemprop="streetAddress"]'];
-    for (const selector of selectors) {
-      const text = $(selector).text().trim();
-      if (text) return text;
+    // Target styled-components wrapper with location icon + address text
+    const addressElements = $('[class*="Wrapper-sc"]');
+    
+    for (let i = 0; i < addressElements.length; i++) {
+      const text = $(addressElements[i]).text().trim();
+      
+      // Check if it matches address pattern: "Neighborhood - Street, Number"
+      if (text.includes(' - ') && /\d+/.test(text)) {
+        const parts = text.split(' - ');
+        if (parts.length === 2) {
+          // Return street part: "Rua ..., 570"
+          return parts[1].trim();
+        }
+      }
     }
+    
     return '';
   }
 
   private extractNeighborhood($: CheerioRoot): string {
+    // Parse from styled-components address wrapper
+    const addressElements = $('[class*="Wrapper-sc"]');
+    
+    for (let i = 0; i < addressElements.length; i++) {
+      const text = $(addressElements[i]).text().trim();
+      
+      if (text.includes(' - ') && /\d+/.test(text)) {
+        const parts = text.split(' - ');
+        if (parts.length >= 1) {
+          // Return neighborhood part: "Santo Antônio"
+          return parts[0].trim();
+        }
+      }
+    }
+    
+    // Fallback to meta location
     const loc = this.extractMetaLocation($);
     return loc?.neighborhood || '';
   }
@@ -117,8 +208,57 @@ export class CanopusParserService {
   }
 
   private extractInfraDescription($: CheerioRoot): string {
-    const list = $('.diferenciais, .amenities, .items, .caracteristicas').first().text().trim();
-    return list || '';
+    // Target styled-components pattern for amenities
+    const container = $('[class*="DifferentialsContainer"], [class*="Amenities"], [class*="Items"]').first();
+    
+    if (container.length === 0) return '';
+    
+    const amenityTexts: string[] = [];
+    
+    container.find('[class*="Differential"], [class*="Item"]').each((_, el) => {
+      const text = $(el).text().trim();
+      if (text.length > 0 && text.length < 100) {
+        amenityTexts.push(text);
+      }
+    });
+    
+    return amenityTexts.join(', ');
+  }
+
+  /**
+   * Extract amenities as individual boolean fields
+   * Maps keywords to infra_* fields
+   */
+  private extractAmenitiesAsFields($: CheerioRoot): Partial<ScrapedKondoDto> {
+    const amenities: Record<string, boolean> = {};
+    
+    // Get all text content from body (lowercase for matching)
+    const infraDesc = this.extractInfraDescription($);
+    const bodyText = $('body').text().toLowerCase();
+    const allText = (infraDesc + ' ' + bodyText).toLowerCase();
+    
+    // Keyword mappings for amenities
+    const amenityMap: Record<string, string[]> = {
+      infra_pool: ['piscina', 'pool', 'swimming'],
+      infra_gym: ['academia', 'gym', 'fitness', 'ginásio'],
+      infra_leisure: ['lazer', 'leisure', 'recreação', 'recreation', 'salão de festas'],
+      infra_parking: ['estacionamento', 'parking', 'garagem', 'garage', 'vagas'],
+      infra_playground: ['parquinho', 'playground', 'brinquedoteca'],
+      infra_sports_court: ['quadra', 'court', 'tennis', 'esportiva'],
+      infra_barbecue_zone: ['churrasqueira', 'bbq', 'grill', 'churrasco', 'grelhados'],
+      infra_garden: ['jardim', 'garden', 'landscape', 'paisagismo'],
+      infra_pet_place: ['pet', 'cachorro', 'animal', 'dog'],
+      infra_coworking: ['coworking', 'trabalho', 'escritório compartilhado'],
+    };
+    
+    for (const [field, keywords] of Object.entries(amenityMap)) {
+      const found = keywords.some(kw => allText.includes(kw));
+      if (found) {
+        amenities[field] = true;
+      }
+    }
+    
+    return amenities as Partial<ScrapedKondoDto>;
   }
 
   private detectType($: CheerioRoot): string {
@@ -154,8 +294,53 @@ export class CanopusParserService {
       .replace(/^-+|-+$/g, '');
   }
 
-  private isMedia(url: string): boolean {
-    return /(\.(jpe?g|png|webp|gif|mp4|webm)|youtube|vimeo)/i.test(url);
+  /**
+   * Decode Next.js image optimization URLs to extract original source
+   * Input: /_next/image?url=https%3A%2F%2Fd1o0fuw54avhiz.cloudfront.net%2F...&w=1920&q=50
+   * Output: https://d1o0fuw54avhiz.cloudfront.net/...
+   */
+  private decodeNextjsImageUrl(url: string): string {
+    if (!url.includes('/_next/image')) {
+      return url; // Not a Next.js URL
+    }
+
+    try {
+      // Parse as URL (handle both relative and absolute)
+      const urlObj = new URL(url, CANOPUS_CONFIG.baseUrl);
+      const encodedUrl = urlObj.searchParams.get('url');
+      
+      if (encodedUrl) {
+        return decodeURIComponent(encodedUrl);
+      }
+    } catch (e) {
+      this.logger.debug(`Failed to decode Next.js URL: ${url}`);
+    }
+
+    return url; // Return original if decoding fails
+  }
+
+  /**
+   * Check if URL is valid media (not placeholder, icon, etc.)
+   */
+  private isValidMediaUrl(url: string): boolean {
+    if (!url) return false;
+
+    // Exclude data URIs, SVGs, base64
+    if (url.startsWith('data:')) return false;
+    if (url.endsWith('.svg')) return false;
+
+    // Exclude icons, logos, placeholders
+    const lowerUrl = url.toLowerCase();
+    if (lowerUrl.includes('icon') || 
+        lowerUrl.includes('logo') || 
+        lowerUrl.includes('placeholder')) {
+      return false;
+    }
+
+    // Include: images, videos, Next.js URLs, CloudFront
+    return /\.(jpe?g|png|webp|gif|avif|mp4|webm|mov)(\?|$)/i.test(url) ||
+           url.includes('/_next/image') ||
+           url.includes('cloudfront');
   }
 
   private normalizeUrl(url: string): string {

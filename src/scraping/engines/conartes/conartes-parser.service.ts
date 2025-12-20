@@ -35,7 +35,7 @@ export class ConartesParserService {
         // Infra
         infra_description: this.extractInfraDescription($),
 
-        status: KondoStatus.MEDIA_GATHERING,
+        status: KondoStatus.DONE,
         active: true,
       };
     } catch (error) {

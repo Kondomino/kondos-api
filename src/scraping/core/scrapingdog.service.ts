@@ -1,14 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosError } from 'axios';
-import { ScrapingDogOptions } from '../interfaces/scraper-config.interface';
+import { ScrapingPlatformOptions } from '../interfaces/scraper-config.interface';
+import { IScrapingPlatform, ScrapingPlatformResponse } from '../interfaces/scraping-platform.interface';
 
 /**
  * Service for interacting with ScrapingDog API
  * Handles HTML fetching from target URLs with proxy and JavaScript rendering support
  */
 @Injectable()
-export class ScrapingDogService {
+export class ScrapingDogService implements IScrapingPlatform {
   private readonly logger = new Logger(ScrapingDogService.name);
   private readonly apiKey: string;
   private readonly baseUrl = 'https://api.scrapingdog.com/scrape';
@@ -24,10 +25,10 @@ export class ScrapingDogService {
   /**
    * Fetch HTML content from a URL via ScrapingDog API
    * @param url - Target URL to scrape
-   * @param options - ScrapingDog options (dynamic, premium, country, etc.)
-   * @returns HTML content as string
+   * @param options - Platform options (dynamic, premium, country, etc.)
+   * @returns HTML content and response metadata
    */
-  async fetchHtml(url: string, options?: ScrapingDogOptions): Promise<string> {
+  async fetchHtml(url: string, options?: ScrapingPlatformOptions): Promise<ScrapingPlatformResponse> {
     try {
       this.logger.debug(`Fetching HTML from: ${url}`);
 
@@ -40,6 +41,7 @@ export class ScrapingDogService {
         ...(options?.extraParams || {}),
       });
 
+      const startTime = Date.now();
       const response = await axios.get(`${this.baseUrl}?${params.toString()}`, {
         timeout: 30000, // 30 seconds timeout
         headers: {
@@ -47,8 +49,17 @@ export class ScrapingDogService {
         },
       });
 
-      this.logger.debug(`Successfully fetched HTML (${response.data.length} bytes)`);
-      return response.data;
+      const responseTimeMs = Date.now() - startTime;
+      const html = response.data;
+      const metadata = {
+        statusCode: response.status,
+        responseTimeMs,
+        platform: 'scrapingdog',
+        renderedJs: options?.dynamic || false,
+      };
+
+      this.logger.debug(`Successfully fetched HTML (${html.length} bytes) in ${responseTimeMs}ms`);
+      return { html, metadata };
 
     } catch (error) {
       this.handleScrapingDogError(error, url);

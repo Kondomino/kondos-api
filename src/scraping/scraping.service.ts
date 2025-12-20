@@ -1,5 +1,4 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Kondo, KondoStatus } from '../kondo/entities/kondo.entity';
 import { Media } from '../media/entities/media.entity';
 import { KONDO_REPOSITORY_PROVIDER } from '../core/constants';
@@ -9,9 +8,28 @@ import { ConartesScraperService } from './engines/conartes/conartes-scraper.serv
 import { isConartesUrl } from './engines/conartes/conartes.config';
 import { CanopusScraperService } from './engines/canopus/canopus-scraper.service';
 import { isCanopusUrl } from './engines/canopus/canopus.config';
+import { ElementorScraperService } from './engines/elementor/elementor-scraper.service';
+import { GenericScraperService } from './engines/generic/generic-scraper.service';
+import { PlatformDetectorService } from './utils/platform-detector.service';
 import { ScrapeResult, ScrapeError } from './dto/scraping-result.dto';
 import { ScrapeOptions } from './interfaces/scraper-config.interface';
 import { ScrapedKondoDto } from './dto/scraped-kondo.dto';
+import { MediaRelevanceScorerService } from './core/media-relevance-scorer.service';
+import { MediaDimensionExtractorService } from './core/media-dimension-extractor.service';
+import { MediaDimensionValidatorService } from './core/media-dimension-validator.service';
+import { MediaDownloadService } from './core/media-download.service';
+import { ScrapingConfig } from '../config/scraping.config';
+import { ScrapingFileLogger } from './logger/scraping-file-logger';
+import { SlugifyService } from '../utils/slugify/slugify.service';
+
+/**
+ * Scored media record for featured image selection
+ */
+interface ScoredMediaRecord {
+  mediaRecord: any;
+  score: number;
+  filename: string;
+}
 
 /**
  * Main orchestration service for scraping operations
@@ -28,10 +46,20 @@ export class ScrapingService {
     private readonly somattosScraperService: SomattosScraperService,
     private readonly conartesScraperService: ConartesScraperService,
     private readonly canopusScraperService: CanopusScraperService,
-    private readonly configService: ConfigService,
+    private readonly elementorScraperService: ElementorScraperService,
+    private readonly genericScraperService: GenericScraperService,
+    private readonly platformDetector: PlatformDetectorService,
+    @Inject('SCRAPING_CONFIG') private readonly scrapingConfig: ScrapingConfig,
+    private readonly mediaScorer: MediaRelevanceScorerService,
+    private readonly mediaDimensionExtractor: MediaDimensionExtractorService,
+    private readonly mediaDimensionValidator: MediaDimensionValidatorService,
+    private readonly mediaDownloader: MediaDownloadService,
+    private readonly fileLogger: ScrapingFileLogger,
+    private readonly slugifyService: SlugifyService,
     // Add other platform scrapers here as they are implemented
   ) {
-    this.delayBetweenRequestsMs = this.configService.get<number>('SCRAPING_DELAY_BETWEEN_REQUESTS_MS') || 4000;
+    this.delayBetweenRequestsMs = this.scrapingConfig.delay?.betweenRequestsMs ?? 4000;
+    this.fileLogger.info(`ScrapingService initialized with delay: ${this.delayBetweenRequestsMs}ms`, 'ScrapingService');
   }
 
   /**
@@ -74,6 +102,8 @@ export class ScrapingService {
       failed: 0,
       skipped: 0,
       errors: [],
+      totalFieldsChanged: 0,
+      totalProtectedIgnored: 0,
     };
 
     for (const kondo of kondos) {
@@ -95,6 +125,50 @@ export class ScrapingService {
   }
 
   /**
+   * Scrape a single random kondo with status = 'scraping'
+   * Useful for quick green-flow checks
+   */
+  async scrapeRandomPending(options?: ScrapeOptions): Promise<ScrapeResult> {
+    this.logger.log('🎲 Selecting one random kondo with status=SCRAPING...');
+
+    const whereClause: any = {
+      status: KondoStatus.SCRAPING,
+    };
+
+    const sequelizeInstance = this.kondoRepository.sequelize;
+    const randomOrder = sequelizeInstance ? [sequelizeInstance.random() as any] : undefined;
+
+    const kondo = await this.kondoRepository.findOne({
+      where: whereClause,
+      order: randomOrder,
+    });
+
+    if (!kondo) {
+      this.logger.warn('⚠️  No kondos found with status=SCRAPING. Nothing to do.');
+      return {
+        success: 0,
+        failed: 0,
+        skipped: 0,
+        errors: [],
+      };
+    }
+
+    const result: ScrapeResult = {
+      success: 0,
+      failed: 0,
+      skipped: 0,
+      errors: [],
+      totalFieldsChanged: 0,
+      totalProtectedIgnored: 0,
+    };
+
+    await this.scrapeKondo(kondo, { ...options, skipDelay: options?.skipDelay ?? true }, result);
+
+    this.logSummary(result);
+    return result;
+  }
+
+  /**
    * Scrape a single kondo
    */
   private async scrapeKondo(
@@ -110,18 +184,21 @@ export class ScrapingService {
     }
 
     this.logger.log(`\n🔍 [${result.success + result.failed + 1}] Scraping: ${kondo.name} (ID: ${kondo.id})`);
-    this.logger.debug(`   URL: ${kondo.url}`);
+    this.logger.log(`   Status: ${kondo.status}`);
+    this.logger.log(`   URL: ${kondo.url}`);
 
     try {
       // Determine platform and get appropriate scraper
       this.logger.debug(`   Selecting scraper...`);
-      const scraper = this.getScraper(kondo.url, options?.platform);
-      this.logger.debug(`   Scraper selected: ${scraper.constructor.name}`);
+      const scraper = await this.getScraper(kondo.url, options?.platform);
+      this.logger.log(`   Platform: ${scraper.constructor.name.replace('ScraperService', '')}`);
 
       // Scrape data
-      this.logger.debug(`   Fetching and parsing data...`);
+      this.logger.log(`   Fetching and parsing data...`);
       const scrapedData = await scraper.scrape(kondo.url);
+      this.logger.log(`   ✓ Extracted ${scrapedData.medias?.length || 0} media URLs`);
       this.logger.debug(`   Scraped ${Object.keys(scrapedData).length} fields`);
+      this.fileLogger.info(`Extracted ${scrapedData.medias?.length || 0} media URLs from ${kondo.name}`, 'ScrapingService');
 
       // Apply delay between requests (unless skipDelay is set)
       if (!options?.skipDelay) {
@@ -130,9 +207,16 @@ export class ScrapingService {
 
       // Save to database (unless dry run)
       if (!options?.dryRun) {
-        this.logger.debug(`   Saving to database...`);
-        await this.saveScrapedData(kondo.id, scrapedData);
+        this.logger.log(`   Saving to database...`);
+        const { mediaCount, fieldsChanged, protectedIgnored } = await this.saveScrapedData(kondo.id, scrapedData);
+        this.logger.log(`   ✓ Saved ${mediaCount} media files to cloud`);
+        this.logger.log(`   ✓ Updated ${fieldsChanged} fields${protectedIgnored > 0 ? ` (${protectedIgnored} protected fields ignored)` : ''}`);
         this.logger.log(`✅ Success: ${kondo.name}`);
+        this.fileLogger.info(`Successfully scraped and saved kondo ${kondo.id}: ${kondo.name} (${mediaCount} media, ${fieldsChanged} fields updated)`, 'ScrapingService');
+        
+        // Track statistics
+        result.totalFieldsChanged = (result.totalFieldsChanged || 0) + fieldsChanged;
+        result.totalProtectedIgnored = (result.totalProtectedIgnored || 0) + protectedIgnored;
       } else {
         this.logger.log(`✅ Success (dry-run): ${kondo.name}`);
         this.logger.debug(`   Would save: ${JSON.stringify(scrapedData, null, 2)}`);
@@ -145,6 +229,14 @@ export class ScrapingService {
       if (options?.verbose) {
         this.logger.error(`Stack: ${error.stack}`);
       }
+      
+      // Log detailed error info to file
+      if (error.name === 'SequelizeValidationError' || error.errors) {
+        this.fileLogger.logValidationError(kondo.id, kondo.name, error);
+      } else {
+        this.fileLogger.error(`Failed to scrape kondo ${kondo.id}`, 'ScrapingService', error);
+      }
+      
       result.failed++;
       result.errors.push({
         kondoId: kondo.id,
@@ -157,7 +249,7 @@ export class ScrapingService {
   /**
    * Determine which scraper to use based on URL
    */
-  private getScraper(url: string, platformFilter?: string) {
+  private async getScraper(url: string, platformFilter?: string) {
     // If platform filter is specified, validate it matches
     if (platformFilter === 'somattos' || isSomattosUrl(url)) {
       return this.somattosScraperService;
@@ -171,10 +263,35 @@ export class ScrapingService {
       return this.canopusScraperService;
     }
 
-    // Add more platform detection here
-    // if (is5AndarUrl(url)) return this.andarScraperService;
+    // If no URL pattern matched, try HTML-based detection
+    try {
+      this.logger.log(`[ScrapingService] No URL pattern matched for ${url}, attempting HTML detection...`);
+      this.fileLogger.info(`No URL pattern matched, attempting HTML detection for: ${url}`, 'ScrapingService');
+      
+      const platform = await this.platformDetector.detectPlatform(url);
+      
+      if (platform === 'elementor') {
+        this.logger.log(`[ScrapingService] Detected Elementor platform for: ${url}`);
+        this.fileLogger.info(`Detected Elementor platform for: ${url}`, 'ScrapingService');
+        return this.elementorScraperService;
+      }
+      
+      if (platform === 'nextjs') {
+        this.logger.log(`[ScrapingService] Detected Next.js platform for: ${url}`);
+        this.fileLogger.info(`Detected Next.js platform for: ${url}`, 'ScrapingService');
+        return this.canopusScraperService;
+      }
+    } catch (error) {
+      this.logger.warn(`[ScrapingService] HTML detection failed for ${url}: ${error.message}`);
+      this.fileLogger.warn(`HTML detection failed for ${url}: ${error.message}`, 'ScrapingService');
+    }
 
-    throw new Error(`No scraper found for URL: ${url}`);
+    // Fallback to generic scraper if detection fails or platform is unknown
+    this.logger.log(
+      `[ScrapingService] Using generic fallback scraper for: ${url}`
+    );
+    this.fileLogger.info(`Using generic fallback scraper for: ${url}`, 'ScrapingService');
+    return this.genericScraperService;
   }
 
   /**
@@ -187,32 +304,434 @@ export class ScrapingService {
 
   /**
    * Save scraped data to database
+   * Filters and downloads media before saving
+   * Handles slug: preserves existing slug, generates new one if null
+   * @returns Object with media count, fields changed count, and protected fields count
    */
   private async saveScrapedData(
     kondoId: number,
     data: ScrapedKondoDto,
-  ): Promise<void> {
-    const { medias, scrapedAt, sourceUrl, ...kondoData } = data;
+  ): Promise<{ mediaCount: number; fieldsChanged: number; protectedIgnored: number }> {
+    const { medias, scrapedAt, sourceUrl, platformMetadata, ...kondoData } = data;
 
-    // Update Kondo entity
-    await this.kondoRepository.update(kondoData, {
+    // Fetch existing kondo to calculate changes
+    const existingKondo = await this.kondoRepository.findOne({
       where: { id: kondoId },
     });
 
-    this.logger.debug(`   Updated kondo ${kondoId} with scraped data`);
+    if (!existingKondo) {
+      this.logger.error(`   Kondo ${kondoId} not found in database`);
+      return { mediaCount: 0, fieldsChanged: 0, protectedIgnored: 0 };
+    }
 
-    // Create Media records
+    // Handle slug: preserve existing slug, generate new one if null
+    if (existingKondo.slug) {
+      console.log(`   Existing slug found: ${existingKondo.slug}`);
+      // Slug already exists - preserve it by removing from update payload
+      delete kondoData.slug;
+      this.logger.debug(`   Preserving existing slug: ${existingKondo.slug}`);
+    } else if (!kondoData.slug) {
+      console.log(`   No slug found, generating from name: ${existingKondo.name}`);
+      // No existing slug and no slug in scraped data - generate from name
+      kondoData.slug = this.slugifyService.run(existingKondo.name);
+      this.logger.debug(`   Generated new slug: ${kondoData.slug}`);
+    } else {
+      // Slug provided in scraped data and no existing slug - use it
+      this.logger.debug(`   Using scraped slug: ${kondoData.slug}`);
+    }
+
+    console.log(`   Final slug to save: ${kondoData.slug}`);
+
+    // Map scraped field names to database field names
+    // 'address' is a virtual getter in Kondo entity, map to actual DB field
+    if ('address' in kondoData && typeof kondoData.address === 'string') {
+      kondoData.address_street_and_numbers = kondoData.address;
+      delete kondoData.address;
+      this.logger.debug(`   Mapped 'address' field to 'address_street_and_numbers'`);
+    }
+
+    // Filter out protected fields and track violations
+    const { filteredData, ignoredFields } = this.filterProtectedFields(kondoData);
+
+    console.log('B - Filtered data to be saved:', filteredData);
+    
+    // Process media: filter and download (BEFORE calculating changes and updating DB)
+    let mediaCount = 0;
     if (medias && medias.length > 0) {
-      const mediaRecords = medias.map((url) => ({
+      this.logger.log(`   Processing ${medias.length} media URLs...`);
+      const { mediaRecords, stats, scoredImages } = await this.filterAndDownloadMedia(medias, kondoId, sourceUrl);
+
+      if (mediaRecords.length > 0) {
+        await Media.bulkCreate(mediaRecords);
+        mediaCount = mediaRecords.length;
+        this.logger.debug(`   Created ${mediaCount} media records`);
+        
+        // Auto-select featured image from best-scoring image (only if not already set)
+        if (!existingKondo.featured_image) {
+          const featuredImageFilename = this.selectFeaturedImage(scoredImages);
+          if (featuredImageFilename) {
+            filteredData.featured_image = featuredImageFilename;
+            this.logger.log(`   ✓ Featured image set: ${featuredImageFilename}`);
+          }
+        } else {
+          this.logger.debug(`   Featured image already set: ${existingKondo.featured_image} (preserved)`);
+        }
+      } else {
+        this.logger.warn(`   ⚠️  No media passed filtering/download`);
+      }
+
+      // Log media extraction statistics to file
+      this.fileLogger.logMediaExtraction(kondoId, existingKondo.name, stats);
+    } else {
+      // Log when no media URLs found
+      this.fileLogger.logMediaExtraction(kondoId, existingKondo.name, {
+        totalDiscovered: 0,
+        imagesDiscovered: 0,
+        videosDiscovered: 0,
+        imagesUploaded: 0,
+        videosDownloaded: 0,
+        videosEmbedded: 0,
+        totalSaved: 0,
+      });
+    }
+
+    // Calculate changes (NOW includes featured_image if it was set)
+    const changes = this.calculateChanges(existingKondo, filteredData);
+
+    console.log('C - Calculated changes:', changes);
+
+    const fieldsChanged = Object.keys(changes).length;
+    const protectedIgnored = ignoredFields.length;
+
+    // Log platform response metadata
+    if (platformMetadata) {
+      this.fileLogger.logPlatformResponse(kondoId, platformMetadata);
+    }
+
+    // Log changes to file
+    if (fieldsChanged > 0 || protectedIgnored > 0) {
+      this.fileLogger.logKondoChanges(
         kondoId,
-        filename: this.extractFilename(url),
-        storage_url: url,
+        existingKondo.name,
+        changes,
+        ignoredFields
+      );
+    }
+
+    // Update Kondo entity (with featured_image included if set)
+    await this.kondoRepository.update(filteredData, {
+      where: { id: kondoId },
+    });
+
+    this.logger.debug(`   Updated kondo ${kondoId}: ${fieldsChanged} fields changed`);
+    
+    return { mediaCount, fieldsChanged, protectedIgnored };
+  }
+
+  /**
+   * Filter out protected fields from scraped data
+   * @returns Filtered data and list of ignored fields
+   */
+  private filterProtectedFields(data: any): { filteredData: any; ignoredFields: string[] } {
+    const filteredData = { ...data };
+    const ignoredFields: string[] = [];
+
+    console.log('   Protected fields to check:', this.scrapingConfig.protectedFields);
+
+    this.scrapingConfig.protectedFields.forEach((field) => {
+      if (field in filteredData) {
+        ignoredFields.push(field);
+        delete filteredData[field];
+      }
+    });
+
+    if (ignoredFields.length > 0) {
+      this.logger.debug(`   Protected fields filtered: ${ignoredFields.join(', ')}`);
+    }
+
+    console.log('   Ignored protected fields:', ignoredFields);
+    console.log('   Filtered data to be saved:', filteredData);
+    return { filteredData, ignoredFields };
+  }
+
+  /**
+   * Calculate field changes between existing and new data
+   * @returns Object with field changes { fieldName: { before, after } }
+   */
+  private calculateChanges(existingKondo: Kondo, newData: any): Record<string, { before: any; after: any }> {
+    const changes: Record<string, { before: any; after: any }> = {};
+
+    Object.keys(newData).forEach((key) => {
+      const oldValue = existingKondo[key];
+      const newValue = newData[key];
+
+      // Only track actual changes (handle null/undefined as equivalent for comparison)
+      const oldNormalized = oldValue === undefined ? null : oldValue;
+      const newNormalized = newValue === undefined ? null : newValue;
+
+      if (oldNormalized !== newNormalized) {
+        // For objects/arrays, do deep comparison
+        if (typeof oldNormalized === 'object' && typeof newNormalized === 'object') {
+          if (JSON.stringify(oldNormalized) !== JSON.stringify(newNormalized)) {
+            changes[key] = { before: oldValue, after: newValue };
+          }
+        } else {
+          changes[key] = { before: oldValue, after: newValue };
+        }
+      }
+    });
+
+    return changes;
+  }
+
+  /**
+   * Filter media by relevance/dimensions and download to cloud storage
+   * Also tracks scored images for featured image selection
+   */
+  private async filterAndDownloadMedia(
+    mediaUrls: string[],
+    kondoId: number,
+    propertyUrl?: string,
+  ): Promise<{ mediaRecords: any[], stats: any, scoredImages: ScoredMediaRecord[] }> {
+    const mediaConfig = this.scrapingConfig.media;
+    const mediaRecords = [];
+    const scoredImages: ScoredMediaRecord[] = [];
+    
+    // Track statistics
+    const stats = {
+      totalDiscovered: mediaUrls.length,
+      imagesDiscovered: 0,
+      videosDiscovered: 0,
+      imagesUploaded: 0,
+      videosDownloaded: 0,
+      videosEmbedded: 0,
+      totalSaved: 0,
+    };
+
+    // Count discovered media by type and log all URLs
+    this.logger.log(`   [Media] Starting to process ${mediaUrls.length} discovered media URLs...`);
+    mediaUrls.forEach((url, index) => {
+      const type = this.detectMediaType(url);
+      const filename = this.extractFilename(url);
+      if (type === 'image') {
+        stats.imagesDiscovered++;
+      } else if (type === 'video') {
+        stats.videosDiscovered++;
+        this.logger.log(`   [Media] VIDEO found [${index + 1}/${mediaUrls.length}]: ${filename}`);
+      }
+    });
+
+    // Process media in parallel batches (3-5 concurrent)
+    const batchSize = 4;
+    for (let i = 0; i < mediaUrls.length; i += batchSize) {
+      const batch = mediaUrls.slice(i, i + batchSize);
+      const batchResults = await Promise.allSettled(
+        batch.map((url) => this.processMediaUrl(url, kondoId, propertyUrl, mediaConfig))
+      );
+
+      for (const result of batchResults) {
+        if (result.status === 'fulfilled' && result.value) {
+          const { record, score } = result.value;
+          mediaRecords.push(record);
+          
+          // Track images with scores for featured image selection
+          if (record.type === 'image') {
+            scoredImages.push({
+              mediaRecord: record,
+              score: score,
+              filename: record.filename,
+            });
+            stats.imagesUploaded++;
+          } else if (record.type === 'video') {
+            // Check if it's embedded or downloaded
+            if (this.isEmbeddedVideo(record.storage_url)) {
+              stats.videosEmbedded++;
+            } else {
+              stats.videosDownloaded++;
+            }
+          }
+        }
+      }
+    }
+
+    stats.totalSaved = mediaRecords.length;
+
+    return { mediaRecords, stats, scoredImages };
+  }
+
+  /**
+   * Process a single media URL: score, check dimensions, download if passes
+   * Returns both the media record and its relevance score for featured image selection
+   */
+  private async processMediaUrl(
+    url: string,
+    kondoId: number,
+    propertyUrl: string | undefined,
+    mediaConfig: any,
+  ): Promise<{ record: any; score: number } | null> {
+    const filename = this.extractFilename(url);
+    try {
+      const mediaType = this.detectMediaType(url);
+      this.logger.log(`   [Media] Processing: ${filename} (${mediaType})`);
+
+      // Score media for relevance
+      const relevanceScore = this.mediaScorer.scoreMediaUrl(url, this.extractDomain(propertyUrl));
+      this.logger.debug(`   [Media] Relevance score: ${relevanceScore.toFixed(3)} (threshold: ${mediaConfig.minRelevanceScore})`);
+
+      // IMAGE: check dimensions first
+      if (mediaType === 'image') {
+        this.logger.debug(`   [Media] Validating image dimensions...`);
+        const validation = await this.mediaDimensionValidator.validateImageDimensions(
+          url,
+          mediaConfig.minImageDimensions.width,
+          mediaConfig.minImageDimensions.height
+        );
+
+        if (validation.dimensions) {
+          this.logger.debug(
+            `   [Media] Dimensions: ${validation.dimensions.width}x${validation.dimensions.height} (min: ${mediaConfig.minImageDimensions.width}x${mediaConfig.minImageDimensions.height})`
+          );
+        }
+
+        // If dimensions >= minimum, auto-approve
+        if (validation.valid) {
+          this.logger.log(
+            `   [Media] ✅ ACCEPTED - ${filename} → Dimensions ${validation.dimensions?.width}x${validation.dimensions?.height} (auto-approved)`
+          );
+          const record = await this.downloadMediaAndCreateRecord(url, kondoId, mediaConfig);
+          return record ? { record, score: relevanceScore } : null;
+        }
+
+        // If dimensions check failed, check relevance score as fallback
+        if (relevanceScore >= mediaConfig.minRelevanceScore) {
+          this.logger.log(`   [Media] ✅ ACCEPTED - ${filename} → Score ${relevanceScore.toFixed(3)} passed (≥${mediaConfig.minRelevanceScore})`);
+          const record = await this.downloadMediaAndCreateRecord(url, kondoId, mediaConfig);
+          return record ? { record, score: relevanceScore } : null;
+        }
+
+        this.logger.warn(
+          `   [Media] ❌ REJECTED - ${filename} → ${validation.reason}, score ${relevanceScore.toFixed(3)} < ${mediaConfig.minRelevanceScore}`
+        );
+        this.fileLogger.debug(
+          `Media rejected: ${filename} - ${validation.reason}, score ${relevanceScore.toFixed(3)}`,
+          'ScrapingService'
+        );
+        return null;
+      }
+
+      // VIDEO: YouTube/Vimeo stored directly, self-hosted videos downloaded
+      if (mediaType === 'video') {
+        // Embedded videos (YouTube/Vimeo): store URL directly without download
+        if (this.isEmbeddedVideo(url)) {
+          this.logger.debug(`   [Media] Detected embedded video (YouTube/Vimeo)`);
+          if (relevanceScore >= mediaConfig.minRelevanceScore) {
+            this.logger.log(`   [Media] ✅ ACCEPTED - ${filename} → Embedded video score ${relevanceScore.toFixed(3)} (stored as URL)`);
+            const record = this.createEmbeddedVideoRecord(url, kondoId);
+            return { record, score: relevanceScore };
+          }
+          this.logger.warn(`   [Media] ❌ REJECTED - ${filename} → Embedded video score ${relevanceScore.toFixed(3)} < ${mediaConfig.minRelevanceScore}`);
+          return null;
+        }
+
+        // Self-hosted video: download and upload
+        this.logger.debug(`   [Media] Self-hosted video detected, will attempt download`);
+        if (relevanceScore >= mediaConfig.minRelevanceScore) {
+          this.logger.log(`   [Media] ✅ ATTEMPTING - ${filename} → Video score ${relevanceScore.toFixed(3)} (≥${mediaConfig.minRelevanceScore})`);
+          const record = await this.downloadMediaAndCreateRecord(url, kondoId, mediaConfig);
+          if (!record) {
+            this.logger.warn(`   [Media] ❌ DOWNLOAD FAILED - ${filename} → Check logs for details`);
+          }
+          return record ? { record, score: relevanceScore } : null;
+        }
+
+        this.logger.warn(`   [Media] ❌ REJECTED - ${filename} → Video score ${relevanceScore.toFixed(3)} < ${mediaConfig.minRelevanceScore}`);
+        return null;
+      }
+
+      // OTHER: check relevance score
+      if (relevanceScore >= mediaConfig.minRelevanceScore) {
+        this.logger.log(`   [Media] ✅ ACCEPTED - ${filename} → Score ${relevanceScore.toFixed(3)} passed`);
+        const record = await this.downloadMediaAndCreateRecord(url, kondoId, mediaConfig);
+        return record ? { record, score: relevanceScore } : null;
+      }
+
+      this.logger.warn(`   [Media] ❌ REJECTED - ${filename} → Score ${relevanceScore.toFixed(3)} < ${mediaConfig.minRelevanceScore}`);
+      return null;
+    } catch (error) {
+      this.logger.error(`   [Media] ❌ ERROR - ${filename}: ${error.message}`);
+      this.fileLogger.error(`Media processing error for ${filename}`, 'ScrapingService', error);
+      return null;
+    }
+  }
+
+  /**
+   * Download media and create Media record with CDN URL
+   */
+  private async downloadMediaAndCreateRecord(
+    url: string,
+    kondoId: number,
+    mediaConfig: any,
+  ): Promise<any | null> {
+    const filename = this.extractFilename(url);
+    this.logger.debug(`   [Media] Downloading: ${filename}...`);
+    
+    const result = await this.mediaDownloader.downloadAndUploadMedia(url, kondoId, {
+      minSizeKb: mediaConfig.minFileSizeKb,
+      minResolution: mediaConfig.minImageDimensions,
+      supportedFormats: mediaConfig.supportedFormats,
+    });
+
+    if (result) {
+      this.logger.debug(`   [Media] ✓ Upload successful: ${result.filename} → CDN`);
+      return {
+        kondoId,
+        filename: result.filename,
+        storage_url: result.cdnUrl, // Store CDN URL, not original
         type: this.detectMediaType(url),
         status: 'draft' as const,
-      }));
+      };
+    }
 
-      await Media.bulkCreate(mediaRecords);
-      this.logger.debug(`   Created ${medias.length} media records`);
+    this.logger.warn(`   [Media] Download/upload failed for: ${filename}`);
+    this.fileLogger.warn(`Media download failed: ${filename} from ${url}`, 'ScrapingService');
+
+    return null;
+  }
+
+  /**
+   * Check if URL is an embedded video (YouTube/Vimeo)
+   */
+  private isEmbeddedVideo(url: string): boolean {
+    const urlLower = url.toLowerCase();
+    return (
+      urlLower.includes('youtube.com') ||
+      urlLower.includes('youtu.be') ||
+      urlLower.includes('vimeo.com')
+    );
+  }
+
+  /**
+   * Create Media record for embedded video (store URL directly)
+   */
+  private createEmbeddedVideoRecord(url: string, kondoId: number): any {
+    return {
+      kondoId,
+      filename: this.extractFilename(url),
+      storage_url: url, // Store YouTube/Vimeo URL directly
+      type: 'video',
+      status: 'draft' as const,
+    };
+  }
+
+  /**
+   * Extract domain from URL
+   */
+  private extractDomain(url?: string): string | undefined {
+    if (!url) return undefined;
+    try {
+      return new URL(url).hostname;
+    } catch {
+      return undefined;
     }
   }
 
@@ -236,7 +755,8 @@ export class ScrapingService {
   private detectMediaType(url: string): string {
     const urlLower = url.toLowerCase();
 
-    if (urlLower.match(/\.(mp4|webm|ogg|mov)(\?.*)?$/)) {
+    // All video formats accepted
+    if (urlLower.match(/\.(mp4|webm|ogg|mov|avi|mkv|flv|wmv)(\?.*)?$/)) {
       return 'video';
     }
 
@@ -245,6 +765,28 @@ export class ScrapingService {
     }
 
     return 'image';
+  }
+
+  /**
+   * Select the best-scoring image as featured image
+   * Returns filename of best image or null if none available
+   */
+  private selectFeaturedImage(scoredImages: ScoredMediaRecord[]): string | null {
+    if (scoredImages.length === 0) {
+      this.logger.debug(`   [Featured] No images available for selection`);
+      return null;
+    }
+    
+    // Sort by score descending and select winner
+    const sorted = [...scoredImages].sort((a, b) => b.score - a.score);
+    const winner = sorted[0];
+    
+    this.logger.log(
+      `   [Featured] Selected: ${winner.filename} ` +
+      `(score: ${winner.score.toFixed(3)}, ranked #1 of ${scoredImages.length})`
+    );
+    
+    return winner.mediaRecord.filename;
   }
 
   /**
@@ -258,6 +800,15 @@ export class ScrapingService {
     this.logger.log(`❌ Failed:   ${result.failed}`);
     this.logger.log(`⏭️  Skipped:  ${result.skipped}`);
     
+    if (result.totalFieldsChanged !== undefined && result.success > 0) {
+      const avg = (result.totalFieldsChanged / result.success).toFixed(1);
+      this.logger.log(`📊 Total fields updated: ${result.totalFieldsChanged} (avg ${avg} per kondo)`);
+    }
+    
+    if (result.totalProtectedIgnored !== undefined && result.totalProtectedIgnored > 0) {
+      this.logger.log(`🔒 Protected fields ignored: ${result.totalProtectedIgnored}`);
+    }
+    
     if (result.errors.length > 0) {
       this.logger.log('\n❌ Errors:');
       result.errors.forEach((error) => {
@@ -266,5 +817,15 @@ export class ScrapingService {
     }
     
     this.logger.log('='.repeat(50) + '\n');
+    
+    // Also log to file
+    this.fileLogger.logSummary(
+      result.success, 
+      result.failed, 
+      result.skipped, 
+      result.errors,
+      result.totalFieldsChanged,
+      result.totalProtectedIgnored
+    );
   }
 }

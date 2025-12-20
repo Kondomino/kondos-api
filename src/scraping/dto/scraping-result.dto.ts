@@ -21,6 +21,16 @@ export interface ScrapeResult {
    * Details of errors encountered
    */
   errors: ScrapeError[];
+
+  /**
+   * Total number of fields changed across all kondos
+   */
+  totalFieldsChanged?: number;
+
+  /**
+   * Total number of protected fields that were ignored
+   */
+  totalProtectedIgnored?: number;
 }
 
 /**

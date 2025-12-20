@@ -43,7 +43,7 @@ export class SomattosParserService {
         ...this.extractConveniences($),
 
         // Meta
-        status: KondoStatus.MEDIA_GATHERING, // Move to next phase after scraping
+        status: KondoStatus.DONE, // Move to next phase after scraping
         active: true,
       };
     } catch (error) {
@@ -62,36 +62,56 @@ export class SomattosParserService {
     const mediaUrls: string[] = [];
 
     try {
+      this.logger.debug(`Starting media extraction from Somattos page`);
+      this.logger.debug(`HTML size: ${html.length} bytes`);
+
       // Find images - check various attributes
-      $('img').each((_, el) => {
+      const imgElements = $('img');
+      this.logger.debug(`Found ${imgElements.length} <img> elements`);
+      
+      imgElements.each((i, el) => {
         const src = $(el).attr('src') || 
                     $(el).attr('data-src') || 
                     $(el).attr('data-lazy-src');
+        const alt = $(el).attr('alt');
+        
+        this.logger.debug(`  [${i}] src="${src}", alt="${alt}"`);
         
         if (src && this.isPropertyMedia(src)) {
           mediaUrls.push(this.normalizeUrl(src));
+          this.logger.debug(`    ✓ Added as property media`);
+        } else if (src) {
+          this.logger.debug(`    ✗ Filtered (not property media)`);
         }
       });
 
       // Find video sources
-      $('video source').each((_, el) => {
+      const videoSources = $('video source');
+      this.logger.debug(`Found ${videoSources.length} <video source> elements`);
+      
+      videoSources.each((i, el) => {
         const src = $(el).attr('src');
         if (src) {
           mediaUrls.push(this.normalizeUrl(src));
+          this.logger.debug(`  [${i}] Video source: ${src}`);
         }
       });
 
       // Find YouTube/Vimeo embeds
-      $('iframe[src*="youtube"], iframe[src*="vimeo"]').each((_, el) => {
+      const embeds = $('iframe[src*="youtube"], iframe[src*="vimeo"]');
+      this.logger.debug(`Found ${embeds.length} video embeds`);
+      
+      embeds.each((i, el) => {
         const src = $(el).attr('src');
         if (src) {
           mediaUrls.push(src);
+          this.logger.debug(`  [${i}] Embed: ${src}`);
         }
       });
 
       // Deduplicate and filter
       const uniqueUrls = [...new Set(mediaUrls)];
-      this.logger.debug(`Extracted ${uniqueUrls.length} media URLs`);
+      this.logger.log(`Extracted ${uniqueUrls.length} unique media URLs from page`);
       
       return uniqueUrls;
     } catch (error) {

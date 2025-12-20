@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { BaseScraper } from '../../core/base-scraper';
-import { ScrapingDogService } from '../../core/scrapingdog.service';
+import { ScrapingPlatformFactory } from '../../core/scraping-platform.factory';
 import { RetryService } from '../../core/retry.service';
 import { SomattosParserService } from './somattos-parser.service';
 import { ScrapedKondoDto } from '../../dto/scraped-kondo.dto';
-import { ScrapingDogOptions } from '../../interfaces/scraper-config.interface';
+import { ScrapingPlatformOptions } from '../../interfaces/scraper-config.interface';
 
 /**
  * Scraper implementation for Somattos platform
@@ -15,17 +15,17 @@ export class SomattosScraperService extends BaseScraper {
   platform = 'somattos';
 
   constructor(
-    scrapingDogService: ScrapingDogService,
+    platformFactory: ScrapingPlatformFactory,
     retryService: RetryService,
     private readonly somattosParser: SomattosParserService,
   ) {
-    super(scrapingDogService, retryService);
+    super(platformFactory, retryService);
   }
 
   /**
-   * Get ScrapingDog configuration for Somattos
+   * Get platform configuration for Somattos
    */
-  protected getScrapingOptions(): ScrapingDogOptions {
+  protected getScrapingOptions(): ScrapingPlatformOptions {
     return {
       dynamic: true,        // Enable JavaScript rendering for dynamic content
       premium: false,       // Use standard proxy pool
@@ -43,7 +43,7 @@ export class SomattosScraperService extends BaseScraper {
   /**
    * Extract media URLs from Somattos page
    */
-  protected async extractMediaUrls(html: string): Promise<string[]> {
+  protected async extractMediaUrls(html: string, url: string): Promise<string[]> {
     return this.somattosParser.extractMediaUrls(html);
   }
 }

@@ -116,11 +116,11 @@ From Somattos pages, the module extracts:
 ## Status Flow
 
 ```
-SCRAPING (before) → scrape → MEDIA_GATHERING (after) → ... → DONE
+SCRAPING (before) → scrape → ... → DONE
 ```
 
 After scraping:
-- Kondo status changes to `MEDIA_GATHERING`
+- Kondo status changes to `DONE`
 - Media records are created with status `draft`
 - Ready for next phase (media download/CDN upload)
 

@@ -1,16 +1,19 @@
 import { Logger } from '@nestjs/common';
-import { ScrapingDogService } from './scrapingdog.service';
+import { ScrapingPlatformFactory } from './scraping-platform.factory';
 import { RetryService } from './retry.service';
 import { ScrapedKondoDto } from '../dto/scraped-kondo.dto';
-import { ScrapingDogOptions } from '../interfaces/scraper-config.interface';
+import { ScrapingPlatformOptions } from '../interfaces/scraper-config.interface';
 import { IScraperEngine } from '../interfaces/scraper-engine.interface';
+import { IScrapingPlatform } from '../interfaces/scraping-platform.interface';
 
 /**
  * Abstract base class for all platform-specific scrapers
  * Provides common scraping logic with retry handling
+ * Now uses factory pattern to support multiple scraping platforms (ScrapingDog, Scrapfly)
  */
 export abstract class BaseScraper implements IScraperEngine {
   protected readonly logger: Logger;
+  protected readonly platformService: IScrapingPlatform;
 
   /**
    * Platform identifier (must be implemented by subclasses)
@@ -18,10 +21,11 @@ export abstract class BaseScraper implements IScraperEngine {
   abstract platform: string;
 
   constructor(
-    protected readonly scrapingDogService: ScrapingDogService,
+    protected readonly platformFactory: ScrapingPlatformFactory,
     protected readonly retryService: RetryService,
   ) {
     this.logger = new Logger(this.constructor.name);
+    this.platformService = platformFactory.getPlatformService();
   }
 
   /**
@@ -33,24 +37,33 @@ export abstract class BaseScraper implements IScraperEngine {
     this.logger.log(`Starting scrape for: ${url}`);
 
     return this.retryService.withRetry(async () => {
-      // 1. Fetch HTML via ScrapingDog
-      const html = await this.scrapingDogService.fetchHtml(
+      // 1. Fetch HTML via platform service (ScrapingDog or Scrapfly)
+      const platformResponse = await this.platformService.fetchHtml(
         url,
         this.getScrapingOptions()
       );
 
+      const { html, metadata } = platformResponse;
+
+      // Log platform response metadata
+      this.logger.debug(`Platform response: ${JSON.stringify(metadata)}`);
+
       // 2. Parse HTML (platform-specific)
       const kondoData = await this.parseHtml(html);
 
-      // 3. Extract media URLs
-      const mediaUrls = await this.extractMediaUrls(html);
+      // 3. Extract media URLs (pass URL for relative path resolution)
+      const mediaUrls = await this.extractMediaUrls(html, url);
 
-      // 4. Build result
+      
+      this.logger.log(`[BASE SCRAPPER] Extracted ${mediaUrls.length} media URLs`);
+
+      // 4. Build result with platform metadata
       const result: ScrapedKondoDto = {
         ...kondoData,
         medias: mediaUrls,
         scrapedAt: new Date(),
         sourceUrl: url,
+        platformMetadata: metadata,
       };
 
       this.logger.log(`Successfully scraped: ${kondoData.name || 'Unknown'}`);
@@ -68,13 +81,14 @@ export abstract class BaseScraper implements IScraperEngine {
   /**
    * Extract media URLs (images, videos) from HTML
    * @param html - Raw HTML content
+   * @param url - Source URL for resolving relative paths
    * @returns Array of media URLs
    */
-  protected abstract extractMediaUrls(html: string): Promise<string[]>;
+  protected abstract extractMediaUrls(html: string, url: string): Promise<string[]>;
 
   /**
-   * Get platform-specific ScrapingDog options
-   * @returns ScrapingDog configuration
+   * Get platform-agnostic scraping options
+   * @returns Platform configuration (dynamic, premium, country, etc.)
    */
-  protected abstract getScrapingOptions(): ScrapingDogOptions;
+  protected abstract getScrapingOptions(): ScrapingPlatformOptions;
 }

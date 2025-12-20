@@ -19,4 +19,18 @@ export interface ScrapedKondoDto extends Partial<Omit<Kondo, 'medias'>> {
    * Source URL that was scraped
    */
   sourceUrl?: string;
+
+  /**
+   * Platform response metadata (status code, cost, response time, etc.)
+   */
+  platformMetadata?: {
+    statusCode?: number;
+    cost?: number;
+    renderedJs?: boolean;
+    responseTimeMs?: number;
+    platform?: string;
+    scrapeId?: string;
+    duration?: number;
+    [key: string]: any;
+  };
 }

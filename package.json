@@ -35,7 +35,8 @@
     "token": "npx ts-node src/kondo/scripts/token-generator.ts",
     "test:db-config": "node scripts/test-db-config.js",
     "scrape": "npx ts-node -r tsconfig-paths/register src/scraping/scraping.cli.ts scrape",
-    "scrape:dry": "npx ts-node -r tsconfig-paths/register src/scraping/scraping.cli.ts scrape --dry-run"
+    "scrape:dry": "npx ts-node -r tsconfig-paths/register src/scraping/scraping.cli.ts scrape --dry-run",
+    "scrape:test": "npx ts-node -r tsconfig-paths/register src/scraping/scraping.cli.ts scrape:test"
   },
   "engines": {
     "node": "24.11.0",
@@ -129,6 +130,9 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "<rootDir>/test-setup.ts"
+    ]
   }
 }

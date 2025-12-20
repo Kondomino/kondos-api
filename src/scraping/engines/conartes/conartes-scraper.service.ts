@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { BaseScraper } from '../../core/base-scraper';
-import { ScrapingDogService } from '../../core/scrapingdog.service';
+import { ScrapingPlatformFactory } from '../../core/scraping-platform.factory';
 import { RetryService } from '../../core/retry.service';
 import { ConartesParserService } from './conartes-parser.service';
 import { ScrapedKondoDto } from '../../dto/scraped-kondo.dto';
-import { ScrapingDogOptions } from '../../interfaces/scraper-config.interface';
+import { ScrapingPlatformOptions } from '../../interfaces/scraper-config.interface';
 import { CONARTES_CONFIG } from './conartes.config';
 
 @Injectable()
@@ -12,14 +12,14 @@ export class ConartesScraperService extends BaseScraper {
   platform = 'conartes';
 
   constructor(
-    scrapingDogService: ScrapingDogService,
+    platformFactory: ScrapingPlatformFactory,
     retryService: RetryService,
     private readonly conartesParser: ConartesParserService,
   ) {
-    super(scrapingDogService, retryService);
+    super(platformFactory, retryService);
   }
 
-  protected getScrapingOptions(): ScrapingDogOptions {
+  protected getScrapingOptions(): ScrapingPlatformOptions {
     return CONARTES_CONFIG.scrapingOptions;
   }
 
@@ -27,7 +27,7 @@ export class ConartesScraperService extends BaseScraper {
     return this.conartesParser.parse(html);
   }
 
-  protected async extractMediaUrls(html: string): Promise<string[]> {
+  protected async extractMediaUrls(html: string, url: string): Promise<string[]> {
     return this.conartesParser.extractMediaUrls(html);
   }
 }

@@ -2,32 +2,38 @@ import { Injectable } from '@nestjs/common';
 import { BaseScraper } from '../../core/base-scraper';
 import { ScrapingPlatformFactory } from '../../core/scraping-platform.factory';
 import { RetryService } from '../../core/retry.service';
-import { CanopusParserService } from './canopus-parser.service';
+import { ElementorParserService } from './elementor-parser.service';
 import { ScrapedKondoDto } from '../../dto/scraped-kondo.dto';
 import { ScrapingPlatformOptions } from '../../interfaces/scraper-config.interface';
-import { CANOPUS_CONFIG } from './canopus.config';
+import { ELEMENTOR_CONFIG } from './elementor.config';
 
+/**
+ * Scraper for Elementor (WordPress) websites
+ * Extends BaseScraper to use platform factory for ScrapingDog or Scrapfly
+ */
 @Injectable()
-export class CanopusScraperService extends BaseScraper {
-  platform = 'canopus';
+export class ElementorScraperService extends BaseScraper {
+  platform = 'elementor';
 
   constructor(
     platformFactory: ScrapingPlatformFactory,
     retryService: RetryService,
-    private readonly canopusParser: CanopusParserService,
+    private readonly parserService: ElementorParserService,
   ) {
     super(platformFactory, retryService);
   }
 
   protected getScrapingOptions(): ScrapingPlatformOptions {
-    return CANOPUS_CONFIG.scrapingOptions;
+    return ELEMENTOR_CONFIG.scrapingOptions;
   }
 
   protected async parseHtml(html: string): Promise<Partial<ScrapedKondoDto>> {
-    return this.canopusParser.parse(html);
+    return this.parserService.parse(html);
   }
 
   protected async extractMediaUrls(html: string, url: string): Promise<string[]> {
-    return this.canopusParser.extractMediaUrls(html);
+    const imageUrls = this.parserService.extractMediaUrls(html, url);
+    const videoUrls = this.parserService.extractVideoUrls(html, url);
+    return [...imageUrls, ...videoUrls];
   }
 }

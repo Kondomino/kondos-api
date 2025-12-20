@@ -1,27 +1,38 @@
 /**
- * ScrapingDog API options
+ * Generic platform options for any scraping service
+ * Compatible with both ScrapingDog and Scrapfly
  */
-export interface ScrapingDogOptions {
+export interface ScrapingPlatformOptions {
   /**
    * Enable JavaScript rendering for dynamic content
+   * ScrapingDog: 'dynamic' parameter
+   * Scrapfly: 'asp' parameter (anti-scraping protection + JS)
    */
   dynamic?: boolean;
 
   /**
-   * Use premium proxy pool
+   * Use premium/residential proxy pool
+   * ScrapingDog: 'premium' parameter
+   * Scrapfly: 'proxy_pool' parameter
    */
   premium?: boolean;
 
   /**
    * Country code for geo-targeting (e.g., 'br' for Brazil)
+   * Both platforms: 'country' parameter
    */
   country?: string;
 
   /**
-   * Additional query parameters to pass to ScrapingDog
+   * Additional query parameters to pass to the platform
    */
   extraParams?: Record<string, string>;
 }
+
+/**
+ * @deprecated Use ScrapingPlatformOptions instead
+ */
+export interface ScrapingDogOptions extends ScrapingPlatformOptions {}
 
 /**
  * Retry configuration

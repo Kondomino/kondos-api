@@ -16,6 +16,7 @@ export class IntegratorService {
   dataTypes: unknown[] = [];
   updated = 0;
   created = 0;
+  skipped = 0;
   uncapturedColumns: Set<string> = new Set();
 
   constructor(
@@ -124,6 +125,107 @@ export class IntegratorService {
   }
   
   /**
+   * Build a map of column name to column index for easy access
+   * @param columnsNames - Array of column names from Excel
+   * @returns Map<columnName, columnIndex>
+   */
+  private buildColumnIndexMap(columnsNames: string[]): Map<string, number> {
+    const columnIndexMap = new Map<string, number>();
+    columnsNames.forEach((name, index) => {
+      columnIndexMap.set(name, index);
+    });
+    return columnIndexMap;
+  }
+
+  /**
+   * Generate slug from name field using column name mapping
+   * @param rows - Row data from Excel
+   * @param columnIndexMap - Map of column names to indexes
+   * @param condoDTO - The DTO being built
+   * @returns Generated slug or empty string
+   */
+  private generateSlugFromName(
+    rows: any[],
+    columnIndexMap: Map<string, number>,
+    condoDTO: CreateKondoDto
+  ): string {
+    const nameIndex = columnIndexMap.get('name');
+    
+    if (nameIndex !== undefined && rows[nameIndex] && rows[nameIndex] !== '') {
+      return this.slugifyService.run(rows[nameIndex]);
+    } else if (condoDTO.name && condoDTO.name.trim() !== '') {
+      // Fallback: generate from DTO if name was already set
+      return this.slugifyService.run(condoDTO.name);
+    }
+    
+    return '';
+  }
+
+  /**
+   * Process a single row by iterating through valid columns
+   * @param rows - Row data from Excel
+   * @param columnsNames - Array of column names
+   * @param columnIndexMap - Map of column names to indexes
+   * @returns Populated CreateKondoDto
+   */
+  private processRowData(
+    rows: any[],
+    columnsNames: string[],
+    columnIndexMap: Map<string, number>
+  ): CreateKondoDto {
+    const condoDTO = new CreateKondoDto();
+    const { validColumns } = validateColumns(columnsNames);
+
+    // Process each valid column by name, not index
+    for (const columnName of validColumns) {
+      const colIndex = columnIndexMap.get(columnName);
+      if (colIndex === undefined) continue; // Column not found in this row
+      
+      let value = rows[colIndex];
+      
+      // Skip empty/undefined values
+      if (value === '' || value === undefined || value === null) {
+        continue;
+      }
+
+      // Boolean normalization
+      if (this.dataTypes[colIndex] && this.dataTypes[colIndex][0] === 'boolean') {
+        value = value === '1' ? '1' : '0';
+      }
+
+      // Normalize and assign to DTO
+      const normalized = normalizeKondoField(columnName, value);
+      if (normalized !== undefined) {
+        condoDTO[columnName] = normalized;
+      }
+    }
+
+    return condoDTO;
+  }
+
+  /**
+   * Validate that a record has all required fields
+   * @param condoDTO - The DTO to validate
+   * @param slug - The generated slug
+   * @returns true if valid, false otherwise
+   */
+  private isValidRecord(condoDTO: CreateKondoDto, slug: string): boolean {
+    if (!condoDTO.name || condoDTO.name.trim() === '') {
+      console.log(`⚠️  Skipping record with slug "${slug || 'unknown'}" - missing required name field`);
+      this.skipped++;
+      return false;
+    }
+    
+    if (!slug || slug === '') {
+      console.log(`⚠️  Skipping record with name "${condoDTO.name}" - failed to generate slug`);
+      this.skipped++;
+      return false;
+    }
+    
+    return true;
+  }
+
+  /**
    * Insert data into Kondo table
    * Collects all promises and waits for completion before returning
    * Only processes columns that exist in the model
@@ -134,50 +236,33 @@ export class IntegratorService {
     console.log('inserting data....');
 
     try {
+      // Build column name to index mapping
+      const columnIndexMap = this.buildColumnIndexMap(columnsNames);
+      console.log('Column mapping:', Object.fromEntries(columnIndexMap));
+
       // Collect all promises for parallel processing
       const insertPromises: Promise<void>[] = [];
 
       for (const rows of records) {
-        const condoDTO = new CreateKondoDto();
-        let slug = '';
-
-        // Process each column, only if valid
-        const { validColumns } = validateColumns(columnsNames);
+        // Process row data by column names
+        const condoDTO = this.processRowData(rows, columnsNames, columnIndexMap);
         
-        rows.forEach((col, colIndex) => {
-          const columnName = columnsNames[colIndex];
-          
-          // Only process columns that exist in the model
-          if (!validColumns.includes(columnName)) {
-            return; // Skip this column
-          }
-
-          // First column (index 0) should be slug
-          if (colIndex == 0) {
-            if (rows[1] && rows[1] != '') {
-              slug = this.slugifyService.run(rows[1]);
-              col = slug;
-            }
-          }
-          // Boolean normalization
-          else if (this.dataTypes[colIndex] && this.dataTypes[colIndex][0] == "boolean") {
-            col = col == "1" ? "1" : "0";
-          }
-
-          // Assign to DTO only if it's a valid property
-          if (validColumns.includes(columnName)) {
-            const normalized = normalizeKondoField(columnName, col);
-            if (normalized !== undefined) {
-              condoDTO[columnName] = normalized;
-            }
-          }
-        });
-
-        // Got a valid slug? Create a promise for this record
-        if (slug !== '') {
-          const promise = this.processCondoRecord(condoDTO, slug);
-          insertPromises.push(promise);
+        // Generate slug from name
+        const slug = this.generateSlugFromName(rows, columnIndexMap, condoDTO);
+        
+        // Assign slug to DTO
+        if (slug) {
+          condoDTO.slug = slug;
         }
+
+        // Validate record has required fields
+        if (!this.isValidRecord(condoDTO, slug)) {
+          continue; // Skip invalid record
+        }
+
+        // Create promise for this valid record
+        const promise = this.processCondoRecord(condoDTO, slug);
+        insertPromises.push(promise);
       }
 
       // Wait for all promises to complete
@@ -229,6 +314,7 @@ export class IntegratorService {
     console.log('\n------ INTEGRATION RESULTS -----');
     console.log('Created:', this.created);
     console.log('Updated:', this.updated);
+    console.log('Skipped:', this.skipped);
     console.log('Total Processed:', this.created + this.updated);
     
     if (this.uncapturedColumns.size > 0) {

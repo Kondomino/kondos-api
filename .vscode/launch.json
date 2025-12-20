@@ -1,16 +1,35 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "type": "node",
-        "request": "launch",
-        "name": "Debug Nest Framework",
-        "args": ["${workspaceFolder}/src/main.ts"],
-        "runtimeArgs": ["--nolazy", "-r", "ts-node/register", "-r", "tsconfig-paths/register"],
-        "sourceMaps": true,
-        "envFile": "${workspaceFolder}/.env",
-        "cwd": "${workspaceRoot}",
-        "console": "integratedTerminal",
-      }
-    ]
-  }
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Nest Framework",
+      "args": ["${workspaceFolder}/src/main.ts"],
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register", "-r", "tsconfig-paths/register"],
+      "sourceMaps": true,
+      "envFile": "${workspaceFolder}/.env",
+      "cwd": "${workspaceRoot}",
+      "console": "integratedTerminal"
+    },
+
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Scraper",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "scrape",
+        "--",
+        "--platform=canopus",
+        "--kondo-id=208"
+      ],
+      "envFile": "${workspaceFolder}/.env",
+      "cwd": "${workspaceRoot}",
+      "console": "integratedTerminal",
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

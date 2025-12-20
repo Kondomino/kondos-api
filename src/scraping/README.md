@@ -113,7 +113,7 @@ After successful scraping:
    - address fields (street, neighborhood, city)
    - financial info (prices, financing)
    - infrastructure/conveniences
-   - status changes to `MEDIA_GATHERING`
+   - status changes to `DONE`
 
 2. **Media records** are created:
    - Each image/video URL becomes a Media record
@@ -214,7 +214,7 @@ To add support for a new platform (e.g., 5andar):
    └─ Save Results:
       ├─ Update Kondo record
       ├─ Create Media records
-      └─ Change status to 'MEDIA_GATHERING'
+      └─ Change status to 'DONE'
 
 3. Log Summary
 ```
@@ -274,7 +274,7 @@ To add support for a new platform (e.g., 5andar):
 
 ## 📝 Notes
 
-- **Status Flow:** `scraping` → `MEDIA_GATHERING` → `done`
+- **Status Flow:** `scraping` → `done`
 - **Media URLs:** Stored as-is, not downloaded (CDN upload is separate process)
 - **Idempotency:** Safe to re-run on same kondo (will update existing data)
 - **Performance:** ScrapingDog handles proxy rotation and rate limiting
