@@ -4,6 +4,7 @@ import { SearchKondoDto } from './dto/search-kondo.dto';
 import { UpdateKondoDto } from './dto/update-kondo.dto';
 import { KondoService } from './kondo.service';
 import { Public } from '../auth/decorators/public.decorator';
+import { SitemapQueryDto } from './dto/sitemap-query.dto';
 
 @Controller('kondo')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -26,6 +27,18 @@ export class KondoController {
   @Get('/conveniences')
   async getConveniences() {
     return this.kondoService.getConveniences();
+  }
+
+  @Public()
+  @Get('/count')
+  async getCount() {
+    return this.kondoService.getCount();
+  }
+
+  @Public()
+  @Get('/sitemap')
+  async getSitemap(@Query() sitemapQueryDto: SitemapQueryDto) {
+    return this.kondoService.getSitemapData(sitemapQueryDto);
   }
 
   // @Public()

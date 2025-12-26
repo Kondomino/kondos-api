@@ -7,6 +7,7 @@ import { SearchKondoDto } from './dto/search-kondo.dto';
 import { SlugifyService } from '../utils/slugify/slugify.service';
 import { KondoRepository } from './repository/kondo.repository';
 import { KondoConveniencesType } from './entities/kondo.conveniences.abstract.entity';
+import { KondoCountResponse, KondoSitemapItem, SitemapQueryDto } from './dto/sitemap-query.dto';
 
 @Injectable()
 export class KondoService {
@@ -72,5 +73,13 @@ export class KondoService {
             throw new NotFoundException();
 
         return await KondoFound.update({ active: false});
+    }
+
+    async getCount(): Promise<KondoCountResponse> {
+        return await this.KondoRepository.getCount();
+    }
+
+    async getSitemapData(sitemapQueryDto: SitemapQueryDto): Promise<KondoSitemapItem[]> {
+        return await this.KondoRepository.getSitemapData(sitemapQueryDto);
     }
 }

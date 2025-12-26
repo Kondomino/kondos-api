@@ -10,6 +10,7 @@ import { PaginationQuery } from "../../core/pagination/pagination.query.type";
 import { Op } from "sequelize";
 import { Like } from "../../like/entities/like.entity";
 import sequelize from "sequelize";
+import { KondoCountResponse, KondoSitemapItem, SitemapQueryDto } from "../dto/sitemap-query.dto";
 
 @Injectable()
 export class KondoRepository {
@@ -113,5 +114,48 @@ export class KondoRepository {
 
     async create(createKondoDto: Partial<Kondo>): Promise<Kondo> {
         return await this.KondoRepositoryProvider.create<Kondo>(createKondoDto);
+    }
+
+    async getCount(): Promise<KondoCountResponse> {
+        const result = await this.KondoRepositoryProvider.findOne({
+            attributes: [
+                [sequelize.fn('COUNT', sequelize.literal('CASE WHEN highlight = true THEN 1 END')), 'highlighted'],
+                [sequelize.fn('COUNT', sequelize.literal('CASE WHEN highlight = false OR highlight IS NULL THEN 1 END')), 'regular']
+            ],
+            where: { active: true },
+            raw: true
+        });
+
+        return {
+            highlighted: parseInt(result['highlighted'] as string) || 0,
+            regular: parseInt(result['regular'] as string) || 0
+        };
+    }
+
+    async getSitemapData(sitemapQueryDto: SitemapQueryDto): Promise<KondoSitemapItem[]> {
+        const { page = 1, limit = 50000, highlighted } = sitemapQueryDto;
+        const offset = (page - 1) * limit;
+
+        const where: any = { active: true };
+
+        if (highlighted === '1') {
+            where.highlight = true;
+        } else if (highlighted === '0') {
+            where[Op.or] = [
+                { highlight: false },
+                { highlight: null }
+            ];
+        }
+
+        const results = await this.KondoRepositoryProvider.findAll({
+            attributes: ['slug', 'updatedAt', 'highlight'],
+            where,
+            order: [['updatedAt', 'DESC']],
+            limit,
+            offset,
+            raw: true
+        });
+
+        return results as any as KondoSitemapItem[];
     }
 }
