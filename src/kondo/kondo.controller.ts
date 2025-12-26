@@ -19,7 +19,7 @@ export class KondoController {
   @Public()
   @Get()
   async findAll(@Query() searchKondoDto: SearchKondoDto) {
-    return this.kondoService.findAll(searchKondoDto);
+    return await this.kondoService.findAll(searchKondoDto);
   }
 
   @Public()

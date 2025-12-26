@@ -7,35 +7,40 @@ export class SearchKondoDto extends PageOptionsDto {
     @ApiProperty()
     @IsString()
     @IsOptional()
-    name: string;
+    name?: string;
 
     @ApiProperty()
     @IsString()
     @IsOptional()
-    slug: string;
+    slug?: string;
 
     @ApiProperty()
     @IsEmail()
     @IsOptional()
-    email: string;
+    email?: string;
 
     @ApiProperty()
     @IsBoolean()
     @IsOptional()
-    active: boolean = true;
+    active?: boolean = true;
 
     @ApiProperty()
     @IsString()
     @IsOptional()
-    status: string = KondoStatus.DONE;
+    status?: string = KondoStatus.DONE;
 
     @ApiProperty()
     @IsString()
     @IsOptional()
-    search: string;
+    search?: string;
 
     @ApiProperty()
     @IsString()
     @IsOptional()
-    conveniences: string;
+    conveniences?: string;
+
+    @ApiProperty()
+    @IsBoolean()
+    @IsOptional()
+    randomize?: boolean;
 }

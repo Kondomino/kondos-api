@@ -24,7 +24,7 @@ export class KondoRepository {
 
     async findAll(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
         // eslint-disable-next-line prefer-const
-        let { take, order, page, name, slug, active, status, search, conveniences } = searchKondoDto;
+        let { take, order, page, name, slug, active, status, search, conveniences, randomize } = searchKondoDto;
 
         // eslint-disable-next-line prefer-const
         let query: PaginationQuery = {
@@ -63,11 +63,14 @@ export class KondoRepository {
         }
 
         // TODO: create an orderByField = 'field'
-        if (order) {
-            query.order = [['id', searchKondoDto.order]];
+        if (randomize) {
+            query.order = [sequelize.literal('highlight DESC, RANDOM()')];
+        }
+        else if (order) {
+            query.order = [['highlight', 'DESC'], ['id', searchKondoDto.order]];
         }
         else {
-            query.order = [['updateddAt', 'DESC']];
+            query.order = [['highlight', 'DESC'], ['updatedAt', 'DESC']];
         }
 
         page = page? page -1 : 0;

@@ -12,7 +12,12 @@ async function bootstrap() {
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3003;
   const app = await NestFactory.create(AppModule, { cors: true });
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(new ValidationPipe({ 
+    transform: true,
+    transformOptions: {
+      enableImplicitConversion: true,
+    }
+  }));
   app.use(cookieParser());
   app.setGlobalPrefix('api');
 
