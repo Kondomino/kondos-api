@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { GoogleStrategy } from './auth/strategies/google.strategy';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
 import { ScrapingModule } from './scraping/scraping.module';
+import { AIComposerModule } from './agentic/ai-composer/ai-composer.module';
 // Environment configuration is handled by ConfigModule
 
 @Module({
@@ -30,7 +31,8 @@ import { ScrapingModule } from './scraping/scraping.module';
     LikeModule,
     AuthModule,
     WhatsappModule,
-    ScrapingModule
+    ScrapingModule,
+    AIComposerModule,
   //   SeederModule.forRoot({
   //     // Activate this if you want to run the seeders if the table is empty in the database
   //     runOnlyIfTableIsEmpty: true,

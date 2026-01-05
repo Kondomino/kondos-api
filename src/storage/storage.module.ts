@@ -15,6 +15,7 @@ import { DigitalOceanSpacesService } from '../whatsapp/services/digital-ocean-sp
     RawContentStorageService,
     StoragePathGeneratorService,
     StorageStreamCdnService,
+    DigitalOceanSpacesService,
   ],
 })
 export class StorageModule {}

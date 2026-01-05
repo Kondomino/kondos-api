@@ -8,13 +8,21 @@ import { SlugifyService } from '../utils/slugify/slugify.service';
 import { KondoRepository } from './repository/kondo.repository';
 import { KondoConveniencesType } from './entities/kondo.conveniences.abstract.entity';
 import { KondoCountResponse, KondoSitemapItem, SitemapQueryDto } from './dto/sitemap-query.dto';
+import { PageDto } from '../core/pagination/page.dto';
+import { PageMetaDto } from '../core/pagination/page.meta.dto';
+import { DigitalOceanSpacesService } from '../whatsapp/services/digital-ocean-spaces.service';
+import { Media } from '../media/entities/media.entity';
+import { Inject } from '@nestjs/common';
+import { MEDIA_REPOSITORY_PROVIDER } from '../core/constants';
 
 @Injectable()
 export class KondoService {
 
     constructor(
         private slugify: SlugifyService,
-        private readonly KondoRepository: KondoRepository
+        private readonly KondoRepository: KondoRepository,
+        private readonly digitalOceanSpacesService: DigitalOceanSpacesService,
+        @Inject(MEDIA_REPOSITORY_PROVIDER) private readonly MediaRepository: typeof Media
     ) {}
 
     async create(Kondo: CreateKondoDto): Promise<findOrCreateType> {
@@ -35,6 +43,7 @@ export class KondoService {
     async findOne(id: number): Promise<Kondo> {
         return await this.KondoRepository.findOne({ where: { id } });
     }
+
     async findBy(searchKondoDto: SearchKondoDto): Promise<Kondo> {
         const { name, slug, email } = searchKondoDto;
         if (name)
@@ -48,8 +57,15 @@ export class KondoService {
         searchKondoDto.active = true;
         return await this.KondoRepository.findAll(searchKondoDto);
     }
-    async findAll(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
-        return await this.KondoRepository.findAll(searchKondoDto);
+    async findAll(searchKondoDto: SearchKondoDto): Promise<PageDto<Kondo>> {
+        const { data, count } = await this.KondoRepository.findAllWithCount(searchKondoDto);
+        
+        const pageMetaDto = new PageMetaDto({
+            pageOptionsDto: searchKondoDto,
+            itemCount: count
+        });
+
+        return new PageDto(data, pageMetaDto);
     }
     async getConveniences(): Promise<KondoConveniencesType[]> {
         const kondo = new Kondo();
@@ -57,22 +73,24 @@ export class KondoService {
         return kondo.getAllConveniences();
     }
     
-    async update(id: number, Kondo: UpdateKondoDto): Promise<Kondo> {
-        const KondoFound = await this.findOne(id);
+    async update(id: number, updateKondoDto: UpdateKondoDto): Promise<Kondo> {
+        const kondoFound = await this.KondoRepository.findOneBaked(id);
 
-        if (!KondoFound)
+        if (!kondoFound)
             throw new NotFoundException();
 
-        return await KondoFound.update({ ...Kondo });
+        Object.assign(kondoFound, updateKondoDto);
+        return await kondoFound.save();
     }
 
     async deactivateKondo(id: number): Promise<Kondo> {
-        const KondoFound = await this.findOne(id);
+        const kondoFound = await this.KondoRepository.findOneBaked(id);
 
-        if (!KondoFound)
+        if (!kondoFound)
             throw new NotFoundException();
 
-        return await KondoFound.update({ active: false});
+        kondoFound.active = false;
+        return await kondoFound.save();
     }
 
     async getCount(): Promise<KondoCountResponse> {
@@ -81,5 +99,62 @@ export class KondoService {
 
     async getSitemapData(sitemapQueryDto: SitemapQueryDto): Promise<KondoSitemapItem[]> {
         return await this.KondoRepository.getSitemapData(sitemapQueryDto);
+    }
+
+    async uploadMedia(kondoId: number, files: Express.Multer.File[]): Promise<{ success: boolean; message: string; data: Media[] }> {
+        // Find kondo to get slug
+        const kondo = await this.findOne(kondoId);
+        if (!kondo) {
+            throw new NotFoundException(`Kondo with ID ${kondoId} not found`);
+        }
+
+        const uploadedMedia: Media[] = [];
+        const errors: string[] = [];
+
+        for (const file of files) {
+            try {
+                // Generate unique filename
+                const timestamp = Date.now();
+                const randomSuffix = Math.random().toString(36).substring(7);
+                const fileExtension = file.originalname.split('.').pop();
+                const uniqueFilename = `${timestamp}-${randomSuffix}.${fileExtension}`;
+                
+                // Upload to DigitalOcean Spaces
+                const key = `kondos/${kondo.slug}/${uniqueFilename}`;
+                const uploadResult = await this.digitalOceanSpacesService.uploadFile(
+                    file.buffer,
+                    key,
+                    file.mimetype,
+                    { kondoId: kondoId.toString() }
+                );
+
+                if (uploadResult.success) {
+                    // Create Media entity
+                    const media = await this.MediaRepository.create({
+                        filename: uniqueFilename,
+                        type: 'image',
+                        status: 'final',
+                        storage_url: uploadResult.url,
+                        kondoId: kondoId
+                    });
+
+                    uploadedMedia.push(media);
+                } else {
+                    errors.push(`${file.originalname}: ${uploadResult.error}`);
+                }
+            } catch (error) {
+                errors.push(`${file.originalname}: ${error.message}`);
+            }
+        }
+
+        if (errors.length > 0 && uploadedMedia.length === 0) {
+            throw new Error(`All uploads failed: ${errors.join(', ')}`);
+        }
+
+        return {
+            success: true,
+            message: `${uploadedMedia.length} image(s) uploaded successfully${errors.length > 0 ? ` (${errors.length} failed)` : ''}`,
+            data: uploadedMedia
+        };
     }
 }

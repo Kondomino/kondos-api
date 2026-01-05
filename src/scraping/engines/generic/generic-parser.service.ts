@@ -106,12 +106,12 @@ export class GenericParserService {
               images.add(src);
               selectorMatches++;
               this.fileLogger.debug(
-                `Phase 1: Found image via selector "${selector}" - ${src.substring(0, 80)}...`,
+                `Phase 1: Found image via selector "${selector}" - ${src}`,
                 'GenericParser'
               );
             } else {
               this.fileLogger.debug(
-                `Phase 1: Skipped invalid URL from "${selector}" - ${src.substring(0, 60)}...`,
+                `Phase 1: Skipped invalid URL from "${selector}" - ${src}`,
                 'GenericParser'
               );
             }
@@ -170,14 +170,14 @@ export class GenericParserService {
             if (!wasAlreadyFound) {
               images.add(src);
               this.fileLogger.debug(
-                `Phase 2: NEW image found - ${src.substring(0, 80)}...`,
+                `Phase 2: NEW image found - ${src}`,
                 'GenericParser'
               );
             }
           } else {
             phase2Skipped++;
             this.fileLogger.debug(
-              `Phase 2: Skipped invalid URL - ${src.substring(0, 60)}...`,
+              `Phase 2: Skipped invalid URL - ${src}`,
               'GenericParser'
             );
           }
@@ -218,12 +218,12 @@ export class GenericParserService {
           if (this.isValidMediaUrl(src)) {
             videos.add(src);
             this.fileLogger.debug(
-              `Video found - ${src.substring(0, 80)}...`,
+              `Video found - ${src}`,
               'GenericParser'
             );
           } else {
             this.fileLogger.debug(
-              `Skipped invalid video URL - ${src.substring(0, 60)}...`,
+              `Skipped invalid video URL - ${src}`,
               'GenericParser'
             );
           }
@@ -289,6 +289,14 @@ export class GenericParserService {
       description = $('meta[name="description"]').attr('content') || '';
     }
 
+    // Enhanced: Try multiple semantic sections and combine
+    if (!description || description.length < 100) {
+      const richDescription = this.extractRichDescription($);
+      if (richDescription && richDescription.length > description.length) {
+        description = richDescription;
+      }
+    }
+
     if (!description) {
       // Generic content extraction
       const contentText = $('main, .main, .content, article')
@@ -299,6 +307,44 @@ export class GenericParserService {
     }
 
     return description || '';
+  }
+
+  /**
+   * Extract rich description from multiple page sections
+   * Useful for SPAs where content is in various containers
+   */
+  private extractRichDescription($: CheerioRoot): string {
+    const descriptions: string[] = [];
+
+    // Try to extract from common description containers
+    const containers = [
+      'main p',
+      'article p',
+      '[class*="description"] p',
+      '[class*="about"] p',
+      '[id*="description"]',
+      '[id*="about"]',
+      '.text-content',
+      '.content p',
+    ];
+
+    for (const selector of containers) {
+      $(selector).each((i, el) => {
+        const text = $(el).text().trim();
+        // Only include substantial paragraphs (> 50 chars)
+        if (text.length > 50 && !descriptions.includes(text)) {
+          descriptions.push(text);
+        }
+      });
+
+      // Stop if we have 3 good paragraphs
+      if (descriptions.length >= 3) {
+        break;
+      }
+    }
+
+    // Combine up to 3 paragraphs with line breaks
+    return descriptions.slice(0, 3).join('\n\n');
   }
 
   /**

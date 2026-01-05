@@ -36,12 +36,20 @@ export class ScrapflyService {
       const params = new URLSearchParams({
         key: this.apiKey,
         url: url,
-        // Scrapfly uses 'asp' for anti-scraping protection + JS rendering
-        asp: options?.dynamic ? 'true' : 'false',
+        // Enable JavaScript rendering (required for wait_for_selector)
+        render_js: options?.dynamic ? 'true' : 'false',
+        // Anti-scraping protection (optional, can be used with render_js)
+        ...(options?.asp && { asp: 'true' }),
         // Country targeting
         ...(options?.country && { country: options.country }),
         // Proxy pool selection
         ...(options?.premium && { proxy_pool: 'public_residential_pool' }),
+        // SPA support: wait for selector (requires render_js=true)
+        ...(options?.waitForSelector && { wait_for_selector: options.waitForSelector }),
+        // Wait time after page load for rendering (milliseconds)
+        ...(options?.renderingWait && { rendering_wait: options.renderingWait.toString() }),
+        // Total timeout for request (milliseconds)
+        ...(options?.timeout && { timeout: options.timeout.toString() }),
         // Format: use 'clean' to get cleaned HTML (removes scripts, styles, etc)
         // This returns raw HTML that can be parsed with Cheerio
         //format: 'text',
@@ -102,6 +110,7 @@ export class ScrapflyService {
       
       if (axiosError.response) {
         const status = axiosError.response.status;
+        const errorBody = axiosError.response.data;
         
         switch (status) {
           case 401:
@@ -111,16 +120,20 @@ export class ScrapflyService {
             this.logger.error('Scrapfly rate limit exceeded');
             break;
           case 400:
-            this.logger.error(`Invalid URL or parameters: ${url}`);
+            this.logger.error(`Scrapfly 400 - Invalid parameters for ${url}`);
+            this.logger.error(`Response: ${JSON.stringify(errorBody)}`);
+            this.logger.error(`Request URL: ${axiosError.config?.url}`);
             break;
           case 422:
             this.logger.error('Scrapfly scrape failed - target site blocked request');
+            this.logger.error(`Response: ${JSON.stringify(errorBody)}`);
             break;
           case 500:
             this.logger.error('Scrapfly internal server error');
             break;
           default:
             this.logger.error(`Scrapfly error (${status}): ${axiosError.message}`);
+            this.logger.error(`Response: ${JSON.stringify(errorBody)}`);
         }
       } else if (axiosError.request) {
         this.logger.error('No response from Scrapfly API - network issue');

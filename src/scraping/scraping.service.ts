@@ -1,4 +1,4 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Injectable, Inject, Logger, NotFoundException } from '@nestjs/common';
 import { Kondo, KondoStatus } from '../kondo/entities/kondo.entity';
 import { Media } from '../media/entities/media.entity';
 import { KONDO_REPOSITORY_PROVIDER } from '../core/constants';
@@ -21,6 +21,10 @@ import { MediaDownloadService } from './core/media-download.service';
 import { ScrapingConfig } from '../config/scraping.config';
 import { ScrapingFileLogger } from './logger/scraping-file-logger';
 import { SlugifyService } from '../utils/slugify/slugify.service';
+import { DataQualityValidatorService } from './core/data-quality-validator.service';
+import { DataMergeService } from './core/data-merge.service';
+import { ScrapeKondoRequestDto } from './dto/scrape-kondo-request.dto';
+import { ScrapeKondoResponseDto, MediaStats } from './dto/scrape-kondo-response.dto';
 
 /**
  * Scored media record for featured image selection
@@ -56,6 +60,8 @@ export class ScrapingService {
     private readonly mediaDownloader: MediaDownloadService,
     private readonly fileLogger: ScrapingFileLogger,
     private readonly slugifyService: SlugifyService,
+    private readonly qualityValidator: DataQualityValidatorService,
+    private readonly dataMerge: DataMergeService,
     // Add other platform scrapers here as they are implemented
   ) {
     this.delayBetweenRequestsMs = this.scrapingConfig.delay?.betweenRequestsMs ?? 4000;
@@ -167,6 +173,120 @@ export class ScrapingService {
     this.logSummary(result);
     return result;
   }
+
+  /**
+   * Scrape a single kondo by ID (API method)
+   * Uses smart merging with data quality validation
+   * 
+   * @param kondoId - ID of kondo to scrape
+   * @param options - Scraping options
+   * @returns Detailed scraping response
+   */
+  async scrapeKondoById(
+    kondoId: number,
+    options?: ScrapeKondoRequestDto,
+  ): Promise<ScrapeKondoResponseDto> {
+    this.logger.log(`🔍 Scraping kondo ${kondoId} via API...`);
+
+    // Fetch kondo from database
+    const kondo = await this.kondoRepository.findOne({
+      where: { id: kondoId },
+    });
+
+    if (!kondo) {
+      throw new NotFoundException(`Kondo with ID ${kondoId} not found`);
+    }
+
+    // Validate URL
+    if (!kondo.url) {
+      return {
+        success: false,
+        kondoId,
+        error: 'Kondo has no URL to scrape',
+      };
+    }
+
+    try {
+      // Determine platform and get scraper
+      const scraper = await this.getScraper(kondo.url, options?.forceEngine);
+      const platform = scraper.constructor.name.replace('ScraperService', '');
+      
+      this.logger.log(`   Platform: ${platform}`);
+      this.logger.log(`   URL: ${kondo.url}`);
+
+      // Scrape data
+      const scrapedData = await scraper.scrape(kondo.url);
+      this.logger.log(`   ✓ Extracted ${scrapedData.medias?.length || 0} media URLs`);
+
+      // Validate scraped data quality
+      const validation = this.qualityValidator.validateScrapedData(scrapedData);
+      if (validation.warnings.length > 0) {
+        this.logger.warn(`   ⚠️ Validation warnings: ${validation.warnings.length}`);
+        validation.warnings.forEach((w) => this.logger.warn(`     - ${w}`));
+      }
+      if (!validation.valid) {
+        this.logger.error(`   ❌ Validation failed: ${validation.issues.length} issues`);
+        validation.issues.forEach((i) => this.logger.error(`     - ${i}`));
+      }
+
+      // Process and save (unless dry run)
+      let stats: ScrapeKondoResponseDto['stats'];
+      let updatedFields: string[] = [];
+      let rejections: any[] = [];
+      let changes: any = {};
+      let mediaStats: MediaStats | undefined;
+      let featuredImage: string | undefined;
+
+      if (!options?.dryRun) {
+        const saveResult = await this.saveScrapedDataWithMerge(kondoId, scrapedData);
+        
+        stats = {
+          fieldsUpdated: saveResult.fieldsUpdated,
+          protectedSkipped: saveResult.protectedSkipped,
+          qualityRejected: saveResult.qualityRejected,
+          mediaUploaded: saveResult.mediaCount,
+          media: saveResult.mediaStats,
+        };
+        
+        updatedFields = saveResult.updatedFields;
+        rejections = saveResult.rejections;
+        changes = options?.verbose ? saveResult.changes : undefined;
+        mediaStats = saveResult.mediaStats;
+        featuredImage = saveResult.featuredImage;
+
+        this.logger.log(`   ✓ Updated ${stats.fieldsUpdated} fields`);
+        this.logger.log(`   ✓ Saved ${stats.mediaUploaded} media files`);
+        if (stats.qualityRejected > 0) {
+          this.logger.warn(`   ⚠️  Rejected ${stats.qualityRejected} fields (quality issues)`);
+        }
+        if (featuredImage) {
+          this.logger.log(`   ✓ Featured image: ${featuredImage}`);
+        }
+      } else {
+        this.logger.log(`   ℹ️  Dry run - no data saved`);
+      }
+
+      return {
+        success: true,
+        kondoId,
+        platform,
+        stats,
+        updatedFields,
+        changes,
+        rejections: rejections.length > 0 ? rejections : undefined,
+        validationIssues: validation.issues.length > 0 ? validation.issues : undefined,
+        validationWarnings: validation.warnings.length > 0 ? validation.warnings : undefined,
+        featuredImage,
+        dryRun: options?.dryRun,
+      };
+    } catch (error) {
+      this.logger.error(`❌ Scraping failed: ${error.message}`);
+      this.fileLogger.error(`API scraping failed for kondo ${kondoId}`, 'ScrapingService', error);
+      
+      throw error;
+    }
+  }
+
 
   /**
    * Scrape a single kondo
@@ -303,7 +423,155 @@ export class ScrapingService {
   }
 
   /**
-   * Save scraped data to database
+   * Save scraped data using smart merge strategy (for API calls)
+   * Uses DataMergeService and DataQualityValidator to protect data quality
+   * 
+   * @returns Detailed save result with statistics
+   */
+  private async saveScrapedDataWithMerge(
+    kondoId: number,
+    data: ScrapedKondoDto,
+  ): Promise<{
+    mediaCount: number;
+    fieldsUpdated: number;
+    protectedSkipped: number;
+    qualityRejected: number;
+    updatedFields: string[];
+    rejections: any[];
+    changes: Record<string, any>;
+    mediaStats?: MediaStats;
+    featuredImage?: string;
+  }> {
+    const { medias, scrapedAt, sourceUrl, platformMetadata, extractionMetadata, ...kondoData } = data;
+
+    // Fetch existing kondo
+    const existingKondo = await this.kondoRepository.findOne({
+      where: { id: kondoId },
+    });
+
+    if (!existingKondo) {
+      this.logger.error(`   Kondo ${kondoId} not found in database`);
+      throw new NotFoundException(`Kondo ${kondoId} not found`);
+    }
+
+    // Handle slug: preserve existing, generate if missing
+    if (existingKondo.slug) {
+      delete kondoData.slug;
+      this.logger.debug(`   Preserving existing slug: ${existingKondo.slug}`);
+    } else if (!kondoData.slug) {
+      kondoData.slug = this.slugifyService.run(existingKondo.name);
+      this.logger.debug(`   Generated new slug: ${kondoData.slug}`);
+    }
+
+    // Map 'address' to 'address_street_and_numbers'
+    if ('address' in kondoData && typeof kondoData.address === 'string') {
+      kondoData.address_street_and_numbers = kondoData.address;
+      delete kondoData.address;
+    }
+
+    // Smart merge with quality validation
+    const mergeResult = this.dataMerge.mergeData(
+      existingKondo,
+      { ...kondoData } as any,
+      this.scrapingConfig.protectedFields,
+    );
+
+    // Process media (before updating DB)
+    let mediaCount = 0;
+    let mediaStats: MediaStats | undefined;
+    let featuredImage: string | undefined;
+    
+    if (medias && medias.length > 0) {
+      this.logger.log(`   Processing ${medias.length} media URLs...`);
+      const { mediaRecords, stats, scoredImages } = await this.filterAndDownloadMedia(
+        medias,
+        kondoId,
+        sourceUrl,
+      );
+
+      if (mediaRecords.length > 0) {
+        await Media.bulkCreate(mediaRecords);
+        mediaCount = mediaRecords.length;
+        mediaStats = stats;
+
+        // Auto-select featured image if not set
+        if (!existingKondo.featured_image) {
+          featuredImage = this.selectFeaturedImage(scoredImages);
+          if (featuredImage) {
+            mergeResult.updates.featured_image = featuredImage;
+            this.logger.log(`   ✓ Featured image set: ${featuredImage}`);
+          }
+        }
+      }
+
+      this.fileLogger.logMediaExtraction(kondoId, existingKondo.name, stats);
+    }
+
+    // Calculate changes for logging
+    const changes = this.calculateChanges(existingKondo, mergeResult.updates);
+
+    // Add extraction metadata to updates if available
+    if (extractionMetadata) {
+      if (extractionMetadata.rawData) {
+        mergeResult.updates.scraped_raw_data = extractionMetadata.rawData;
+      }
+      if (extractionMetadata.source) {
+        mergeResult.updates.scraped_data_source = extractionMetadata.source;
+      }
+      if (extractionMetadata.method) {
+        mergeResult.updates.scraped_extraction_method = extractionMetadata.method;
+      }
+      if (extractionMetadata.confidence !== undefined) {
+        mergeResult.updates.scraped_extraction_confidence = extractionMetadata.confidence;
+      }
+      mergeResult.updates.scraped_at = new Date();
+
+      this.logger.debug(
+        `   Extraction metadata: method=${extractionMetadata.method}, confidence=${extractionMetadata.confidence?.toFixed(2) || 'N/A'}, source=${extractionMetadata.source || 'N/A'}`
+      );
+      this.fileLogger.debug(
+        `Extraction metadata stored - method: ${extractionMetadata.method}, confidence: ${extractionMetadata.confidence?.toFixed(2) || 'N/A'}, source: ${extractionMetadata.source || 'N/A'}`,
+        'ScrapingService'
+      );
+    }
+
+    // Update database
+    if (Object.keys(mergeResult.updates).length > 0) {
+      await this.kondoRepository.update(mergeResult.updates, {
+        where: { id: kondoId },
+      });
+    }
+
+    // Log changes
+    if (Object.keys(changes).length > 0 || mergeResult.rejected.length > 0) {
+      this.fileLogger.logKondoChanges(
+        kondoId,
+        existingKondo.name,
+        changes,
+        mergeResult.rejected.map((r) => r.field),
+      );
+    }
+
+    // Log platform metadata
+    if (platformMetadata) {
+      this.fileLogger.logPlatformResponse(kondoId, platformMetadata);
+    }
+
+    return {
+      mediaCount,
+      fieldsUpdated: mergeResult.accepted.length,
+      protectedSkipped: mergeResult.rejected.filter((r) => r.reason.includes('Protected')).length,
+      qualityRejected: mergeResult.rejected.filter((r) => !r.reason.includes('Protected')).length,
+      updatedFields: mergeResult.accepted,
+      rejections: mergeResult.rejected,
+      changes,
+      mediaStats,
+      featuredImage,
+    };
+  }
+
+  /**
+   * Save scraped data to database (legacy method for CLI)
    * Filters and downloads media before saving
    * Handles slug: preserves existing slug, generates new one if null
    * @returns Object with media count, fields changed count, and protected fields count
@@ -429,7 +697,8 @@ export class ScrapingService {
   }
 
   /**
-   * Filter out protected fields from scraped data
+   * Filter out protected fields from scraped data (legacy - for CLI)
+   * Now supports enhanced protected field config
    * @returns Filtered data and list of ignored fields
    */
   private filterProtectedFields(data: any): { filteredData: any; ignoredFields: string[] } {
@@ -438,8 +707,13 @@ export class ScrapingService {
 
     console.log('   Protected fields to check:', this.scrapingConfig.protectedFields);
 
-    this.scrapingConfig.protectedFields.forEach((field) => {
-      if (field in filteredData) {
+    this.scrapingConfig.protectedFields.forEach((item) => {
+      // Handle both string and object format
+      const field = typeof item === 'string' ? item : item.field;
+      const mode = typeof item === 'string' ? 'never' : item.mode;
+      
+      // For CLI, only filter 'never' mode fields
+      if (mode === 'never' && field in filteredData) {
         ignoredFields.push(field);
         delete filteredData[field];
       }
@@ -688,7 +962,7 @@ export class ScrapingService {
         filename: result.filename,
         storage_url: result.cdnUrl, // Store CDN URL, not original
         type: this.detectMediaType(url),
-        status: 'draft' as const,
+        status: 'final' as const,
       };
     }
 
@@ -719,7 +993,7 @@ export class ScrapingService {
       filename: this.extractFilename(url),
       storage_url: url, // Store YouTube/Vimeo URL directly
       type: 'video',
-      status: 'draft' as const,
+      status: 'final' as const,
     };
   }
 

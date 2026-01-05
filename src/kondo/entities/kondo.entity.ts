@@ -357,6 +357,67 @@ export class Kondo extends Model {
     video: string;
 
     /**
+     * SCRAPED RAW DATA STORAGE
+     */
+    @Column({
+        allowNull: true,
+        type: DataType.JSONB,
+        comment: 'Raw scraped JavaScript data objects (window.aldeaData, etc.)'
+    })
+    scraped_raw_data: any;
+
+    @Column({
+        allowNull: true,
+        type: DataType.TEXT,
+        comment: 'Name of the window object that was extracted (e.g., "aldeaData", "__INITIAL_STATE__")'
+    })
+    scraped_data_source: string;
+
+    @Column({
+        allowNull: true,
+        type: DataType.ENUM('manual', 'js-rendered'),
+        comment: 'How data was extracted: manual HTML parsing or JS rendering'
+    })
+    scraped_extraction_method: 'manual' | 'js-rendered';
+
+    @Column({
+        allowNull: true,
+        type: DataType.DECIMAL(3, 2),
+        defaultValue: 0.00,
+        validate: {
+            min: 0.00,
+            max: 1.00
+        },
+        comment: 'Confidence score of scraping extraction (0.00 to 1.00)'
+    })
+    scraped_extraction_confidence: number;
+
+    @Column({
+        allowNull: true,
+        type: DataType.DATE,
+        comment: 'Timestamp of last scraping'
+    })
+    scraped_at: Date;
+
+    /**
+     * AI COMPOSER TRACKING
+     */
+    @Column({
+        allowNull: true,
+        type: DataType.BOOLEAN,
+        defaultValue: false,
+        comment: 'Whether AI Composer has processed this kondo'
+    })
+    ai_composed: boolean;
+
+    @Column({
+        allowNull: true,
+        type: DataType.DATE,
+        comment: 'Timestamp of last AI composition'
+    })
+    ai_composed_at: Date;
+
+    /**
      * KONDO DATA QUALITY TRACKING
      */
     @Column({

@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Delete } from '@nestjs/common';
 import { MediaService } from './media.service';
 import { Public } from '../auth/decorators/public.decorator';
 
@@ -17,6 +17,13 @@ export class MediaController {
   @Get(':id')
   findMediasOfKondo(@Param('id') kondoId: string) {
     return this.mediaService.findMediasOfKondo(kondoId);
+  }
+
+  @Public()
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    console.log('MediaController remove called with id: ', id);
+    return this.mediaService.remove(+id);
   }
 
   // @Get(':id')

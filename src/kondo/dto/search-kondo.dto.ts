@@ -43,4 +43,24 @@ export class SearchKondoDto extends PageOptionsDto {
     @IsBoolean()
     @IsOptional()
     randomize?: boolean;
+
+    @ApiProperty()
+    @IsBoolean()
+    @IsOptional()
+    onlyHighlighted?: boolean;
+
+    @ApiProperty()
+    @IsBoolean()
+    @IsOptional()
+    excludeHighlighted?: boolean;
+
+    @ApiProperty()
+    @IsBoolean()
+    @IsOptional()
+    includeInactive?: boolean;
+
+    @ApiProperty()
+    @IsBoolean()
+    @IsOptional()
+    allStatuses?: boolean = false;
 }

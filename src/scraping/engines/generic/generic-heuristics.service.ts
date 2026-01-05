@@ -4,6 +4,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { MediaRelevanceScorerService } from '../../core/media-relevance-scorer.service';
 import { CACHE_CONFIG, PLACEHOLDER_PATTERNS, FAKE_KEYWORDS } from './generic.config';
+import { WixUrlTransformerService } from './transformers/wix-url-transformer.service';
+import { ImgixUrlTransformerService } from './transformers/imgix-url-transformer.service';
+import { ICdnTransformer } from './transformers/cdn-transformer.interface';
 
 /**
  * Results from cache skip detection
@@ -52,10 +55,21 @@ export interface PaginationInfo {
 export class GenericHeuristicsService {
   private readonly logger = new Logger(GenericHeuristicsService.name);
   private cacheDir: string;
+  private cdnTransformers: ICdnTransformer[];
 
-  constructor(private readonly mediaScorer: MediaRelevanceScorerService) {
+  constructor(
+    private readonly mediaScorer: MediaRelevanceScorerService,
+    private readonly wixTransformer: WixUrlTransformerService,
+    private readonly imgixTransformer: ImgixUrlTransformerService,
+  ) {
     this.cacheDir = CACHE_CONFIG.directory;
     this.ensureCacheDir();
+    
+    // Register all CDN transformers
+    this.cdnTransformers = [
+      this.wixTransformer,
+      this.imgixTransformer,
+    ];
   }
 
   /**
@@ -215,6 +229,68 @@ export class GenericHeuristicsService {
   }
 
   /**
+   * Normalize URL to ensure it has a proper protocol
+   * Handles protocol-relative URLs (//domain.com/image.jpg)
+   * 
+   * @param url - URL to normalize
+   * @returns Normalized URL with https:// protocol
+   */
+  private normalizeUrlProtocol(url: string): string {
+    if (!url) return url;
+    
+    // Handle protocol-relative URLs (//domain.com/image.jpg)
+    if (url.startsWith('//')) {
+      return `https:${url}`;
+    }
+    
+    // Already has protocol or is relative
+    return url;
+  }
+
+  /**
+   * Transform CDN URLs to highest quality versions
+   * Upgrades Wix, Imgix, and other CDN URLs to remove thumbnails/blur
+   * Also normalizes protocol-relative URLs
+   * 
+   * @param urls - Array of media URLs
+   * @returns Array of transformed URLs
+   */
+  transformCdnUrls(urls: string[]): string[] {
+    this.logger.debug(`[HEURISTICS] Processing ${urls.length} URLs for CDN transformation`);
+    
+    const transformed = urls.map((url) => {
+      // First, normalize protocol-relative URLs
+      let normalizedUrl = this.normalizeUrlProtocol(url);
+      
+      // Try each CDN transformer
+      for (const transformer of this.cdnTransformers) {
+        if (transformer.isCdnUrl(normalizedUrl)) {
+          const upgraded = transformer.transformToHighQuality(normalizedUrl);
+          
+          if (upgraded !== normalizedUrl) {
+            this.logger.log(
+              `[HEURISTICS] Upgraded ${transformer.getCdnName()} URL: ${this.shortenUrl(normalizedUrl)} → ${this.shortenUrl(upgraded)}`
+            );
+          }
+          
+          return upgraded;
+        }
+      }
+      
+      // No transformer matched, return normalized URL
+      return normalizedUrl;
+    });
+
+    const transformedCount = transformed.filter((url, i) => url !== urls[i]).length;
+    
+    if (transformedCount > 0) {
+      this.logger.log(`[HEURISTICS] Transformed ${transformedCount}/${urls.length} CDN URLs to high quality`);
+    }
+
+    return transformed;
+  }
+
+  /**
    * Sort media URLs by relevance score
    * Uses MediaRelevanceScorerService to rank URLs
    */
@@ -340,6 +416,13 @@ export class GenericHeuristicsService {
    */
   private md5(text: string): string {
     return crypto.createHash('md5').update(text).digest('hex');
+  }
+
+  /**
+   * Shorten URL for logging (first 60 chars)
+   */
+  private shortenUrl(url: string): string {
+    return url.length > 60 ? `${url.substring(0, 60)}...` : url;
   }
 
   /**

@@ -4,6 +4,7 @@ import { ConfigModule } from '../config/config.module';
 import { DatabaseModule } from '../database/database.module';
 import { SlugifyModule } from '../utils/slugify/slugify.module';
 import { ScrapingService } from './scraping.service';
+import { ScrapingController } from './scraping.controller';
 import { ScrapeCommand, ScrapeTestCommand } from './scraping.command';
 import { ScrapingFileLogger } from './logger/scraping-file-logger';
 
@@ -16,6 +17,11 @@ import { MediaRelevanceScorerService } from './core/media-relevance-scorer.servi
 import { MediaDimensionExtractorService } from './core/media-dimension-extractor.service';
 import { MediaDimensionValidatorService } from './core/media-dimension-validator.service';
 import { MediaDownloadService } from './core/media-download.service';
+import { DataQualityValidatorService } from './core/data-quality-validator.service';
+import { DataMergeService } from './core/data-merge.service';
+import { SPADetectorService } from './core/spa-detector.service';
+import { ManualDataExtractorService } from './core/manual-data-extractor.service';
+import { StructuredMediaExtractorService } from './core/structured-media-extractor.service';
 
 // Storage
 import { StorageStreamCdnService } from '../storage/services/storage-stream-cdn.service';
@@ -41,6 +47,10 @@ import { GenericScraperService } from './engines/generic/generic-scraper.service
 import { GenericParserService } from './engines/generic/generic-parser.service';
 import { GenericHeuristicsService } from './engines/generic/generic-heuristics.service';
 
+// Generic CDN transformers
+import { WixUrlTransformerService } from './engines/generic/transformers/wix-url-transformer.service';
+import { ImgixUrlTransformerService } from './engines/generic/transformers/imgix-url-transformer.service';
+
 // Utils
 import { PlatformDetectorService } from './utils/platform-detector.service';
 
@@ -58,6 +68,9 @@ import { kondoProviders } from '../kondo/repository/kondo.provider';
     DatabaseModule,
     SlugifyModule,
   ],
+  controllers: [
+    ScrapingController,
+  ],
   providers: [
     // Logger
     ScrapingFileLogger,
@@ -71,7 +84,12 @@ import { kondoProviders } from '../kondo/repository/kondo.provider';
     MediaDimensionExtractorService,
     MediaDimensionValidatorService,
     MediaDownloadService,
+    DataQualityValidatorService,
+    DataMergeService,
     StorageStreamCdnService,
+    SPADetectorService,
+    ManualDataExtractorService,
+    StructuredMediaExtractorService,
 
     // Somattos engine
     SomattosParserService,
@@ -93,6 +111,10 @@ import { kondoProviders } from '../kondo/repository/kondo.provider';
     GenericParserService,
     GenericHeuristicsService,
     GenericScraperService,
+    
+    // Generic CDN transformers
+    WixUrlTransformerService,
+    ImgixUrlTransformerService,
 
     // Utils
     PlatformDetectorService,

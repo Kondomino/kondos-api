@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ClassSerializerInterceptor, UseInterceptors, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ClassSerializerInterceptor, UseInterceptors, Query, UploadedFiles } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { CreateKondoDto } from './dto/create-kondo.dto';
 import { SearchKondoDto } from './dto/search-kondo.dto';
 import { UpdateKondoDto } from './dto/update-kondo.dto';
 import { KondoService } from './kondo.service';
 import { Public } from '../auth/decorators/public.decorator';
 import { SitemapQueryDto } from './dto/sitemap-query.dto';
+import { ImageValidationPipe } from './pipes/image-validation.pipe';
 
 @Controller('kondo')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -55,11 +57,22 @@ export class KondoController {
     return this.kondoService.findBy(searchKondoDto);
   }
 
+  @Public()
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateKondoDto: UpdateKondoDto) {
     return this.kondoService.update(+id, updateKondoDto);
   }
 
+  @Post(':id/media')
+  @UseInterceptors(FilesInterceptor('images', 10))
+  async uploadMedia(
+    @Param('id') id: string,
+    @UploadedFiles(new ImageValidationPipe()) files: Express.Multer.File[]
+  ) {
+    return this.kondoService.uploadMedia(+id, files);
+  }
+
+  @Public()
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.kondoService.deactivateKondo(+id);

@@ -37,7 +37,8 @@
     "scrape": "npx ts-node -r tsconfig-paths/register src/scraping/scraping.cli.ts scrape",
     "scrape:dry": "npx ts-node -r tsconfig-paths/register src/scraping/scraping.cli.ts scrape --dry-run",
     "scrape:test": "npx ts-node -r tsconfig-paths/register src/scraping/scraping.cli.ts scrape:test",
-    "update:descriptions": "npx ts-node -r tsconfig-paths/register scripts/update.kondos.description.ts"
+    "update:descriptions": "npx ts-node -r tsconfig-paths/register scripts/update.kondos.description.ts",
+    "sync:prod": "npx ts-node -r tsconfig-paths/register scripts/sync-production-from-local.ts"
   },
   "engines": {
     "node": "24.11.0",
@@ -91,6 +92,7 @@
     "@types/cookie-parser": "^1.4.7",
     "@types/express": "^4.17.13",
     "@types/jest": "29.5.0",
+    "@types/multer": "^2.0.0",
     "@types/node": "18.15.11",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/passport-jwt": "^4.0.1",

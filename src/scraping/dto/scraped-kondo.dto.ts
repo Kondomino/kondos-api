@@ -33,4 +33,14 @@ export interface ScrapedKondoDto extends Partial<Omit<Kondo, 'medias'>> {
     duration?: number;
     [key: string]: any;
   };
+
+  /**
+   * Extraction metadata (method, confidence, raw data, etc.)
+   */
+  extractionMetadata?: {
+    method: 'manual' | 'js-rendered';
+    source?: string;
+    confidence?: number;
+    rawData?: any;
+  };
 }

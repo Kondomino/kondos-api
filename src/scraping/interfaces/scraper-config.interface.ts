@@ -6,7 +6,7 @@ export interface ScrapingPlatformOptions {
   /**
    * Enable JavaScript rendering for dynamic content
    * ScrapingDog: 'dynamic' parameter
-   * Scrapfly: 'asp' parameter (anti-scraping protection + JS)
+   * Scrapfly: 'render_js' parameter (must be true for wait_for_selector)
    */
   dynamic?: boolean;
 
@@ -22,6 +22,34 @@ export interface ScrapingPlatformOptions {
    * Both platforms: 'country' parameter
    */
   country?: string;
+
+  /**
+   * CSS selector to wait for before considering page loaded (for SPAs)
+   * Scrapfly: 'wait_for_selector' parameter
+   * Note: Requires render_js=true
+   */
+  waitForSelector?: string;
+
+  /**
+   * Time to wait after page load for rendering (milliseconds)
+   * Scrapfly: 'rendering_wait' parameter
+   * Typical: 3000-8000ms for SPAs
+   */
+  renderingWait?: number;
+
+  /**
+   * Total timeout for the request (milliseconds)
+   * Scrapfly: 'timeout' parameter
+   * Default: 30000ms, increase for slow SPAs
+   */
+  timeout?: number;
+
+  /**
+   * Enable anti-scraping protection (upgrades proxy/browser)
+   * Scrapfly: 'asp' parameter
+   * Note: Can be used alongside render_js
+   */
+  asp?: boolean;
 
   /**
    * Additional query parameters to pass to the platform

@@ -4,6 +4,84 @@
 export type ScrapingPlatformProvider = 'scrapingdog' | 'scrapfly';
 
 /**
+ * Protected field configuration mode
+ */
+export type ProtectedFieldMode = 'never' | 'if-empty' | 'quality-check';
+
+/**
+ * Protected field configuration
+ */
+export interface ProtectedFieldConfig {
+  field: string;
+  mode: ProtectedFieldMode;
+}
+
+/**
+ * SPA (Single Page Application) detection and handling configuration
+ */
+export interface SPAConfig {
+  /**
+   * CSS selectors to wait for before considering page loaded
+   */
+  waitForSelectors: string[];
+
+  /**
+   * Maximum time to wait for selectors (milliseconds)
+   */
+  maxWaitTimeMs: number;
+
+  /**
+   * Whether to retry scraping if no images found on SPA
+   */
+  retryOnEmpty: boolean;
+
+  /**
+   * Extended wait time for retry attempt (milliseconds)
+   */
+  retryWaitTimeMs: number;
+}
+
+/**
+ * Extraction confidence scoring configuration
+ */
+export interface ExtractionConfidenceConfig {
+  /**
+   * Minimum confidence threshold for manual extraction to be considered successful
+   */
+  manualExtractionThreshold: number;
+
+  /**
+   * Confidence weights for data richness scoring
+   */
+  confidenceWeights: {
+    /**
+     * Weight for data size (max contribution)
+     */
+    size: number;
+    
+    /**
+     * Weight for object depth/nesting (max contribution)
+     */
+    depth: number;
+    
+    /**
+     * Weight for property-relevant keywords (max contribution)
+     */
+    keywords: number;
+  };
+
+  /**
+   * Minimum text content length to not be considered an SPA shell
+   */
+  minTextContentLength: number;
+
+  /**
+   * Keywords to check for in extracted data to boost confidence
+   */
+  relevantKeywords: string[];
+}
+
+/**
  * Scraping module configuration
  */
 export interface ScrapingConfig {
@@ -16,6 +94,16 @@ export interface ScrapingConfig {
      */
     provider: ScrapingPlatformProvider;
   };
+
+  /**
+   * SPA (Single Page Application) handling configuration
+   */
+  spa: SPAConfig;
+
+  /**
+   * Extraction confidence scoring configuration
+   */
+  extractionConfidence: ExtractionConfidenceConfig;
 
   /**
    * ScrapingDog API configuration
@@ -98,8 +186,12 @@ export interface ScrapingConfig {
   /**
    * Protected fields that cannot be modified by scraping
    * These fields are manually curated and should not be overwritten
+   * Supports both simple string format and advanced config with modes:
+   * - 'never': Never allow overwriting
+   * - 'if-empty': Only allow if existing value is empty/null
+   * - 'quality-check': Allow but subject to quality validation
    */
-  protectedFields: string[];
+  protectedFields: Array<string | ProtectedFieldConfig>;
 }
 
 /**
@@ -119,6 +211,22 @@ export function createScrapingConfigFromEnv(): ScrapingConfig {
     delay: {
       betweenRequestsMs: parseInt(process.env.SCRAPING_DELAY_BETWEEN_REQUESTS_MS || '4000', 10),
     },
+    spa: {
+      waitForSelectors: (process.env.SCRAPING_SPA_WAIT_SELECTORS || 'img,picture,article,main img').split(','),
+      maxWaitTimeMs: parseInt(process.env.SCRAPING_SPA_MAX_WAIT_MS || '10000', 10),
+      retryOnEmpty: process.env.SCRAPING_SPA_RETRY_ON_EMPTY !== 'false',
+      retryWaitTimeMs: parseInt(process.env.SCRAPING_SPA_RETRY_WAIT_MS || '15000', 10),
+    },
+    extractionConfidence: {
+      manualExtractionThreshold: parseFloat(process.env.SCRAPING_EXTRACTION_THRESHOLD || '0.5'),
+      confidenceWeights: {
+        size: parseFloat(process.env.SCRAPING_CONFIDENCE_WEIGHT_SIZE || '0.4'),
+        depth: parseFloat(process.env.SCRAPING_CONFIDENCE_WEIGHT_DEPTH || '0.3'),
+        keywords: parseFloat(process.env.SCRAPING_CONFIDENCE_WEIGHT_KEYWORDS || '0.3'),
+      },
+      minTextContentLength: parseInt(process.env.SCRAPING_MIN_TEXT_CONTENT_LENGTH || '500', 10),
+      relevantKeywords: (process.env.SCRAPING_RELEVANT_KEYWORDS || 'image,photo,gallery,description,amenity,feature,price,location,address,title,lazer,diferenciais').split(','),
+    },
     media: {
       minRelevanceScore: parseFloat(process.env.SCRAPING_MEDIA_MIN_RELEVANCE_SCORE || '0.7'),
       minImageDimensions: {
@@ -133,7 +241,21 @@ export function createScrapingConfigFromEnv(): ScrapingConfig {
       delayMs: parseInt(process.env.SCRAPING_RETRY_DELAY_MS || '1000', 10),
       backoffMultiplier: parseFloat(process.env.SCRAPING_RETRY_BACKOFF || '2'),
     },
-    protectedFields: ['name', 'url', 'video', 'highlight', 'featured_image', 'type'],
+    protectedFields: [
+      // Never overwrite these fields (manually curated)
+      { field: 'name', mode: 'never' as const },
+      { field: 'url', mode: 'never' as const },
+      { field: 'highlight', mode: 'never' as const },
+      { field: 'type', mode: 'never' as const },
+      
+      // Only update if empty
+      { field: 'featured_image', mode: 'if-empty' as const },
+      { field: 'video', mode: 'if-empty' as const },
+      
+      // Allow updates with quality checks
+      { field: 'description', mode: 'quality-check' as const },
+      { field: 'address_street_and_numbers', mode: 'quality-check' as const },
+    ],
   };
 }
 
@@ -153,6 +275,26 @@ export const DEFAULT_SCRAPING_CONFIG: ScrapingConfig = {
   delay: {
     betweenRequestsMs: 4000,
   },
+  spa: {
+    waitForSelectors: ['img', 'picture', 'article', 'main img'],
+    maxWaitTimeMs: 10000,
+    retryOnEmpty: true,
+    retryWaitTimeMs: 15000,
+  },
+  extractionConfidence: {
+    manualExtractionThreshold: 0.5,
+    confidenceWeights: {
+      size: 0.4,
+      depth: 0.3,
+      keywords: 0.3,
+    },
+    minTextContentLength: 500,
+    relevantKeywords: [
+      'image', 'photo', 'gallery', 'description', 'amenity', 
+      'feature', 'price', 'location', 'address', 'title',
+      'lazer', 'diferenciais', 'empreendimento', 'unidades'
+    ],
+  },
   media: {
     minRelevanceScore: 0.7,
     minImageDimensions: {
@@ -167,5 +309,19 @@ export const DEFAULT_SCRAPING_CONFIG: ScrapingConfig = {
     delayMs: 1000,
     backoffMultiplier: 2,
   },
-  protectedFields: ['name', 'url', 'video', 'highlight', 'featured_image', 'type'],
+  protectedFields: [
+    // Never overwrite these fields (manually curated)
+    { field: 'name', mode: 'never' as const },
+    { field: 'url', mode: 'never' as const },
+    { field: 'highlight', mode: 'never' as const },
+    { field: 'type', mode: 'never' as const },
+    
+    // Only update if empty
+    { field: 'featured_image', mode: 'if-empty' as const },
+    { field: 'video', mode: 'if-empty' as const },
+    
+    // Allow updates with quality checks
+    { field: 'description', mode: 'quality-check' as const },
+    { field: 'address_street_and_numbers', mode: 'quality-check' as const },
+  ],
 };
