@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize-typescript';
+import { QueryTypes } from 'sequelize';
 import { Kondo } from '../src/kondo/entities/kondo.entity';
 import { Media } from '../src/media/entities/media.entity';
 import { Like } from '../src/like/entities/like.entity';
@@ -66,6 +67,7 @@ class KondoSyncService {
    */
   async connectLocal(): Promise<Sequelize> {
     console.log('📋 Step 2: Connecting to databases...');
+    console.log('');
     
     // Set NODE_ENV temporarily to get development config
     const originalEnv = process.env.NODE_ENV;
@@ -75,6 +77,14 @@ class KondoSyncService {
     
     // Restore NODE_ENV
     process.env.NODE_ENV = originalEnv;
+    
+    // Debug: Show local connection info
+    console.log('🔍 LOCAL Database Connection:');
+    console.log(`  - Using URL: ${dbConfig.url ? 'Yes' : 'No'}`);
+    console.log(`  - Database: ${dbConfig.database}`);
+    console.log(`  - Host: ${dbConfig.host}:${dbConfig.port}`);
+    console.log(`  - Username: ${dbConfig.username}`);
+    console.log(`  - Dialect: ${dbConfig.dialect}`);
     
     // Create Sequelize instance (same pattern as database.dropAll.ts)
     const sequelize = dbConfig.url
@@ -89,7 +99,9 @@ class KondoSyncService {
           logging: false,
         } as any);
     
+    console.log('  - Authenticating...');
     await sequelize.authenticate();
+    console.log('  ✓ Connected successfully');
     return sequelize;
   }
 
@@ -97,6 +109,8 @@ class KondoSyncService {
    * Connect to production database
    */
   async connectProduction(): Promise<Sequelize> {
+    console.log('');
+    
     // Use RENDER_EXTERNAL_URL for external connections (has full hostname)
     const productionUrl = process.env.RENDER_EXTERNAL_URL || process.env.DATABASE_URL;
     
@@ -104,10 +118,19 @@ class KondoSyncService {
       throw new Error('RENDER_EXTERNAL_URL or DATABASE_URL must be set for production connection');
     }
     
+    // Parse URL for logging
+    const urlMatch = productionUrl.match(/postgres:\/\/([^:]+):([^@]+)@([^/]+)\/(.+)/);
+    const username = urlMatch?.[1] || 'unknown';
+    const host = urlMatch?.[3] || 'unknown';
+    const database = urlMatch?.[4] || 'unknown';
+    
     // Debug: Show what we're connecting to
-    console.log('🔍 Production connection:');
+    console.log('🔍 PRODUCTION Database Connection:');
     console.log(`  - Using: ${productionUrl.includes('oregon-postgres.render.com') ? 'RENDER_EXTERNAL_URL' : 'DATABASE_URL'}`);
-    console.log(`  - Host: ${productionUrl.split('@')[1]?.split('/')[0] || 'N/A'}`);
+    console.log(`  - Database: ${database}`);
+    console.log(`  - Host: ${host}`);
+    console.log(`  - Username: ${username}`);
+    console.log(`  - SSL: Enabled (required)`);
     
     // Create Sequelize instance with SSL for production
     const sequelize = new Sequelize(productionUrl, {
@@ -122,7 +145,10 @@ class KondoSyncService {
       logging: false,
     } as any);
     
+    console.log('  - Authenticating...');
     await sequelize.authenticate();
+    console.log('  ✓ Connected successfully');
+    console.log('');
     return sequelize;
   }
 
@@ -183,14 +209,16 @@ class KondoSyncService {
    * Insert a new Kondo with its Media into production
    */
   async insertKondo(kondo: any): Promise<void> {
-    const ProdKondo = this.prodDB.model('Kondo') as typeof Kondo;
-    const ProdMedia = this.prodDB.model('Media') as typeof Media;
+    const ProdKondo = this.prodDB.models.Kondo as any;
+    const ProdMedia = this.prodDB.models.Media as any;
 
-    // Prepare Kondo data (exclude id, let DB generate)
-    const kondoData: any = kondo.get({ plain: true });
+    // Prepare Kondo data (exclude id, let DB generate, also handle raw data)
+    const kondoData: any = { ...kondo };
     delete kondoData.id;
     delete kondoData.medias;
     delete kondoData.likes;
+    delete kondoData.createdAt;
+    delete kondoData.updatedAt;
     
     // Insert Kondo
     const newKondo = await ProdKondo.create(kondoData);
@@ -198,8 +226,10 @@ class KondoSyncService {
     // Insert related Media
     if (kondo.medias && kondo.medias.length > 0) {
       for (const media of kondo.medias) {
-        const mediaData: any = media.get({ plain: true });
+        const mediaData: any = { ...media };
         delete mediaData.id;
+        delete mediaData.createdAt;
+        delete mediaData.updatedAt;
         mediaData.kondoId = newKondo.id; // Use new production ID
         delete mediaData.unitId; // We're only syncing Kondo-related media
         
@@ -213,9 +243,9 @@ class KondoSyncService {
    * Update an existing Kondo in production
    */
   async updateKondo(localKondo: any, prodKondoId: number): Promise<void> {
-    const ProdKondo = this.prodDB.model('Kondo') as typeof Kondo;
+    const ProdKondo = this.prodDB.models.Kondo as any;
 
-    const kondoData: any = localKondo.get({ plain: true });
+    const kondoData: any = { ...localKondo };
     delete kondoData.id;
     delete kondoData.createdAt;
     delete kondoData.updatedAt;
@@ -231,7 +261,7 @@ class KondoSyncService {
    * Sync Media for a specific Kondo
    */
   async syncMedia(localMedia: any[], prodMedia: any[], prodKondoId: number): Promise<void> {
-    const ProdMedia = this.prodDB.model('Media') as typeof Media;
+    const ProdMedia = this.prodDB.models.Media as any;
 
     // Create a map of production media by filename for quick lookup
     const prodMediaMap = new Map(
@@ -282,34 +312,95 @@ class KondoSyncService {
 
     try {
       // Step 1: Run migrations
-      await this.runProductionMigrations();
+      //await this.runProductionMigrations();
 
       // Step 2: Connect to databases
       this.localDB = await this.connectLocal();
       this.prodDB = await this.connectProduction();
 
       // Step 3: Fetch Kondos
-      const LocalKondo = this.localDB.model('Kondo') as typeof Kondo;
-      const ProdKondo = this.prodDB.model('Kondo') as typeof Kondo;
+      // Don't cast to imported Kondo class - use the model from the instance directly
+      const ProdKondo = this.prodDB.models.Kondo as any;
+      const ProdMedia = this.prodDB.models.Media as any;
 
-      const localKondos = await LocalKondo.findAll({
-        include: [{ model: this.localDB.model('Media') as typeof Media, as: 'medias' }],
-      });
+      // Debug: Direct SQL queries to bypass Sequelize
+      console.log('🔍 Direct SQL Query Test - LOCAL DB:');
+      try {
+        const rawCount = await this.localDB.query(
+          'SELECT COUNT(*) as count FROM "Kondos"',
+          { type: QueryTypes.SELECT }
+        );
+        console.log(`  - Direct SQL count: ${(rawCount[0] as any)?.count || 0}`);
+        
+        const schemaResult = await this.localDB.query(
+          'SELECT current_schema()',
+          { type: QueryTypes.SELECT }
+        );
+        console.log(`  - Current schema: ${(schemaResult[0] as any)?.current_schema}`);
+        
+        const tables = await this.localDB.query(
+          "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename",
+          { type: QueryTypes.SELECT }
+        );
+        console.log(`  - Tables in public schema: ${tables.map((t: any) => t.tablename).join(', ')}`);
+        
+        // Get first few records
+        const sampleData = await this.localDB.query(
+          'SELECT id, name, slug FROM "Kondos" LIMIT 3',
+          { type: QueryTypes.SELECT }
+        );
+        console.log(`  - Sample data (first 3):`, sampleData);
+      } catch (error: any) {
+        console.error(`  ❌ SQL Error: ${error.message}`);
+      }
+      console.log('');
 
+      console.log('📋 Step 3: Fetching Kondos with media using raw SQL...');
+      
+      // Fetch all Kondos from local using raw SQL (bypassing ORM)
+      const localKondosRaw = await this.localDB.query(
+        'SELECT * FROM "Kondos" ORDER BY id',
+        { type: QueryTypes.SELECT }
+      ) as any[];
+      
+      // Fetch all Media for these Kondos using raw SQL
+      const localMediaRaw = await this.localDB.query(
+        'SELECT * FROM "Media" WHERE "kondoId" IS NOT NULL ORDER BY "kondoId", id',
+        { type: QueryTypes.SELECT }
+      ) as any[];
+      
+      // Group media by kondoId
+      const mediaByKondoId = new Map<number, any[]>();
+      for (const media of localMediaRaw) {
+        if (!mediaByKondoId.has(media.kondoId)) {
+          mediaByKondoId.set(media.kondoId, []);
+        }
+        mediaByKondoId.get(media.kondoId)!.push(media);
+      }
+      
+      // Attach media to kondos
+      const localKondos = localKondosRaw.map(kondo => ({
+        ...kondo,
+        medias: mediaByKondoId.get(kondo.id) || []
+      }));
+      
+      console.log(`✓ Local: Fetched ${localKondos.length} kondos with media via raw SQL`);
+
+      // Fetch production Kondos normally (this works)
       const prodKondos = await ProdKondo.findAll({
-        include: [{ model: this.prodDB.model('Media') as typeof Media, as: 'medias' }],
+        include: [{ model: ProdMedia, as: 'medias' }],
       });
 
       console.log(`✓ Local DB connected (${localKondos.length} kondos found)`);
       console.log(`✓ Production DB connected (${prodKondos.length} kondos found)\n`);
 
       // Step 4: Create slug-based map for production
-      const prodKondoMap = new Map(prodKondos.map((k) => [k.slug, k]));
+      const prodKondoMap = new Map(prodKondos.map((k: any) => [k.slug, k]));
 
       // Step 5: Process each local Kondo
       console.log('📋 Step 3: Syncing Kondos...');
       for (const localKondo of localKondos) {
-        const prodKondo = prodKondoMap.get(localKondo.slug);
+        const prodKondo = prodKondoMap.get(localKondo.slug) as any;
 
         if (!prodKondo) {
           // INSERT new Kondo + Media

@@ -1,4 +1,5 @@
 import { IsBoolean, IsEmail, IsOptional, IsString } from "class-validator";
+import { Transform } from "class-transformer";
 import { PageOptionsDto } from "../../core/pagination/page.options.dto";
 import { KondoStatus } from "../entities/kondo.entity";
 import { ApiProperty } from "@nestjs/swagger";
@@ -22,7 +23,8 @@ export class SearchKondoDto extends PageOptionsDto {
     @ApiProperty()
     @IsBoolean()
     @IsOptional()
-    active?: boolean = true;
+    @Transform(({ value }) => value === 'true')
+    active?: boolean;
 
     @ApiProperty()
     @IsString()
@@ -42,25 +44,30 @@ export class SearchKondoDto extends PageOptionsDto {
     @ApiProperty()
     @IsBoolean()
     @IsOptional()
+    @Transform(({ value }) => value === 'true')
     randomize?: boolean;
 
     @ApiProperty()
     @IsBoolean()
     @IsOptional()
-    onlyHighlighted?: boolean;
+    @Transform(({ value }) => value === 'true')
+    highlight?: boolean;
 
     @ApiProperty()
     @IsBoolean()
     @IsOptional()
-    excludeHighlighted?: boolean;
+    @Transform(({ value }) => value === 'true')
+    includeHighlighted?: boolean;
 
     @ApiProperty()
     @IsBoolean()
     @IsOptional()
+    @Transform(({ value }) => value === 'true')
     includeInactive?: boolean;
 
     @ApiProperty()
     @IsBoolean()
     @IsOptional()
+    @Transform(({ value }) => value === 'true')
     allStatuses?: boolean = false;
 }

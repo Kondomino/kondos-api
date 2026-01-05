@@ -1,12 +1,56 @@
 import { Sequelize, QueryTypes } from 'sequelize';
 // Note: keep the explicit .ts extension so ESM loaders (ts-node/tsx) resolve this file correctly
 import getDbConfig from '../src/database/config.ts';
+import * as dotenv from 'dotenv';
 
-// Build a standalone Sequelize instance using the same config used by the app/CLI
-const dbConfig = getDbConfig();
-const sequelize = dbConfig.url
-  ? new Sequelize(dbConfig.url, dbConfig as any)
-  : new Sequelize(dbConfig.database, dbConfig.username as string, dbConfig.password as string, dbConfig as any);
+// Load environment variables
+dotenv.config();
+
+// Parse command line arguments
+const args = process.argv.slice(2);
+const isProduction = args.includes('--prod') || args.includes('--production');
+
+// Build Sequelize instance
+let sequelize: Sequelize;
+
+if (isProduction) {
+  console.log('🔴 PRODUCTION MODE: Targeting production database');
+  
+  // Use RENDER_EXTERNAL_URL for external connections (has full hostname)
+  const productionUrl = process.env.RENDER_EXTERNAL_URL || process.env.DATABASE_URL;
+  
+  if (!productionUrl) {
+    console.error('❌ ERROR: RENDER_EXTERNAL_URL or DATABASE_URL must be set for production');
+    process.exit(1);
+  }
+  
+  console.log(`🔗 Host: ${productionUrl.split('@')[1]?.split('/')[0] || 'N/A'}`);
+  console.log('');
+  
+  sequelize = new Sequelize(productionUrl, {
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
+    logging: false,
+  } as any);
+  
+} else {
+  console.log('🟢 DEVELOPMENT MODE: Targeting local database');
+  
+  const dbConfig = getDbConfig();
+  
+  console.log(`📍 Database: ${dbConfig.database}`);
+  console.log(`🔗 Host: ${dbConfig.host}`);
+  console.log('');
+  
+  sequelize = dbConfig.url
+    ? new Sequelize(dbConfig.url, dbConfig as any)
+    : new Sequelize(dbConfig.database, dbConfig.username as string, dbConfig.password as string, dbConfig as any);
+}
 
 async function dropAll() {
   const qi = sequelize.getQueryInterface();

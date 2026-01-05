@@ -34,8 +34,11 @@ export class KondoRepository {
 
     async findAll(searchKondoDto: SearchKondoDto): Promise<Kondo[]> {
         // eslint-disable-next-line prefer-const
-        let { take, order, page, name, slug, active, status, search, conveniences, randomize, onlyHighlighted, excludeHighlighted } = searchKondoDto;
+        let { take, order, page, name, slug, active, status, search, conveniences, randomize, includeHighlighted, includeInactive, allStatuses } = searchKondoDto;
 
+        console.log('findAll');
+        console.log('allStatuses', allStatuses);
+        console.log('active', active);
         // eslint-disable-next-line prefer-const
         let query: PaginationQuery = {
             attributes: ['Kondo.*', [sequelize.fn('COUNT', sequelize.col('likes.kondoId')), 'likes']],
@@ -72,18 +75,18 @@ export class KondoRepository {
             query.where = Object.assign(query.where, { slug });
         }
 
-        if (onlyHighlighted) {
-            query.where = Object.assign(query.where, { highlight: true });
+        if (includeHighlighted) {
+            delete query.where.highlight;
+        }
+        
+        if (includeInactive) {
+            delete query.where.active;
         }
 
-        if (excludeHighlighted) {
-            query.where = Object.assign(query.where, { 
-                [Op.or]: [
-                    { highlight: false },
-                    { highlight: null }
-                ]
-            });
+        if (allStatuses) {
+            delete query.where.status;
         }
+        console.log('where', query.where);
 
         // TODO: create an orderByField = 'field'
         if (randomize) {
@@ -104,11 +107,14 @@ export class KondoRepository {
 
     async findAllWithCount(searchKondoDto: SearchKondoDto): Promise<{ data: Kondo[], count: number }> {
         // eslint-disable-next-line prefer-const
-        let { take, order, page, name, slug, active, status, search, conveniences, randomize, onlyHighlighted, excludeHighlighted, includeInactive, allStatuses } = searchKondoDto;
+        let { take, order, page, name, slug, active, status, search, conveniences, randomize, highlight, includeHighlighted, includeInactive, allStatuses } = searchKondoDto;
 
+        console.log('findAllWithCount');
+        console.log('allStatuses', allStatuses);
+        console.log('active', active);
         // Build where clause for both queries
         // eslint-disable-next-line prefer-const
-        let whereClause: any = { active, status };
+        let whereClause: any = { active, status, highlight };
 
         if (search) {
             const queryPhraseArray = search.split(' ');
@@ -137,28 +143,18 @@ export class KondoRepository {
             whereClause = Object.assign(whereClause, { slug });
         }
 
-        if (onlyHighlighted) {
-            whereClause = Object.assign(whereClause, { highlight: true });
-        }
-
-        if (excludeHighlighted) {
-            whereClause = Object.assign(whereClause, { 
-                [Op.or]: [
-                    { highlight: false },
-                    { highlight: null }
-                ]
-            });
+        if (includeHighlighted) {
+            delete whereClause.highlight;
         }
 
         if (includeInactive) {
             delete whereClause.active;
         }
 
-        console.log('where', whereClause);
         if (allStatuses) {
             delete whereClause.status;
         }
-console.log('where', whereClause);
+        console.log('where', whereClause);
         // Get total count (without pagination)
         const count = await this.KondoRepositoryProvider.count({ where: whereClause });
 
