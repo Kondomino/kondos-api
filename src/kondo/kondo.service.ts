@@ -93,6 +93,26 @@ export class KondoService {
         return await kondoFound.save();
     }
 
+    async updateFeaturedImage(id: number, filename: string): Promise<Kondo> {
+        const kondoFound = await this.KondoRepository.findOneBaked(id);
+
+        if (!kondoFound) {
+            throw new NotFoundException(`Kondo with ID ${id} not found`);
+        }
+
+        // Validate that the image belongs to this kondo
+        const mediaExists = await this.MediaRepository.findOne({
+            where: { kondoId: id, filename: filename }
+        });
+
+        if (!mediaExists) {
+            throw new NotFoundException(`Media file "${filename}" not found for this kondo`);
+        }
+
+        kondoFound.featured_image = filename;
+        return await kondoFound.save();
+    }
+
     async getCount(): Promise<KondoCountResponse> {
         return await this.KondoRepository.getCount();
     }

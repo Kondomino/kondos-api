@@ -487,6 +487,16 @@ export class Kondo extends Model {
         return this.getAddress();
     }
 
+    @Expose()
+    get featured_image_url(): string | null {
+        if (!this.featured_image || !this.medias) {
+            return null;
+        }
+        
+        const featuredMedia = this.medias.find(m => m.filename === this.featured_image);
+        return featuredMedia?.storage_url || null;
+    }
+
     getDetails() {
         return {
             lot_avg_price: this.lot_avg_price,

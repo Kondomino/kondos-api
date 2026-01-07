@@ -9,6 +9,7 @@ import { SearchKondoDto } from "../dto/search-kondo.dto";
 import { PaginationQuery } from "../../core/pagination/pagination.query.type";
 import { Op } from "sequelize";
 import { Like } from "../../like/entities/like.entity";
+import { Media } from "../../media/entities/media.entity";
 import sequelize from "sequelize";
 import { KondoCountResponse, KondoSitemapItem, SitemapQueryDto } from "../dto/sitemap-query.dto";
 
@@ -24,7 +25,10 @@ export class KondoRepository {
     }
 
     async findOneBaked(id: number): Promise<Kondo> {
-        const kondo = await this.KondoRepositoryProvider.findOne<Kondo>({ where: { id } });
+        const kondo = await this.KondoRepositoryProvider.findOne<Kondo>({ 
+            where: { id },
+            include: [{ model: Media, as: 'medias', required: false, attributes: ['filename', 'storage_url'] }]
+        });
         if (kondo) {
             // Ensure Sequelize recognizes this as an existing record
             kondo.isNewRecord = false;
@@ -44,8 +48,11 @@ export class KondoRepository {
             attributes: ['Kondo.*', [sequelize.fn('COUNT', sequelize.col('likes.kondoId')), 'likes']],
             limit: take,
             where: { active, status },
-            include: { model: Like, as: 'likes', required: false, duplicating: false, attributes: [] },
-            group: 'Kondo.id'
+            include: [
+                { model: Like, as: 'likes', required: false, duplicating: false, attributes: [] },
+                { model: Media, as: 'medias', required: false, attributes: ['filename', 'storage_url'] }
+            ],
+            group: ['Kondo.id', 'medias.id'] as any
         };
 
         if (search) {
@@ -161,12 +168,20 @@ export class KondoRepository {
         // Build query for data
         // eslint-disable-next-line prefer-const
         let query: PaginationQuery = {
-            attributes: ['Kondo.*', [sequelize.fn('COUNT', sequelize.col('likes.kondoId')), 'likes']],
+            attributes: {
+                include: [
+                    [sequelize.fn('COUNT', sequelize.col('likes.kondoId')), 'likes']
+                ]
+            },
             limit: take,
             where: whereClause,
-            include: { model: Like, as: 'likes', required: false, duplicating: false, attributes: [] },
-            group: 'Kondo.id'
-        };
+            include: [
+                { model: Like, as: 'likes', required: false, duplicating: false, attributes: [] },
+                { model: Media, as: 'medias', required: false, attributes: ['filename', 'storage_url'] }
+            ],
+            group: ['Kondo.id', 'medias.id'],
+            subQuery: false
+        } as any;
 
         // TODO: create an orderByField = 'field'
         if (randomize) {

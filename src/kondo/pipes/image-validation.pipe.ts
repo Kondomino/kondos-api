@@ -9,7 +9,7 @@ export class ImageValidationPipe implements PipeTransform {
     'image/webp'
   ];
 
-  private readonly minSize = 400 * 1024; // 400KB in bytes
+  private readonly minSize = 300 * 1024; // 300KB in bytes
   private readonly maxSize = 10 * 1024 * 1024; // 10MB in bytes
 
   transform(files: Express.Multer.File[]) {
@@ -35,7 +35,7 @@ export class ImageValidationPipe implements PipeTransform {
       // Validate minimum size
       if (file.size < this.minSize) {
         errors.push(
-          `${file.originalname}: File too small. Minimum size is 400KB (current: ${Math.round(file.size / 1024)}KB).`
+          `${file.originalname}: File too small. Minimum size is 300KB (current: ${Math.round(file.size / 1024)}KB).`
         );
         continue;
       }
