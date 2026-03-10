@@ -16,15 +16,15 @@ export const AI_COMPOSER_CONFIG = {
   
   // Description preferences
   description: {
-    minLength: 150,
-    maxLength: 300,
-    targetParagraphs: 2, // 2-3 paragraphs
+    minLength: 190,
+    maxLength: 550,
+    targetParagraphs: 3, // 2-3 paragraphs
   },
   
   // Infrastructure description preferences
   infraDescription: {
     minLength: 50,
-    maxLength: 150,
+    maxLength: 350,
   },
   
   // Note: Model, temperature, max_tokens, API credentials 

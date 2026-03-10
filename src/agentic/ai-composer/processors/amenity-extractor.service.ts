@@ -85,6 +85,7 @@ export class AmenityExtractorService {
 
       this.logger.log(`Amenity extraction using: ${sources.join(', ')}`);
 
+      console.log('Search Text:', searchText);  
       // Pattern matching
       for (const [field, keywords] of Object.entries(this.amenityKeywords)) {
         amenities[field] = keywords.some((keyword) =>
@@ -100,6 +101,7 @@ export class AmenityExtractorService {
         .filter(([_, found]) => !found)
         .map(([field, _]) => field);
 
+        console.log('Not found amenities:', notFound);
       if (notFound.length > 0 && (rawData || existingData.description || existingData.infra_description)) {
         this.logger.log(
           `Verifying ${notFound.length} ambiguous amenities with AI...`,
@@ -238,18 +240,27 @@ export class AmenityExtractorService {
     fields: string[],
   ): Promise<Record<string, boolean>> {
     try {
-      // Format field names to human-readable
+      // Format field names to human-readable with keys
       const fieldDescriptions = fields
-        .map((f) => f.replace('infra_', '').replace(/_/g, ' '))
+        .map((f) => `${f} (${f.replace('infra_', '').replace(/_/g, ' ')})`)
         .join(', ');
 
+        console.log('Verifying fields with AI:', fieldDescriptions);
+        console.log('Raw Data for AI:', JSON.stringify(rawData, null, 2));
+      // Build prompt
       const prompt = `Analyze this property data and determine which amenities are present:
 
 Data: ${JSON.stringify(rawData, null, 2)}
 
 Check for these amenities: ${fieldDescriptions}
 
-Return ONLY a JSON object with true/false for each field. Use the exact field names provided.
+Return ONLY a JSON object where each field is:
+- true  → explicit evidence in the data
+- false → explicit evidence of absence
+- null  → not mentioned in the data
+
+Do NOT use general knowledge or assumptions.
+Only mark true when explicit textual evidence exists in Data.
 
 Example format:
 {

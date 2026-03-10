@@ -274,8 +274,8 @@ class KondoSyncService {
       const prodMediaItem = prodMediaMap.get(localMediaItem.filename);
 
       if (!prodMediaItem) {
-        // Insert new Media
-        const mediaData: any = localMediaItem.get({ plain: true });
+        // Insert new Media - localMediaItem is already a plain object
+        const mediaData: any = { ...localMediaItem };
         delete mediaData.id;
         mediaData.kondoId = prodKondoId;
         delete mediaData.unitId; // We're only syncing Kondo-related media
@@ -285,7 +285,7 @@ class KondoSyncService {
       } else {
         // Check if update needed
         if (!this.areMediaEqual(localMediaItem, prodMediaItem)) {
-          const mediaData: any = localMediaItem.get({ plain: true });
+          const mediaData: any = { ...localMediaItem };
           delete mediaData.id;
           delete mediaData.createdAt;
           delete mediaData.updatedAt;
